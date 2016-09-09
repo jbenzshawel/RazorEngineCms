@@ -1,0 +1,60 @@
+﻿
+@{
+    ViewBag.Title = "New Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <script src="~/Scripts/codemirror.js" type="text/javascript"></script>
+    <script src="~/Scripts/codemirror-mode/clike/clike.js" type="text/javascript"></script>
+    <script src="~/Scripts/codemirror-mode/htmlmixed/htmlmixed.js" type="text/javascript"></script>
+    <script src="~/Scripts/codemirror-mode/xml/xml.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="~/Content/codemirror.css" type="text/css" />
+    <link rel="stylesheet" href="~/Content/codemirror-themes/material.css" type="text/css" />
+}
+
+
+<h2>New Page</h2>
+
+<div class="row">
+    <div class="col-xs-12">
+        <form id="newPage">
+            <div class="form-group">
+                <label for="pageName">Page Name</label>
+                <input type="text" name="pageName" id="pageName" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="pageVar">Page Variable</label>
+                <input type="text" name="pageVar" id="pageVar" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="model">Page Model</label>
+                <textarea class="form-control" id="model" name="model"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="content">Page Content</label>
+                <textarea class="form-control" id="content" name="content"></textarea>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { 
+<script type="text/javascript">
+    var pageModelEditor = CodeMirror.fromTextArea(document.getElementById("model"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        mode: "text/x-csharp",
+        theme: "material"
+    });
+    var pageContentEditor = CodeMirror.fromTextArea(document.getElementById("content"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        mode: "xml",
+        theme: "material"
+    });
+</script>
+}
