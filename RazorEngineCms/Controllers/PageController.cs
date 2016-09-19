@@ -60,13 +60,14 @@ namespace RazorEngineCms.Controllers
                 {
                     // compile and save template
                     page =  await this.CompileTemplateAndSavePage(page);
-                } // end if valid model state 
-                else
-                {
-                    this.Errors.Add("Invalid parameters");
-                }
-            } // end if no errors after compiling model
-            
+                }  // end if no errors after compiling model
+                
+            } // end if valid model state 
+            else
+            {
+                this.Errors.Add("Invalid parameters");
+            } 
+
             return  Json(new { this.Errors, Status = this.Errors.Count == 0 }); 
         }
 
