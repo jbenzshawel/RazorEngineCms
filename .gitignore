@@ -12,7 +12,7 @@
 
 [Tt]mp/
 
-[Ss]cripts/vendor/*
+[Ss]cripts/vendor/
 
 # Build results
 [Dd]ebug/
