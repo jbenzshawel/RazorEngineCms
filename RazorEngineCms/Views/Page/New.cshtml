@@ -5,10 +5,10 @@
 }
 
 @section styles {
-    <script src="~/Scripts/codemirror.js" type="text/javascript"></script>
-    <script src="~/Scripts/codemirror-mode/clike/clike.js" type="text/javascript"></script>
-    <script src="~/Scripts/codemirror-mode/htmlmixed/htmlmixed.js" type="text/javascript"></script>
-    <script src="~/Scripts/codemirror-mode/xml/xml.js" type="text/javascript"></script>
+    <script src="~/Scripts/vendor/codemirror.js" type="text/javascript"></script>
+    <script src="~/Scripts/vendor/codemirror-mode/clike/clike.js" type="text/javascript"></script>
+    <script src="~/Scripts/vendor/codemirror-mode/htmlmixed/htmlmixed.js" type="text/javascript"></script>
+    <script src="~/Scripts/vendor/codemirror-mode/xml/xml.js" type="text/javascript"></script>
     <link rel="stylesheet" href="~/Content/codemirror.css" type="text/css" />
     <link rel="stylesheet" href="~/Content/codemirror-themes/material.css" type="text/css" />
 }
@@ -49,7 +49,24 @@
 </div>
 
 @section Scripts { 
+<script type="text/javascript" src="~/Scripts/page.js"></script>
 <script type="text/javascript">
+    // page object for validating and submitting a new page request 
+    var page = new Page();
+    // setup code mirror editors 
+    var pageModelEditor = CodeMirror.fromTextArea(document.getElementById("model"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        mode: "text/x-csharp",
+        theme: "material"
+    });
+    var pageTemplateEditor = CodeMirror.fromTextArea(document.getElementById("template"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        mode: "xml",
+        theme: "material"
+    });
+    pageModelEditor.setSize("100%", "80%");
     // onload jquery events (events only attached if page object exists else user notifed of error) 
     $(function () {
         if (page == undefined) {
@@ -67,85 +84,5 @@
             _default.updateInputField(inputField);
         }
     });
-    // setup code mirror editors 
-    var pageModelEditor = CodeMirror.fromTextArea(document.getElementById("model"), {
-        lineNumbers: true,
-        matchBrackets: true,
-        mode: "text/x-csharp",
-        theme: "material"
-    });
-    var pageTemplateEditor = CodeMirror.fromTextArea(document.getElementById("template"), {
-        lineNumbers: true,
-        matchBrackets: true,
-        mode: "xml",
-        theme: "material"
-    });
-    pageModelEditor.setSize("100%", "80%")
-    // page object for validating and submitting a new page request 
-    var page = page || {};
-    // sets object properties with form values
-    page.init = function () {
-        this.name = $("#pageName").val() != undefined ? $("#pageName").val().trim() : "",
-        this.$name = $("#pageName"),
-        this.variable = $("#pageVar").val() != undefined ? $("#pageVar").val().trim() : "",
-        this.$variable = $("#pageVar"),
-        this.$model = $("#model"),
-        this.$template = $("#template"),
-        page.template = pageTemplateEditor.getValue().trim(),
-        page.model = pageModelEditor.getValue().trim()
-    };
-    // validates new page form inputs and returns true if valid 
-    page.validate = function () {
-        var isValid = true;
-        if (this.name === null || this.name.length === 0) {
-            this.$name.addError("Name cannot be empty", "name");
-            isValid = false;
-        }
-        else if (this.name.indexOf(" ") > -1) {
-            this.$name.add("Name cannot contain a space");
-            isValid = false;
-        }
-        if (this.variable != null && this.variable.indexOf(" ") > -1) {
-            this.$variable.add("Name cannot contain a space");
-            isValid = false;
-        }
-        if (this.template === null || this.template.length === 0) {
-            this.$template.addError("Template cannot be empty", "template");
-            isValid = false;
-        }
-        if (this.model != null && this.model.indexOf("); DROP TABLE") > -1 || this.model.indexOf("DROP TABLE") > -1) {
-            this.$model.addError("SQL injetion detected", "model");
-            isValid = false;
-        }
-        return isValid; 
-    }
-    // calls page.validate() then saves page
-    page.save = function () {
-        this.init();
-        _default.clearErrors();
-        if (this.validate()) {
-            var scopedObject = this;
-            // create page object model for post request 
-            var pageModel = {
-                Name: scopedObject.name,
-                Variable: scopedObject.variable,
-                Model: scopedObject.model,
-                Template: scopedObject.template
-            };
-            // set params for ajax request 
-            var settings = {
-                type: "POST",
-                contentType: "application/json",
-                url: "/Page/New",
-                data: JSON.stringify(pageModel),
-                success: function (data) {
-                    console.log(data);
-                }
-            };
-            // submit post request 
-            $.ajax(settings);
-        } // end if valid request 
-        return;
-    };
 </script>
 }

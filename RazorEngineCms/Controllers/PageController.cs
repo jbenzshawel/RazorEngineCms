@@ -85,7 +85,7 @@ namespace RazorEngineCms.Controllers
         {
             try
             {
-                var cacheName = string.Format("{0}-{1}", DateTime.Now.ToString(), Guid.NewGuid().ToString());
+                var cacheName = string.Format("{0}-{1}", page.Name, Guid.NewGuid().ToString());
                 // null for modelType parameter since templates are dynamic 
                 page.CompiledTemplate = Engine.Razor.RunCompile(page.Template, cacheName, null, JsonConvert.DeserializeObject(page.CompiledModel));
                 this._db.Page.Add(page);
