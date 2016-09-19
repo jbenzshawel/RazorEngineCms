@@ -13,6 +13,7 @@
 [Tt]mp/
 
 Scripts/vendor/
+Content/codemirror-themes/
 
 # Build results
 [Dd]ebug/
