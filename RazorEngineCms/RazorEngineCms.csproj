@@ -167,6 +167,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Classes\StringCompiler.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\IdentityConfig.cs" />
@@ -180,9 +181,23 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201609091608299_firstMigration.cs" />
+    <Compile Include="Migrations\201609091608299_firstMigration.Designer.cs">
+      <DependentUpon>201609091608299_firstMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609111526237_UpdatingPageModel.cs" />
+    <Compile Include="Migrations\201609111526237_UpdatingPageModel.Designer.cs">
+      <DependentUpon>201609111526237_UpdatingPageModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609122233177_AddingConstructor.cs" />
+    <Compile Include="Migrations\201609122233177_AddingConstructor.Designer.cs">
+      <DependentUpon>201609122233177_AddingConstructor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\NewPageModel.cs" />
     <Compile Include="Models\Page.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -523,6 +538,7 @@
     <Content Include="Scripts\codemirror-mode\z80\index.html" />
     <Content Include="Scripts\codemirror-mode\z80\z80.js" />
     <Content Include="Scripts\codemirror.js" />
+    <Content Include="Scripts\default.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
@@ -574,6 +590,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="tmp\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -582,6 +599,17 @@
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201609091608299_firstMigration.resx">
+      <DependentUpon>201609091608299_firstMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609111526237_UpdatingPageModel.resx">
+      <DependentUpon>201609111526237_UpdatingPageModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609122233177_AddingConstructor.resx">
+      <DependentUpon>201609122233177_AddingConstructor.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

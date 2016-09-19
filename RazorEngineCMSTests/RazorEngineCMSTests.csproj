@@ -64,6 +64,15 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RazorEngineCms\RazorEngineCms.csproj">
+      <Project>{a258a6e9-16b8-4e95-aa8a-b1a16adf414a}</Project>
+      <Name>RazorEngineCms</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="tmp\" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

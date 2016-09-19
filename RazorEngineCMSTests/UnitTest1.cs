@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Mono.CSharp;
+using RazorEngineCms.App_Classes;
 
 namespace RazorEngineCMSTests
 {
@@ -16,7 +17,7 @@ namespace RazorEngineCMSTests
         public void TestCompile()
         {
             var model = "Model = new { test = \"object\" };";
-            
+
             using (var CSharpProvider = new CSharpCodeProvider())
             {
                 var paramz = new System.CodeDom.Compiler.CompilerParameters()
@@ -43,6 +44,20 @@ namespace RazorEngineCMSTests
 
                 Assert.IsNotNull(JsonConvert.DeserializeObject(output.ToString()));
             }
+
         }
-    }
+            
+            [TestMethod]
+            public void TestStringCompiler()
+            {
+                var model = "var Model = new { test = \"object\" };";
+
+                using (var stringCompiler = new StringCompiler())
+                {
+                    stringCompiler.CompilePageModel(model);
+
+                    Assert.IsTrue(stringCompiler.IsValid);
+               }
+            }
+        }
 }

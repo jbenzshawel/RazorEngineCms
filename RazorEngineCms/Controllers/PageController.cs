@@ -1,32 +1,71 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
+using System.CodeDom.Compiler;
+using System.Threading.Tasks;
 using RazorEngine;
 using RazorEngine.Templating;
 using RazorEngineCms.DAL;
+using RazorEngineCms.Models;
+using RazorEngineCms.App_Classes;
+
 using Microsoft.CSharp;
-using System.CodeDom.Compiler;
 using Newtonsoft.Json;
 
 namespace RazorEngineCms.Controllers
 {
     public class PageController : Controller
     {
-        public object Model { get; set; }
+        public List<string> Errors { get; set; }
 
         private ApplicationContext _db { get; set; }
 
         public PageController()
         {
-            this._db = new ApplicationContext(); 
+            this._db = new ApplicationContext();
+            this.Errors = new List<string>(); 
         }
 
         // GET: Page
         public ActionResult New()
         {
             return View();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> New(PageRequest pageRequest)
+        {
+            var page = new Page(pageRequest);
+            if (ModelState.IsValid)
+            {
+                // compile the model from the string Model declaration in pageRequest
+                using (var stringCompiler = new StringCompiler())
+                {
+                    stringCompiler.CompilePageModel(page.Model);
+                    if (stringCompiler.IsValid)
+                    {
+                        page.CompiledModel = stringCompiler.ToString();
+                    }
+                    else
+                    {
+                        this.Errors.AddRange(stringCompiler.Errors);
+                    }
+                } // end using stringCompiler
+                
+                if (this.Errors.Count == 0)
+                {
+                    // compile and save template
+                    page =  await this.CompileTemplateAndSavePage(page);
+                } // end if valid model state 
+                else
+                {
+                    this.Errors.Add("Invalid parameters");
+                }
+            } // end if no errors after compiling model
+            
+            return  Json(new { this.Errors, Status = this.Errors.Count == 0 }); 
         }
 
         public ActionResult Page(string name, string variable)
@@ -36,14 +75,7 @@ namespace RazorEngineCms.Controllers
                                                  string.Equals(p.Variable, variable, StringComparison.CurrentCultureIgnoreCase));
             if (page != null)
             {
-                this.Model = this.CompilePageModel(page.Model);
-
-                var cacheName = string.Format("{0}-{1}-key", name, variable);
-
-                // null for modelType parameter since templates are dynamic 
-                var model = new {
-                    Content = Engine.Razor.RunCompile(page.Content, cacheName, null, this.Model)
-                };
+                var model = JsonConvert.DeserializeObject(page.CompiledTemplate);
                 return View(model);
             }
             
@@ -52,33 +84,35 @@ namespace RazorEngineCms.Controllers
             return View(new { Content = string.Empty });
         }
 
-        internal object CompilePageModel(string model)
+
+        internal async Task<Page> CompileTemplateAndSavePage(Page page)
         {
-            using (var CSharpProvider = new CSharpCodeProvider())
+            try
             {
-                var paramz = new System.CodeDom.Compiler.CompilerParameters()
-                {
-                    GenerateInMemory = true
-                };
-                paramz.ReferencedAssemblies.Add("Newtonsoft.Json.dll");
-                var res = CSharpProvider.CompileAssemblyFromSource(paramz,
-                   @"
-                    using Newtonsoft.Json;
-                    public class ModelClass {
-                        public string Execute() {
-                            object Model;" +
-                            model +
-                            @"return JsonConvert.SerializeObject(Model);        
-                        }
-                    }");
-
-                var type = res.CompiledAssembly.GetType("ModelClass");
-
-                var obj = Activator.CreateInstance(type);
-
-                var output = type.GetMethod("Execute").Invoke(obj, new object[] { });
-                return JsonConvert.DeserializeObject(output.ToString());
+                var cacheName = string.Format("{0}-{1}", DateTime.Now.ToString(), Guid.NewGuid().ToString());
+                // null for modelType parameter since templates are dynamic 
+                page.CompiledTemplate = Engine.Razor.RunCompile(page.Template, cacheName, null, JsonConvert.DeserializeObject(page.CompiledModel));
+                this._db.Page.Add(page);
+                await this._db.SaveChangesAsync();
             }
+            catch (Exception ex)
+            {
+                this.Errors.Add(ex.Message);
+                // if failed to save model get why
+                if (this._db.GetValidationErrors().Count() > 0)
+                {
+                    foreach (var error in this._db.GetValidationErrors())
+                    {
+                        foreach (var valErr in error.ValidationErrors)
+                        {
+                            this.Errors.Add(string.Format("Model Error: {0}, Model Property: {1}",
+                                valErr.ErrorMessage, valErr.PropertyName));
+                        }
+                    } // end foreach this._db.GetValidationErrors()
+                } // end if have validation errors
+            } // end catch
+
+            return page; 
         }
     }
 }
