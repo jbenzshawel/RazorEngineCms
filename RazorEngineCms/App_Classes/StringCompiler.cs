@@ -27,7 +27,7 @@ namespace RazorEngineCms.App_Classes
             {
                 var compileModelGuid = Guid.NewGuid().ToString();
                 var tempFileName = string.Format("temp-model-file-{0}.cs", compileModelGuid);
-                var tempPath = Path.GetDirectoryName(Path.GetDirectoryName(System.IO.Directory.GetCurrentDirectory())) + @"\tmp\" + tempFileName;
+                var tempPath = HttpContext.Current.Server.MapPath("~") + @"\tmp\" + tempFileName;
     
                 // create a temp file with model for page
                 if (!File.Exists(tempPath))

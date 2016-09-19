@@ -12,6 +12,8 @@
 
 [Tt]mp/
 
+[Ss]cripts/vendor/*
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
