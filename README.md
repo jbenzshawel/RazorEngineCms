@@ -6,4 +6,8 @@ Example of creating a new page in cms:
 
 ![New Page](http://i.imgur.com/3LXaxbK.png)
 
+Example compiled template from above code:
+
+![Compiled Template](http://i.imgur.com/SveFUek.png)
+
 More to come!
