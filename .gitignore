@@ -12,8 +12,8 @@
 
 [Tt]mp/
 
-Scripts/vendor/
-Content/codemirror-themes/
+RazorEngineCms/Scripts/vendor/
+RazorEngineCms/Content/codemirror-themes/
 
 # Build results
 [Dd]ebug/
