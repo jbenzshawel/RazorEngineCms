@@ -3,7 +3,6 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Web;
 
 namespace RazorEngineCms.App_Classes
@@ -29,7 +28,7 @@ namespace RazorEngineCms.App_Classes
                 var tempFileName = string.Format("temp-model-file-{0}.cs", compileModelGuid);
                 var tempPath = HttpContext.Current.Server.MapPath("~") + @"\tmp\" + tempFileName;
     
-                // create a temp file with model for page
+                // create a temp file with model for page to be used by CSharpCodeProvider for compiling
                 if (!File.Exists(tempPath))
                 {
                     using (var stringWriter = File.CreateText(tempPath))
@@ -47,6 +46,7 @@ namespace RazorEngineCms.App_Classes
                     }
                 }
 
+                // define parameters for CSharpCodeProvider
                 var paramz = new CompilerParameters()
                 {
                     GenerateInMemory = true,
@@ -59,9 +59,8 @@ namespace RazorEngineCms.App_Classes
                                                                     "System.Linq.dll",
                                                                     @"C:\Git\RazorEngineCms\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll" });
 
-                var providerResult = CSharpProvider.CompileAssemblyFromFile(paramz, tempPath);
-
                 // try to compile model 
+                var providerResult = CSharpProvider.CompileAssemblyFromFile(paramz, tempPath);
                 try
                 {
                     var type = providerResult.CompiledAssembly.GetType("ModelClass");
@@ -100,7 +99,7 @@ namespace RazorEngineCms.App_Classes
         {
             return this.JsonResult;
         }
-
+        
         void IDisposable.Dispose()
         {
             this.JsonResult = string.Empty;

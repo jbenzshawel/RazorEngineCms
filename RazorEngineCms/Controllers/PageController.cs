@@ -24,12 +24,18 @@ namespace RazorEngineCms.Controllers
             this.Errors = new List<string>(); 
         }
 
-        // GET: Page
+        // GET: Page/New
         public ActionResult New()
         {
             return View();
         }
 
+        /// <summary>
+        /// Compiles template model and template then saves results in Pages table
+        /// </summary>
+        /// <param name="pageRequest"></param>
+        /// <returns>JsonResult with boolean status and list of errors</returns>
+        // POST: Page/New
         [HttpPost]
         public async Task<ActionResult> New(PageRequest pageRequest)
         {

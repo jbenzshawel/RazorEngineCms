@@ -1,9 +1,19 @@
-﻿"use strict";
+﻿/**
+ * Page.js 
+ * Description : Page class used for saving a new page in RazorEngineCms
+ * Methods: init, validate, and save
+ * Dependencies: jQuery, default.js, an initialized code mirror object 
+ *               called pageTemplateEditor
+ * LastUpdated : 9/18/2016
+ */
+
+"use strict";
 
 var Page = function () {
     this.init();
 }
 
+// initialize Page object properties 
 Page.prototype.init = function () {
     this.name = $("#pageName").val() != undefined ? $("#pageName").val().trim() : "";
     this.$name = $("#pageName");
@@ -42,7 +52,7 @@ Page.prototype.validate = function () {
     }
     return isValid;
 }
-// calls page.validate() then saves page
+// calls page.validate() then saves page using /Page/New post request
 Page.prototype.save = function () {
     this.init();
     _default.clearErrors();
