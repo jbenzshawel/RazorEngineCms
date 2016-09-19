@@ -54,14 +54,13 @@ namespace RazorEngineCms.Controllers
                     {
                         this.Errors.AddRange(stringCompiler.Errors);
                     }
-                } // end using stringCompiler
+                } // end using StringCompiler
                 
                 if (this.Errors.Count == 0)
                 {
                     // compile and save template
                     page =  await this.CompileTemplateAndSavePage(page);
                 }  // end if no errors after compiling model
-                
             } // end if valid model state 
             else
             {

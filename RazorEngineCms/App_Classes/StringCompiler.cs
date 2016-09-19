@@ -7,6 +7,12 @@ using System.Web;
 
 namespace RazorEngineCms.App_Classes
 {
+    /// <summary>
+    /// Compiles C# code then returns what is assigned to the string
+    /// "Model" object (e.g. "var Model = new { Test = \"example\" }").
+    /// The Json serialized object of the Model variable is returned with
+    /// the .ToString() extension.
+    /// </summary>
     public class StringCompiler : IDisposable
     {
         public string JsonResult { get; set; }
@@ -89,7 +95,6 @@ namespace RazorEngineCms.App_Classes
                         File.Delete(tempPath);
                     }
                 } // end finally 
-
             } // end using CSharpCodeProvider 
             return; // void
         }
