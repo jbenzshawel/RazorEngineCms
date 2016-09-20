@@ -592,7 +592,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="tmp\" />
-    <Folder Include="Views\CompiledTemplates\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

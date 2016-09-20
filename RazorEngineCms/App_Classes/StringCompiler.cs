@@ -28,30 +28,32 @@ namespace RazorEngineCms.App_Classes
 
         public void CompilePageModel(string model)
         {
+            if (string.IsNullOrEmpty(model))
+            {
+                this.Errors.Add("model cannot be empty in CompilePageModel");
+                return;
+            }
+
             using (var CSharpProvider = new CSharpCodeProvider())
             {
                 var compileModelGuid = Guid.NewGuid().ToString();
-                var tempFileName = string.Format("temp-model-file-{0}.cs", compileModelGuid);
-                var tempPath = HttpContext.Current.Server.MapPath("~") + @"\tmp\" + tempFileName;
-    
-                // create a temp file with model for page to be used by CSharpCodeProvider for compiling
-                if (!File.Exists(tempPath))
-                {
-                    using (var stringWriter = File.CreateText(tempPath))
-                    {
-                        stringWriter.WriteLine("using System;");
-                        stringWriter.WriteLine("using System.Collections.Generic;");
-                        stringWriter.WriteLine("using System.Linq;");
-                        stringWriter.WriteLine("using Newtonsoft.Json;");
-                        stringWriter.WriteLine("public class ModelClass { ");
-                        stringWriter.WriteLine("public string Execute() { ");
-                        stringWriter.WriteLine(model);
-                        stringWriter.WriteLine(" return JsonConvert.SerializeObject(Model);");
-                        stringWriter.WriteLine("} ");
-                        stringWriter.WriteLine("}");
-                    }
-                }
+                var pageModelSource = string.Empty;
 
+                using (var sw = new StringWriter())
+                {
+                    sw.WriteLine("using System;");
+                    sw.WriteLine("using System.Collections.Generic;");
+                    sw.WriteLine("using System.Linq;");
+                    sw.WriteLine("using Newtonsoft.Json;");
+                    sw.WriteLine("public class ModelClass { ");
+                    sw.WriteLine("public string Execute() { ");
+                    sw.WriteLine(model);
+                    sw.WriteLine("return JsonConvert.SerializeObject(Model);");
+                    sw.WriteLine("} ");
+                    sw.WriteLine("}");
+                    pageModelSource = sw.ToString();
+                } // end using StringWriter
+            
                 // define parameters for CSharpCodeProvider
                 var paramz = new CompilerParameters()
                 {
@@ -61,12 +63,11 @@ namespace RazorEngineCms.App_Classes
                     
                 };
                 paramz.ReferencedAssemblies.AddRange(new string[] { "System.dll",
-                                                                    //"System.Collections.Generic",
                                                                     "System.Linq.dll",
                                                                     @"C:\Git\RazorEngineCms\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll" });
 
                 // try to compile model 
-                var providerResult = CSharpProvider.CompileAssemblyFromFile(paramz, tempPath);
+                var providerResult = CSharpProvider.CompileAssemblyFromSource(paramz, pageModelSource);
                 try
                 {
                     var type = providerResult.CompiledAssembly.GetType("ModelClass");
@@ -87,16 +88,8 @@ namespace RazorEngineCms.App_Classes
                     }
                     this.Errors.Add(ex.Message);
                 } // end catch 
-                finally
-                {
-                    // delete the temp model file when done
-                    if (File.Exists(tempPath))
-                    {
-                        File.Delete(tempPath);
-                    }
-                } // end finally 
             } // end using CSharpCodeProvider 
-            return; // void
+            return; 
         }
 
         // string override that returns json string of compiled model
