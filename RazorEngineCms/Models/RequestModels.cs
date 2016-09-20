@@ -11,6 +11,8 @@ namespace RazorEngineCms.Models
 
         public string Model { get; set; }
 
+        public bool CreateTemplateFile { get; set; }
+
         [Required]
         public string Template { get; set; }
     }

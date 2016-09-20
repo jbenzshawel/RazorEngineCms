@@ -59,7 +59,7 @@ namespace RazorEngineCms.Controllers
                 if (this.Errors.Count == 0)
                 {
                     // compile and save template
-                    page =  await this.CompileTemplateAndSavePage(page);
+                    page =  await this.CompileTemplateAndSavePage(page, saveAsFile: pageRequest.CreateTemplateFile);
                 }  // end if no errors after compiling model
             } // end if valid model state 
             else
@@ -67,7 +67,7 @@ namespace RazorEngineCms.Controllers
                 this.Errors.Add("Invalid parameters");
             } 
 
-            return  Json(new { this.Errors, Status = this.Errors.Count == 0 }); 
+            return  Json(new { Status = this.Errors.Count == 0, this.Errors }); 
         }
 
         public ActionResult Page(string name, string variable)
@@ -87,15 +87,31 @@ namespace RazorEngineCms.Controllers
         }
 
 
-        internal async Task<Page> CompileTemplateAndSavePage(Page page)
+        internal async Task<Page> CompileTemplateAndSavePage(Page page, bool saveAsFile = false)
         {
             try
             {
-                var cacheName = string.Format("{0}-{1}", page.Name, Guid.NewGuid().ToString());
+                var templateGuid = Guid.NewGuid().ToString();
+                var cacheName = string.Format("{0}-{1}", page.Name, templateGuid);
                 // null for modelType parameter since templates are dynamic 
                 page.CompiledTemplate = Engine.Razor.RunCompile(page.Template, cacheName, null, JsonConvert.DeserializeObject(page.CompiledModel));
-                this._db.Page.Add(page);
-                await this._db.SaveChangesAsync();
+                if (saveAsFile)
+                {
+                    var fileName = string.Format("{0}-{1}-template-{2}.html", page.Name, string.IsNullOrEmpty(page.Variable) ? "_" : page.Variable, templateGuid);
+                    var savePath = Server.MapPath("~") + @"\Views\CompiledTemplates\" + fileName;
+                    if(!System.IO.File.Exists(savePath))
+                    {
+                        using (var sw = System.IO.File.CreateText(savePath))
+                        {
+                            await sw.WriteAsync(page.CompiledTemplate);
+                        }
+                    }
+                }
+                else // save in db 
+                {
+                    this._db.Page.Add(page);
+                    await this._db.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {

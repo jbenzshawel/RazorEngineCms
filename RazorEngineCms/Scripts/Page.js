@@ -21,6 +21,7 @@ Page.prototype.init = function () {
     this.$variable = $("#pageVar");
     this.$model = $("#model");
     this.$template = $("#template");
+    this.createTemplateFile = $("input[name=\"templateFile\"]:checked").val();
     if (typeof (pageTemplateEditor) != "undefined") {
         this.template = pageTemplateEditor.getValue().trim();
         this.model = pageModelEditor.getValue().trim()
@@ -63,7 +64,24 @@ Page.prototype.save = function () {
             Name: scopedObject.name,
             Variable: scopedObject.variable,
             Model: scopedObject.model,
-            Template: scopedObject.template
+            Template: scopedObject.template,
+            CreateTemplateFile: scopedObject.createTemplateFile
+        };
+        // callback for successful post request
+        var successCallback = function (data) {
+            $("#new-page-alert").remove();
+            // create element to store alerts
+            $("#newPage").prepend("<div id=\"new-page-alert\"></div>");
+            if (data.Status == true) {
+                _default.alertMsg("success", "New page created.", "#new-page-alert")
+            } else {
+                _default.alertMsg("error", "Something went wrong. Try again?", "#new-page-alert")
+                if (data.Errors.length > 0) {
+                    for (var i = 0, error; error = data.Errors[i++];) {
+                        logger.logError(error);
+                    }
+                } // end if data.Errors.length > 0 
+            } // end else 
         };
         // set params for ajax request 
         var settings = {
@@ -71,9 +89,7 @@ Page.prototype.save = function () {
             contentType: "application/json",
             url: "/Page/New",
             data: JSON.stringify(pageModel),
-            success: function (data) {
-                console.log(data);
-            }
+            success: successCallback
         };
         // submit post request 
         $.ajax(settings);

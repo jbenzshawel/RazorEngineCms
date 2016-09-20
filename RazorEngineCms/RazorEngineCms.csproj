@@ -197,7 +197,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
-    <Compile Include="Models\NewPageModel.cs" />
+    <Compile Include="Models\RequestModels.cs" />
     <Compile Include="Models\Page.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -592,6 +592,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="tmp\" />
+    <Folder Include="Views\CompiledTemplates\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

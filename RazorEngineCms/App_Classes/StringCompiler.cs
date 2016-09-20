@@ -38,7 +38,6 @@ namespace RazorEngineCms.App_Classes
             {
                 var compileModelGuid = Guid.NewGuid().ToString();
                 var pageModelSource = string.Empty;
-
                 using (var sw = new StringWriter())
                 {
                     sw.WriteLine("using System;");
