@@ -24,6 +24,11 @@ namespace RazorEngineCms.Models
 
         public string CompiledTemplate { get; set; }
 
+        public Page()
+        {
+
+        }
+
         public Page(PageRequest pageRequest)
         {
             this.Name = pageRequest.Name;

@@ -167,6 +167,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Classes\FileHelper.cs" />
     <Compile Include="App_Classes\StringCompiler.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -197,6 +198,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\PageTemplate.cs" />
     <Compile Include="Models\RequestModels.cs" />
     <Compile Include="Models\Page.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -588,6 +590,7 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Page\New.cshtml" />
     <Content Include="Views\Page\Page.cshtml" />
+    <Content Include="Views\Page\NotFound.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

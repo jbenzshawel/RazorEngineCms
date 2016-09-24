@@ -16,12 +16,15 @@ namespace RazorEngineCms.Controllers
     {
         public List<string> Errors { get; set; }
 
+        internal FileHelper FileHelper { get; set; }
+
         private ApplicationContext _db { get; set; }
 
         public PageController()
         {
             this._db = new ApplicationContext();
-            this.Errors = new List<string>(); 
+            this.Errors = new List<string>();
+            this.FileHelper = new FileHelper(); 
         }
 
         // GET: Page/New
@@ -32,6 +35,7 @@ namespace RazorEngineCms.Controllers
 
         /// <summary>
         /// Compiles template model and template then saves results in Pages table
+        /// or as a file in /Views/CompiledTemplates/
         /// </summary>
         /// <param name="pageRequest"></param>
         /// <returns>JsonResult with boolean status and list of errors</returns>
@@ -72,18 +76,40 @@ namespace RazorEngineCms.Controllers
 
         public ActionResult Page(string name, string variable)
         {
-            var page = this._db.Page
-                            .FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                 string.Equals(p.Variable, variable, StringComparison.CurrentCultureIgnoreCase));
-            if (page != null)
+            //var page = this._db.Page
+            //                .FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
+            //                                     string.Equals(p.Variable, variable, StringComparison.CurrentCultureIgnoreCase));
+            //if (page != null)
+            //{
+            //    return View(new { Content = page.CompiledTemplate } );
+            //}
+
+                
+            PageTemplate template = template = new PageTemplate { Content = string.Empty };
+
+            if (FileHelper.Files.Any(f => string.Equals(f.Name, name, StringComparison.CurrentCultureIgnoreCase))) // get template from files?
             {
-                var model = JsonConvert.DeserializeObject(page.CompiledTemplate);
-                return View(model);
+                var file = FileHelper.Files.Where(f => string.Equals(f.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
+                                                                    (string.Equals(f.Variable, variable, StringComparison.CurrentCultureIgnoreCase) ||
+                                                                        (f.Variable == "_" && variable == "")))
+                                                                    .FirstOrDefault();
+                if (file != null && System.IO.File.Exists(file.Path))
+                {
+                    var page = new Page();
+                    page.CompiledTemplate = System.IO.File.ReadAllText(file.Path);
+                    if (!string.IsNullOrEmpty(page.CompiledTemplate))
+                    {
+                         template = new PageTemplate { Content = page.CompiledTemplate };
+                    }
+                }
             }
-            
-            // To Do: redirect to 404 
-            // return empty view if can't find page
-            return View(new { Content = string.Empty });
+
+            if (!string.IsNullOrEmpty(template.Content))
+            {
+                return View(template);
+            }
+
+            return View("~/Views/Page/NotFound.cshtml");
         }
 
 

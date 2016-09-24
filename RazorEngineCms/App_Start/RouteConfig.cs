@@ -14,10 +14,18 @@ namespace RazorEngineCms
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+                name: "Preview",
+                url: "Preview/{name}/{variable}",
+                defaults: new { controller = "Page", action = "Page", name = UrlParameter.Optional, variable = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+
+
         }
     }
 }
