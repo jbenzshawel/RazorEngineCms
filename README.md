@@ -8,6 +8,6 @@ Example of creating a new page in cms:
 
 Example compiled template from above code:
 
-![Compiled Template](http://i.imgur.com/SveFUek.png)
+![Compiled Template](http://i.imgur.com/Gh0TOR0.png)
 
 More to come!
