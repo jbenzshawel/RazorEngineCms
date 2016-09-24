@@ -71,9 +71,10 @@
         // onload jquery events (events only attached if page object exists else user notifed of error) 
         $(function () {
             if (!(page instanceof Page)) {
-                logger.logError("Page object could not be initialized! JS error may have prevented page object from being created.")
-                alert("Unexpected error. Please try refreshing the page.");
-                return;
+                //logger.logError("Page object could not be initialized! JS error may have prevented page object from being created.")
+                //alert("Unexpected error. Please try refreshing the page.");
+                //return;
+                page = new Page(); 
             }
             $("#submitNewPage").click(function (e) {
                 e.preventDefault();

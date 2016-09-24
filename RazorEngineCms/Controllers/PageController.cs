@@ -74,25 +74,22 @@ namespace RazorEngineCms.Controllers
             return  Json(new { Status = this.Errors.Count == 0, this.Errors }); 
         }
 
+        /// <summary>
+        /// Returns view with the template for the passed in name and variable. The
+        /// PageTemplate model is passed to the view. 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="variable"></param>
+        /// <returns></returns>
+        // GET: Preview/Name/Variable 
         public ActionResult Page(string name, string variable)
         {
-            //var page = this._db.Page
-            //                .FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-            //                                     string.Equals(p.Variable, variable, StringComparison.CurrentCultureIgnoreCase));
-            //if (page != null)
-            //{
-            //    return View(new { Content = page.CompiledTemplate } );
-            //}
+            var template = new PageTemplate { Content = string.Empty };
 
-                
-            PageTemplate template = template = new PageTemplate { Content = string.Empty };
-
+            // first see if there is a file template 
             if (FileHelper.Files.Any(f => string.Equals(f.Name, name, StringComparison.CurrentCultureIgnoreCase))) // get template from files?
             {
-                var file = FileHelper.Files.Where(f => string.Equals(f.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                                    (string.Equals(f.Variable, variable, StringComparison.CurrentCultureIgnoreCase) ||
-                                                                        (f.Variable == "_" && variable == "")))
-                                                                    .FirstOrDefault();
+                var file = FileHelper.GetFile(name, variable);
                 if (file != null && System.IO.File.Exists(file.Path))
                 {
                     var page = new Page();
@@ -104,14 +101,28 @@ namespace RazorEngineCms.Controllers
                 }
             }
 
+            //var page = this._db.Page
+            //                .FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
+            //                                     string.Equals(p.Variable, variable, StringComparison.CurrentCultureIgnoreCase));
+            //if (page != null)
+            //{
+            //    return View(new { Content = page.CompiledTemplate } );
+            //}
+
             if (!string.IsNullOrEmpty(template.Content))
             {
                 return View(template);
             }
 
+            // return 404 view if could not find page in db or files 
             return View("~/Views/Page/NotFound.cshtml");
         }
 
+
+        //public ActionResult Edit()
+        //{
+
+        //}
 
         internal async Task<Page> CompileTemplateAndSavePage(Page page, bool saveAsFile = false)
         {
@@ -125,13 +136,18 @@ namespace RazorEngineCms.Controllers
                 {
                     var fileName = string.Format("{0}-{1}-template-{2}.html", page.Name, string.IsNullOrEmpty(page.Variable) ? "_" : page.Variable, templateGuid);
                     var savePath = Server.MapPath("~") + @"\Views\CompiledTemplates\" + fileName;
-                    if(!System.IO.File.Exists(savePath))
+                    // delete the template if it exists 
+                    var oldFile = FileHelper.GetFile(page.Name, page.Variable);
+                    if (oldFile != null && System.IO.File.Exists(oldFile.Path))
                     {
-                        using (var sw = System.IO.File.CreateText(savePath))
-                        {
-                            await sw.WriteAsync(page.CompiledTemplate);
-                        }
+                        System.IO.File.Delete(oldFile.Path);
                     }
+
+                    using (var sw = System.IO.File.CreateText(savePath))
+                    {
+                        await sw.WriteAsync(page.CompiledTemplate);
+                    }
+                    
                 }
                 else // save in db 
                 {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -26,6 +27,14 @@ namespace RazorEngineCms.App_Classes
         {
             this.TemplatesPath = HttpContext.Current.Server.MapPath("~") + "/Views/CompiledTemplates";
             this.Files = GetFiles();
+        }
+
+        public File GetFile(string name, string variable)
+        {
+            return this.Files.FirstOrDefault(f => string.Equals(f.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
+                                                                    (string.Equals(f.Variable, variable, StringComparison.CurrentCultureIgnoreCase) ||
+                                                                        ((f.Variable == "_" || f.Variable == "") && variable == "")));
+                                                               
         }
 
         public IList<File> GetFiles()
