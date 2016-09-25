@@ -73,23 +73,28 @@ Page.prototype.save = function () {
             // create element to store alerts
             $("#newPage").prepend("<div id=\"new-page-alert\"></div>");
             if (data.Status == true) {
-                _default.alertMsg("success", "New page created. <a href='/Preview/" + scopedObject.name + "/" + scopedObject.variable + "' target='_blank'>Preview</a>", "#new-page-alert")
+                _default.alertMsg("success", "New page created. <a href='/Page/Preview/" + scopedObject.name + "/" + scopedObject.variable + "' target='_blank'>Preview</a>", "#new-page-alert")
             } else {
                 _default.alertMsg("error", "Something went wrong. Try again?", "#new-page-alert")
                 
                 if (data.Errors.length > 0) {
+                    var errorMsgBlock = [];
                     for (var i = 0, error; error = data.Errors[i++];) {
-                        logger.logError(error);
-                        $("#new-page-alert").append("<div class\"exception-msg\"><pre><h4>Exception:</h4>" + error + "</pre></div>");
+                        //logger.logError(error);
+                        errorMsgBlock.push(error);
+                        errorMsgBlock.push(("<br/>"));
                     }
+                    $("#new-page-alert").append("<div class\"exception-msg\"><pre><h4>Exception:</h4>" + errorMsgBlock.join("") + "</pre></div>");
+
                 } // end if data.Errors.length > 0 
             } // end else 
+            $("html, body").animate({ scrollTop: 0 }, "slow");
         };
         // set params for ajax request 
         var settings = {
             type: "POST",
             contentType: "application/json",
-            url: "/Page/New",
+            url: "/Page/Save",
             data: JSON.stringify(pageModel),
             success: successCallback
         };

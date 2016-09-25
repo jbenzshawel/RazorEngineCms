@@ -182,22 +182,15 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201609091608299_firstMigration.cs" />
-    <Compile Include="Migrations\201609091608299_firstMigration.Designer.cs">
-      <DependentUpon>201609091608299_firstMigration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201609111526237_UpdatingPageModel.cs" />
-    <Compile Include="Migrations\201609111526237_UpdatingPageModel.Designer.cs">
-      <DependentUpon>201609111526237_UpdatingPageModel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201609122233177_AddingConstructor.cs" />
-    <Compile Include="Migrations\201609122233177_AddingConstructor.Designer.cs">
-      <DependentUpon>201609122233177_AddingConstructor.cs</DependentUpon>
+    <Compile Include="Migrations\201609251544488_firstMigration.cs" />
+    <Compile Include="Migrations\201609251544488_firstMigration.Designer.cs">
+      <DependentUpon>201609251544488_firstMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\PageList.cs" />
     <Compile Include="Models\PageTemplate.cs" />
     <Compile Include="Models\RequestModels.cs" />
     <Compile Include="Models\Page.cs" />
@@ -554,7 +547,9 @@
     <Content Include="Scripts\vendor\respond.js" />
     <Content Include="Scripts\vendor\respond.min.js" />
     <Content Include="Scripts\vendor\_references.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -589,8 +584,10 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Page\New.cshtml" />
-    <Content Include="Views\Page\Page.cshtml" />
+    <Content Include="Views\Page\Preview.cshtml" />
     <Content Include="Views\Page\NotFound.cshtml" />
+    <Content Include="Views\Page\List.cshtml" />
+    <Content Include="Views\Page\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -606,14 +603,8 @@
     <Content Include="Scripts\vendor\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201609091608299_firstMigration.resx">
-      <DependentUpon>201609091608299_firstMigration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201609111526237_UpdatingPageModel.resx">
-      <DependentUpon>201609111526237_UpdatingPageModel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201609122233177_AddingConstructor.resx">
-      <DependentUpon>201609122233177_AddingConstructor.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201609251544488_firstMigration.resx">
+      <DependentUpon>201609251544488_firstMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

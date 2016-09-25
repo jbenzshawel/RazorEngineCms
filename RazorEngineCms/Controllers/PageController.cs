@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -22,9 +23,9 @@ namespace RazorEngineCms.Controllers
 
         public PageController()
         {
-            this._db = new ApplicationContext();
-            this.Errors = new List<string>();
-            this.FileHelper = new FileHelper(); 
+            _db = new ApplicationContext();
+            Errors = new List<string>();
+            FileHelper = new FileHelper();
         }
 
         // GET: Page/New
@@ -41,7 +42,7 @@ namespace RazorEngineCms.Controllers
         /// <returns>JsonResult with boolean status and list of errors</returns>
         // POST: Page/New
         [HttpPost]
-        public async Task<ActionResult> New(PageRequest pageRequest)
+        public async Task<ActionResult> Save(PageRequest pageRequest)
         {
             var page = new Page(pageRequest);
             if (ModelState.IsValid)
@@ -56,22 +57,35 @@ namespace RazorEngineCms.Controllers
                     }
                     else
                     {
-                        this.Errors.AddRange(stringCompiler.Errors);
+                        Errors.AddRange(stringCompiler.Errors);
                     }
                 } // end using StringCompiler
-                
-                if (this.Errors.Count == 0)
+
+                if (Errors.Count == 0)
                 {
                     // compile and save template
-                    page =  await this.CompileTemplateAndSavePage(page, saveAsFile: pageRequest.CreateTemplateFile);
+                    page = await CompileTemplateAndSavePage(page, saveAsFile: pageRequest.CreateTemplateFile);
                 }  // end if no errors after compiling model
             } // end if valid model state 
             else
             {
-                this.Errors.Add("Invalid parameters");
-            } 
+                Errors.Add("Invalid parameters");
+            }
 
-            return  Json(new { Status = this.Errors.Count == 0, this.Errors }); 
+            return Json(new { Status = Errors.Count == 0, Errors });
+        }
+
+        public ActionResult Edit(string name, string variable)
+        {
+            var page = Page.FindPage(name, variable);
+
+            if (page != null)
+            {
+                return View(page);
+            }
+
+            // return 404 view if could not find page in db or files 
+            return View("~/Views/Page/NotFound.cshtml");
         }
 
         /// <summary>
@@ -82,33 +96,16 @@ namespace RazorEngineCms.Controllers
         /// <param name="variable"></param>
         /// <returns></returns>
         // GET: Preview/Name/Variable 
-        public ActionResult Page(string name, string variable)
+        public ActionResult Preview(string name, string variable)
         {
             var template = new PageTemplate { Content = string.Empty };
+            var page = Page.FindPage(name, variable);
 
-            // first see if there is a file template 
-            if (FileHelper.Files.Any(f => string.Equals(f.Name, name, StringComparison.CurrentCultureIgnoreCase))) // get template from files?
+            if (page != null)
             {
-                var file = FileHelper.GetFile(name, variable);
-                if (file != null && System.IO.File.Exists(file.Path))
-                {
-                    var page = new Page();
-                    page.CompiledTemplate = System.IO.File.ReadAllText(file.Path);
-                    if (!string.IsNullOrEmpty(page.CompiledTemplate))
-                    {
-                         template = new PageTemplate { Content = page.CompiledTemplate };
-                    }
-                }
+                template.Content = page.CompiledTemplate;
             }
-
-            //var page = this._db.Page
-            //                .FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-            //                                     string.Equals(p.Variable, variable, StringComparison.CurrentCultureIgnoreCase));
-            //if (page != null)
-            //{
-            //    return View(new { Content = page.CompiledTemplate } );
-            //}
-
+            // return the page with a template if it is found
             if (!string.IsNullOrEmpty(template.Content))
             {
                 return View(template);
@@ -118,11 +115,25 @@ namespace RazorEngineCms.Controllers
             return View("~/Views/Page/NotFound.cshtml");
         }
 
-
-        //public ActionResult Edit()
-        //{
-
-        //}
+        public ActionResult List()
+        {
+            var pageModel = new PageList { Pages = new List<Page>() };
+            foreach (var file in FileHelper.Files)
+            {
+                pageModel.Pages.Add(new Page
+                {
+                    Id = -1,
+                    Name = file.Name,
+                    Variable = file.Variable,
+                    CompiledTemplate = FileHelper.GetFile(file.Name, file.Variable).ToString()
+                });
+            }
+            foreach (var page in _db.Page)
+            {
+                pageModel.Pages.Add(page);
+            }
+            return View(pageModel);
+        }
 
         internal async Task<Page> CompileTemplateAndSavePage(Page page, bool saveAsFile = false)
         {
@@ -147,32 +158,51 @@ namespace RazorEngineCms.Controllers
                     {
                         await sw.WriteAsync(page.CompiledTemplate);
                     }
-                    
+
                 }
-                else // save in db 
+
+                var pageInDb =
+                    _db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
+                                                 p.Variable.Equals(page.Variable,
+                                                     StringComparison.CurrentCultureIgnoreCase));
+                // always save copy in db 
+                if (pageInDb != null)
                 {
-                    this._db.Page.Add(page);
-                    await this._db.SaveChangesAsync();
+                    pageInDb.Model = page.Model;
+                    pageInDb.Template = page.Template;
+                    pageInDb.CompiledModel = page.CompiledModel;
+                    pageInDb.CompiledTemplate = page.CompiledTemplate;
                 }
+                else
+                {
+                    _db.Page.Add(page);
+                }
+                await _db.SaveChangesAsync();
+                
             }
             catch (Exception ex)
             {
-                this.Errors.Add(ex.Message);
-                // if failed to save model get why
-                if (this._db.GetValidationErrors().Count() > 0)
+                Errors.Add(string.Format("Template Compile Error: {0}", ex.Message));
+                if (ex.GetType() == typeof(TemplateParsingException))
                 {
-                    foreach (var error in this._db.GetValidationErrors())
+                    Errors.Add(string.Format("Line: {0}", ((TemplateParsingException)ex).Line));
+                }
+                Errors.Add(string.Format("Stack Trace: \r\n {0}", ex.StackTrace));
+                // if failed to save model get why
+                if (_db.GetValidationErrors().Any())
+                {
+                    foreach (var error in _db.GetValidationErrors())
                     {
                         foreach (var valErr in error.ValidationErrors)
                         {
-                            this.Errors.Add(string.Format("Model Error: {0}, Model Property: {1}",
+                            Errors.Add(string.Format("Model Error: {0}, Model Property: {1}",
                                 valErr.ErrorMessage, valErr.PropertyName));
                         }
                     } // end foreach this._db.GetValidationErrors()
                 } // end if have validation errors
             } // end catch
 
-            return page; 
+            return page;
         }
     }
 }

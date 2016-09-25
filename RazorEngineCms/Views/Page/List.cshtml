@@ -1,0 +1,32 @@
+﻿@model RazorEngineCms.Models.PageList
+
+@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Pages</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>Page ID</th>
+        <th>Page Name</th>
+        <th>Page Variable</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var page in Model.Pages)
+    {
+        <tr>
+            <td><a href="/Page/Preview/@page.Name/@page.Variable" target="_blank">Preview</a></td>
+            <td><a href="/Page/Edit/@page.Name/@page.Variable">Edit</a></td>
+            <td>@page.Id</td>
+            <td>@page.Name</td>
+            <td>@page.Variable</td>
+        </tr>
+    }
+    </tbody>
+</table>

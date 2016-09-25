@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using RazorEngineCms.App_Classes;
+using RazorEngineCms.DAL;
 
 namespace RazorEngineCms.Models
 {
@@ -35,6 +37,27 @@ namespace RazorEngineCms.Models
             this.Variable = pageRequest.Variable;
             this.Model = pageRequest.Model;
             this.Template = pageRequest.Template;
+        }
+
+        internal static Page FindPage(string name, string variable)
+        {
+            var db = new ApplicationContext();
+            var page = new Page { Name = name, Variable = variable };
+            var fileHelper = new FileHelper();
+            // first see if there is a file template 
+            if (fileHelper.Files.Any(f => string.Equals(f.Name, name, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                var file = fileHelper.GetFile(name, variable);
+                page.CompiledTemplate = file.ToString();
+            }
+            else // get page from database if there isn't a file
+            {
+                page = db.Page
+                                .FirstOrDefault(p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase) &&
+                                                        p.Variable.Equals(variable, StringComparison.CurrentCultureIgnoreCase));
+            }
+
+            return page;
         }
     }
 }

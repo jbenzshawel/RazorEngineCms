@@ -82,7 +82,12 @@ namespace RazorEngineCms.App_Classes
                         for (var i = 0; i < providerResult.Errors.Count; i++)
                         {
                             var errorLine = providerResult.Errors[i].Line > 4 ? providerResult.Errors[i].Line - 4 : providerResult.Errors[i].Line;
-                            this.Errors.Add(string.Format("Compile Error: {0}, Line: {1}", providerResult.Errors[i].ErrorText, errorLine));
+                            // need to adjust error lines since ui editor is offset  
+                            if (errorLine > 2)
+                            {
+                                errorLine = errorLine - 2;
+                            }
+                            this.Errors.Add(string.Format("Model Compile Error: {0}, Line: {1}", providerResult.Errors[i].ErrorText, errorLine)); 
                         }
                     }
                     this.Errors.Add(ex.Message);

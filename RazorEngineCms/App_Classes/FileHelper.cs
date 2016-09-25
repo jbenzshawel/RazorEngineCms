@@ -15,6 +15,20 @@ namespace RazorEngineCms.App_Classes
         public string Variable { get; set; }
 
         public string Path { get; set; }
+
+        public override string ToString()
+        {
+            if (System.IO.File.Exists(this.Path))
+            {
+               var compiledTemplate = System.IO.File.ReadAllText(this.Path);
+                if (!string.IsNullOrEmpty(compiledTemplate))
+                {
+                    return compiledTemplate;
+                }
+            }
+
+            return string.Empty;
+        }
     }
 
     internal class FileHelper
