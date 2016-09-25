@@ -137,10 +137,12 @@ namespace RazorEngineCms.Controllers
 
         internal async Task<Page> CompileTemplateAndSavePage(Page page, bool saveAsFile = false)
         {
+
+            var templateGuid = Guid.NewGuid().ToString();
+            var cacheName = string.Format("{0}-{1}", page.Name, templateGuid);
+
             try
             {
-                var templateGuid = Guid.NewGuid().ToString();
-                var cacheName = string.Format("{0}-{1}", page.Name, templateGuid);
                 // null for modelType parameter since templates are dynamic 
                 page.CompiledTemplate = Engine.Razor.RunCompile(page.Template, cacheName, null, JsonConvert.DeserializeObject(page.CompiledModel));
                 if (saveAsFile)
@@ -158,28 +160,8 @@ namespace RazorEngineCms.Controllers
                     {
                         await sw.WriteAsync(page.CompiledTemplate);
                     }
-
-                }
-
-                var pageInDb =
-                    _db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                 p.Variable.Equals(page.Variable,
-                                                     StringComparison.CurrentCultureIgnoreCase));
-                // always save copy in db 
-                if (pageInDb != null)
-                {
-                    pageInDb.Model = page.Model;
-                    pageInDb.Template = page.Template;
-                    pageInDb.CompiledModel = page.CompiledModel;
-                    pageInDb.CompiledTemplate = page.CompiledTemplate;
-                }
-                else
-                {
-                    _db.Page.Add(page);
-                }
-                await _db.SaveChangesAsync();
-                
-            }
+                } // end if saveAsFile
+            } // end try
             catch (Exception ex)
             {
                 Errors.Add(string.Format("Template Compile Error: {0}", ex.Message));
@@ -201,6 +183,24 @@ namespace RazorEngineCms.Controllers
                     } // end foreach this._db.GetValidationErrors()
                 } // end if have validation errors
             } // end catch
+
+            // always save copy in db 
+            var pageInDb =
+                 _db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
+                                              p.Variable.Equals(page.Variable,
+                                                  StringComparison.CurrentCultureIgnoreCase));
+            if (pageInDb != null)
+            {
+                pageInDb.Model = page.Model;
+                pageInDb.Template = page.Template;
+                pageInDb.CompiledModel = page.CompiledModel;
+                pageInDb.CompiledTemplate = page.CompiledTemplate;
+            }
+            else
+            {
+                _db.Page.Add(page);
+            }
+            await _db.SaveChangesAsync();
 
             return page;
         }
