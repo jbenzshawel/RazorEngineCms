@@ -41,9 +41,12 @@ namespace RazorEngineCms.App_Classes
                 using (var sw = new StringWriter())
                 {
                     sw.WriteLine("using System;");
+                    sw.WriteLine("using System.Data;");
                     sw.WriteLine("using System.Collections.Generic;");
                     sw.WriteLine("using System.Linq;");
+                    sw.WriteLine("using System.Xml.Serialization;");
                     sw.WriteLine("using Newtonsoft.Json;");
+                    sw.WriteLine("using RazorEngineCms.App_Classes;");
                     sw.WriteLine("public class ModelClass { ");
                     sw.WriteLine("public string Execute() { ");
                     sw.WriteLine(model);
@@ -63,6 +66,9 @@ namespace RazorEngineCms.App_Classes
                 };
                 paramz.ReferencedAssemblies.AddRange(new string[] { "System.dll",
                                                                     "System.Linq.dll",
+                                                                    "System.Data.dll",
+                                                                    "System.Xml.dll",
+                                                                    @"C:\Git\RazorEngineCms\RazorEngineCms\bin\RazorEngineCms.dll",
                                                                     @"C:\Git\RazorEngineCms\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll" });
 
                 // try to compile model 
@@ -83,9 +89,9 @@ namespace RazorEngineCms.App_Classes
                         {
                             var errorLine = providerResult.Errors[i].Line > 4 ? providerResult.Errors[i].Line - 4 : providerResult.Errors[i].Line;
                             // need to adjust error lines since ui editor is offset  
-                            if (errorLine > 2)
+                            if (errorLine > 3)
                             {
-                                errorLine = errorLine - 2;
+                                errorLine = errorLine - 3;
                             }
                             this.Errors.Add(string.Format("Model Compile Error: {0}, Line: {1}", providerResult.Errors[i].ErrorText, errorLine)); 
                         }

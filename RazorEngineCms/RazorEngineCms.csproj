@@ -167,6 +167,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Classes\DataHelper.cs" />
     <Compile Include="App_Classes\FileHelper.cs" />
     <Compile Include="App_Classes\StringCompiler.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />

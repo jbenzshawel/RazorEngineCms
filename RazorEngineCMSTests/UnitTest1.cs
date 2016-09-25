@@ -46,18 +46,27 @@ namespace RazorEngineCMSTests
             }
 
         }
-            
-            [TestMethod]
-            public void TestStringCompiler()
+
+        [TestMethod]
+        public void TestStringCompiler()
+        {
+            var model = "var Model = new { test = \"object\" };";
+
+            using (var stringCompiler = new StringCompiler())
             {
-                var model = "var Model = new { test = \"object\" };";
+                stringCompiler.CompilePageModel(model);
 
-                using (var stringCompiler = new StringCompiler())
-                {
-                    stringCompiler.CompilePageModel(model);
-
-                    Assert.IsTrue(stringCompiler.IsValid);
-               }
+                Assert.IsTrue(stringCompiler.IsValid);
             }
         }
+
+        [TestMethod]
+        public void TestGetData()
+        {
+            var dataHelper = new DataHelper();
+            var results = dataHelper.GetData("prGetPages");
+
+            Assert.IsNotNull(results);
+        }
+    }
 }
