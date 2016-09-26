@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -186,25 +185,36 @@ namespace RazorEngineCms.Controllers
                 } // end if have validation errors
             } // end catch
 
-            // always save copy in db 
-            var pageInDb =
-                 _db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
-                                              p.Variable.Equals(page.Variable,
+           // save copy in db regardless of saveAsFile param
+           try
+            {
+                var pageInDb =
+                     _db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
+                                                  p.Variable.Equals(page.Variable,
                                                   StringComparison.CurrentCultureIgnoreCase));
-            if (pageInDb != null)
+                if (pageInDb != null)
+                {
+                    // update the page if it exists
+                    pageInDb.Model = page.Model;
+                    pageInDb.Template = page.Template;
+                    pageInDb.CompiledModel = page.CompiledModel;
+                    pageInDb.CompiledTemplate = page.CompiledTemplate;
+                }
+                else
+                {
+                    _db.Page.Add(page);
+                }
+                await _db.SaveChangesAsync();
+            } // end try
+            catch (Exception ex)
             {
-                // update the page if it exists
-                pageInDb.Model = page.Model;
-                pageInDb.Template = page.Template;
-                pageInDb.CompiledModel = page.CompiledModel;
-                pageInDb.CompiledTemplate = page.CompiledTemplate;
-            }
-            else
+                this.Errors.Add(string.Format("Error Saving Model: {0}", ex.Message));
+            } // end catch
+            finally
             {
-                _db.Page.Add(page);
+                _db.Dispose();
             }
-            await _db.SaveChangesAsync();
-
+            
             return page;
         }
     }
