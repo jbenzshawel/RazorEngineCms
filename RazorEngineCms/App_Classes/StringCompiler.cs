@@ -42,6 +42,7 @@ namespace RazorEngineCms.App_Classes
                 {
                     sw.WriteLine("using System;");
                     sw.WriteLine("using System.Data;");
+                    sw.WriteLine("using System.Data.SqlClient;");
                     sw.WriteLine("using System.Collections.Generic;");
                     sw.WriteLine("using System.Linq;");
                     sw.WriteLine("using System.Xml.Serialization;");
@@ -89,9 +90,9 @@ namespace RazorEngineCms.App_Classes
                         {
                             var errorLine = providerResult.Errors[i].Line > 4 ? providerResult.Errors[i].Line - 4 : providerResult.Errors[i].Line;
                             // need to adjust error lines since ui editor is offset  
-                            if (errorLine > 3)
+                            if (errorLine > 5)
                             {
-                                errorLine = errorLine - 3;
+                                errorLine = errorLine - 6;
                             }
                             this.Errors.Add(string.Format("Model Compile Error: {0}, Line: {1}", providerResult.Errors[i].ErrorText, errorLine)); 
                         }

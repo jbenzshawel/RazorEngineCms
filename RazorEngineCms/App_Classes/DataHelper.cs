@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace RazorEngineCms.App_Classes
 {
-    public class DataHelper
+    public class DataHelper : IDisposable
     {
         private const string CONN_STRING = @"Data Source =.\SQLEXPRESS; Initial Catalog = RazorEngineCms.ApplicationContext; Integrated Security = True";
 
@@ -42,7 +42,7 @@ namespace RazorEngineCms.App_Classes
                         {
                             sqlCmd.Parameters.Add(param);
                         }
-                    }
+                   }
 
                     try
                     {
@@ -96,6 +96,11 @@ namespace RazorEngineCms.App_Classes
             }
 
             return dataTable;
+        }
+
+        void IDisposable.Dispose()
+        {
+           
         }
     }
 }

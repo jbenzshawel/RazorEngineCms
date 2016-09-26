@@ -72,6 +72,8 @@ namespace RazorEngineCms.Controllers
                 Errors.Add("Invalid parameters");
             }
 
+
+
             return Json(new { Status = Errors.Count == 0, Errors });
         }
 
@@ -191,6 +193,7 @@ namespace RazorEngineCms.Controllers
                                                   StringComparison.CurrentCultureIgnoreCase));
             if (pageInDb != null)
             {
+                // update the page if it exists
                 pageInDb.Model = page.Model;
                 pageInDb.Template = page.Template;
                 pageInDb.CompiledModel = page.CompiledModel;
