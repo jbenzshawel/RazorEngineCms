@@ -184,10 +184,7 @@ namespace RazorEngineCms.Controllers
             if (page != null && page.CompiledTemplate != null)
             {
                 template.Content = page.CompiledTemplate;
-            }
-            // return the page with a template if it is found
-            if (!string.IsNullOrEmpty(template.Content))
-            {
+                // return the page with a template if it is found
                 return View(template);
             }
 
