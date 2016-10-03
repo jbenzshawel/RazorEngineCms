@@ -43,7 +43,7 @@ else // Show Page List Table
     </table>
 }
 
-    @Html.Partial("_ConfiromDeleteModalPartial");
+    @Html.Partial("_ConfiromDeleteModal")
 
 @section Scripts {
     <script type="text/javascript" src="~/Scripts/page.js"></script>
@@ -64,6 +64,7 @@ else // Show Page List Table
             $("#deletePageModal").modal("hide");
         }
         $(function () {
+            sessionStorage.clear();
             $("#confirmDeletePage").click(function () {
                 var sessionKey = $(this).attr("data-sessionkey");;
                 confirmDelete(sessionKey);

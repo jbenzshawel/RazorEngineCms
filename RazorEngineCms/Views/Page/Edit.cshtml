@@ -72,7 +72,7 @@
     </div>
 </div>
 
-@Html.Partial("_ConfiromDeleteModalPartial");
+@Html.Partial("_ConfiromDeleteModal")
 
 @section Scripts {
     <script type="text/javascript" src="~/Scripts/page.js"></script>
@@ -98,9 +98,6 @@
         // onload jquery events (events only attached if page object exists else user notifed of error)
         $(function () {
             if (!(page instanceof Page)) {
-                //logger.logError("Page object could not be initialized! JS error may have prevented page object from being created.")
-                //alert("Unexpected error. Please try refreshing the page.");
-                //return;
                 page = new Page();
             }
             $("#deletePage").click(function (e) {
