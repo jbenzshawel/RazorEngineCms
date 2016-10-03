@@ -80,7 +80,7 @@ Page.prototype.save = function () {
             // create element to store alerts
             $("#newPage").prepend("<div id=\"new-page-alert\"></div>");
             if (data.Status == true) {
-                _default.alertMsg("success", "Page has been saved. <a href='/Page/View/" + scopedObject.name + "/" + scopedObject.variable + "' target='_blank'>Preview</a>", "#new-page-alert")
+                _default.alertMsg("success", "Page has been saved. <a href='/" + scopedObject.name + "/" + scopedObject.variable + "' target='_blank'>View</a>", "#new-page-alert")
             } else {
                 _default.alertMsg("error", "Something went wrong. Try again?", "#new-page-alert")
                 
@@ -101,7 +101,7 @@ Page.prototype.save = function () {
         var settings = {
             type: "POST",
             contentType: "application/json",
-            url: "/Page/Save",
+            url: "/CMS/Page/Save",
             data: JSON.stringify(pageModel),
             success: successCallback
         };
@@ -138,7 +138,7 @@ Page.prototype.delete = function (name, variable, msgSel) {
     };
     var settings = {
         type: "POST",
-        url: variable != null ? "/Page/Delete/" + name + "/" + variable : "/Page/Delete/" + name,
+        url: variable != null ? "/CMS/Page/Delete/" + name + "/" + variable : "/CMS/Page/Delete/" + name,
         success: successCallback,
         async: false
     };

@@ -31,10 +31,6 @@ namespace RazorEngineCms.Controllers
             Errors = new List<string>();
             FileHelper = new FileHelper();
             AllowCache = ConfigurationManager.AppSettings["AllowPageCaching"] == "true";
-            if (AllowCache)
-            {
-                CacheManager = new CacheManager();                
-            }
         }
 
         // GET: Page/New
@@ -93,11 +89,11 @@ namespace RazorEngineCms.Controllers
         /// Finds a page to edit and returns the page. Returns 404 if not found
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="variable"></param>
+        /// <param name="section"></param>
         /// <returns></returns>
-        public ActionResult Edit(string name, string variable)
+        public ActionResult Edit(string name, string section)
         {
-            var page = Page.FindPage(name, variable);
+            var page = Page.FindPage(name, section);
 
             if (page != null)
             {
@@ -158,8 +154,9 @@ namespace RazorEngineCms.Controllers
 
             if (AllowCache) // only look for page in cache if caching enabled
             {
+                CacheManager = new CacheManager();
                 PageCache cachedPage = CacheManager.FindPage(name, section);
-                if (cachedPage != null)
+                if (cachedPage != null && cachedPage.CompiledTemplate != null)
                 {
                     page = new Page
                     {
@@ -175,7 +172,7 @@ namespace RazorEngineCms.Controllers
             }
 
             // if we couldn't get the page from cache get it from the db
-            if (page == null)
+            if (page == null || page.CompiledTemplate == null)
             {
                 page = Page.FindPage(name, section);
                 if (AllowCache)

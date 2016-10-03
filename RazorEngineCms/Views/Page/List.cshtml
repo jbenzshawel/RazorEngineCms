@@ -33,9 +33,15 @@ else // Show Page List Table
                     <td>@page.Id</td>
                     <td>@page.Name</td>
                     <td>@page.Section</td>
-                    <td><a href="/Page/View/@page.Name/@page.Section" target="_blank">Preview</a></td>
-                    <td><a href="/Page/Edit/@page.Name/@page.Section">Edit</a></td>
-                    <td><a href="#" data-pagename="@page.Name" data-pagesection="@page.Section" class="delete-page">Delete</a></td>
+                    <td><a href="/@page.Name/@page.Section" target="_blank">Preview</a></td>
+                    <td><a href="/CMS/Page/Edit/@page.Name/@page.Section">Edit</a></td>
+                    <td><a href="#"
+                           data-pagename="@page.Name"
+                           data-pagesection="@page.Section"
+                           class="delete-page"
+                           target="_blank">
+                        Delete
+                    </a></td>
 
                 </tr>
             }

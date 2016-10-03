@@ -77,7 +77,7 @@ namespace RazorEngineCms.App_Classes
 
         public PageCache FindPage(string name, string section, string param = null, string param2 = null)
         {
-            PageCache pageCache = null;
+            var pageCache = new PageCache();
 
             if (this.CacheList.Count > 0)
             {

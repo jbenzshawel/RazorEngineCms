@@ -601,6 +601,7 @@
     <Content Include="Views\Page\List.cshtml" />
     <Content Include="Views\Page\Edit.cshtml" />
     <Content Include="Views\Shared\_ConfiromDeleteModal.cshtml" />
+    <Content Include="Views\Shared\_ViewPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
