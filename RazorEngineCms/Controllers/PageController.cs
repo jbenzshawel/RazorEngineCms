@@ -226,7 +226,6 @@ namespace RazorEngineCms.Controllers
         /// <returns></returns>
         internal async Task<Page> CompileTemplateAndSavePage(Page page, bool saveAsFile = false)
         {
-
             var templateGuid = Guid.NewGuid().ToString();
             var cacheName = string.Format("{0}-{1}", page.Name, templateGuid);
 
@@ -235,9 +234,7 @@ namespace RazorEngineCms.Controllers
                 if (!string.IsNullOrEmpty(page.Model))
                 {
                     // null for modelType parameter since templates are dynamic 
-                    page.CompiledTemplate = Engine.Razor.RunCompile(page.Template, cacheName, null,
-                        JsonConvert.DeserializeObject(page.CompiledModel));
-
+                    page.CompiledTemplate = Engine.Razor.RunCompile(page.Template, cacheName, null, JsonConvert.DeserializeObject(page.CompiledModel));
                 }
                 else // no template model so do not need to compile
                 {
@@ -261,7 +258,7 @@ namespace RazorEngineCms.Controllers
                     }
                 } // end if saveAsFile
             } // end try
-            catch (Exception ex)
+            catch (Exception ex) // catch exception from saving as file
             {
                 Errors.Add(string.Format("Template Compile Error: {0}", ex.Message));
                 if (ex.GetType() == typeof(TemplateParsingException))
@@ -283,28 +280,29 @@ namespace RazorEngineCms.Controllers
                 } // end if have validation errors
             } // end catch
 
-           // save copy in db regardless of saveAsFile param
-           try
+            // save copy in db regardless of saveAsFile param
+            var pageInDb =
+                        _db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
+                                                    p.Section.Equals(page.Section,
+                                                    StringComparison.CurrentCultureIgnoreCase));
+            if (pageInDb != null)
             {
-                var pageInDb =
-                     _db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                  p.Section.Equals(page.Section,
-                                                  StringComparison.CurrentCultureIgnoreCase));
-                if (pageInDb != null)
-                {
-                    // update the page if it exists
-                    pageInDb.Model = page.Model;
-                    pageInDb.Template = page.Template;
-                    pageInDb.CompiledModel = page.CompiledModel;
-                    pageInDb.CompiledTemplate = page.CompiledTemplate;
-                }
-                else
-                {
-                    _db.Page.Add(page);
-                }
+                // update the page if it exists
+                pageInDb.Model = page.Model;
+                pageInDb.Template = page.Template;
+                pageInDb.CompiledModel = page.CompiledModel;
+                pageInDb.CompiledTemplate = page.CompiledTemplate;
+            }
+            else
+            {
+                _db.Page.Add(page);
+            }
+
+            try
+            {
                 await _db.SaveChangesAsync();
-            } // end try
-            catch (Exception ex)
+            } 
+            catch (Exception ex) // catch exception from saving to db
             {
                 this.Errors.Add(string.Format("Error Saving Model: {0}", ex.Message));
             } // end catch
