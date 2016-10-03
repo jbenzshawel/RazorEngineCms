@@ -20,10 +20,30 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="pageVar">Page Variable</label>
+                    <label for="pageVar">Page Section</label>
                     <input type="text" name="pageVar" id="pageVar" class="form-control" />
                 </div>
-
+                <div class="form-group">
+                    <p><strong>Does this page have url parameters?</strong> (pages with url parameters cannot be pre compiled)</p>
+                    <p>Default route is /name/section/param/param2 where param and param2 are option parameters.</p>
+                    <label for="hasParams-true" class="weight-normal">
+                        <input type="radio" name="hasParams" id="hasParams-true" value="true" class="formControl" /> True
+                    </label>
+                    <label for="hasParams-false" class="weight-normal">
+                        <input type="radio" name="hasParams" id="hasParams-false" value="false" class="formControl" checked /> False
+                    </label>
+                </div>
+                <div class="form-group">
+                    <p><strong>Create Template File?</strong></p>
+                    <label for="templateFileTrue" class="weight-normal">
+                        <input type="radio" name="templateFile" id="templateFileTrue" value="true" />
+                        True
+                    </label>
+                    <label for="templateFileFalse" class="weight-normal">
+                        <input type="radio" name="templateFile" id="templateFileFalse" value="false" checked />
+                        False
+                    </label>
+                </div>
                 <div class="form-group">
                     <label for="model">Page Model</label>
                     <p>Create an object variable named "Model" to pass .NET code to view</p>
@@ -35,14 +55,6 @@
                     <p>Access Page Model with Razor Syntax (e.g. @@Model.PropertyName)</p>
                     <textarea class="form-control" id="template" name="template"></textarea>
                 </div>
-
-                <div class="form-group">
-                    <label for="templateFile">Create Template File?</label>
-                    True <input type="radio" name="templateFile" id="templateFileTrue" value="true"/> 
-                    False <input type="radio" name="templateFile" id="templateFileFalse" value="false" checked />
-                </div>
-
-
                 <div class="form-group">
                     <input type="submit" class="btn btn-default" id="submitNewPage" />
                 </div>

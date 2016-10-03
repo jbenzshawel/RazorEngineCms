@@ -56,20 +56,23 @@ namespace RazorEngineCms.Controllers
             var page = new Page(pageRequest);
             if (ModelState.IsValid)
             {
-                // compile the model from the string Model declaration in pageRequest
-                using (var stringCompiler = new StringCompiler())
+                if (!string.IsNullOrEmpty(page.Model))
                 {
-                    stringCompiler.CompilePageModel(page.Model);
-                    if (stringCompiler.IsValid)
+                    // compile the model from the string Model declaration in pageRequest
+                    using (var stringCompiler = new StringCompiler())
                     {
-                        page.CompiledModel = stringCompiler.ToString();
-                    }
-                    else
-                    {
-                        Errors.AddRange(stringCompiler.Errors);
-                    }
-                } // end using StringCompiler
-
+                        stringCompiler.CompilePageModel(page.Model);
+                        if (stringCompiler.IsValid)
+                        {
+                            page.CompiledModel = stringCompiler.ToString();
+                        }
+                        else
+                        {
+                            Errors.AddRange(stringCompiler.Errors);
+                        }
+                    } // end using StringCompiler
+                } // end if page.Model not empty
+               
                 if (Errors.Count == 0)
                 {
                     // compile and save template
@@ -112,23 +115,30 @@ namespace RazorEngineCms.Controllers
         /// <param name="variable"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> Delete(string name, string variable)
+        public async Task<ActionResult> Delete(string name, string section = null)
         {
-            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(variable))
+            bool status = false;
+            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(section))
             {
                 try
                 {
-                    var page = Page.FindPage(name, variable);
+                    var page = Page.FindPage(name, section);
+                    this._db.Page.Attach(page);
                     this._db.Page.Remove(page);
-                    await this._db.SaveChangesAsync();
+                    status = await this._db.SaveChangesAsync() > 0;
                 }
                 catch (Exception ex)
                 {
                     this.Errors.Add(ex.Message);
+                    status = false;
                 }
             }
+            else
+            {
+                this.Errors.Add("Page not found");
+            }
 
-            return Json(new { Status = this.Errors.Count == 0, this.Errors });
+            return Json(new { Status = status, this.Errors });
         }
 
         /// <summary>
@@ -140,7 +150,7 @@ namespace RazorEngineCms.Controllers
         /// <param name="param"></param>
         /// <param name="param2"></param>
         /// <returns></returns>
-        // GET: Preview/Name/Variable 
+        // GET: Preview/Name/Section 
         public ActionResult View(string name, string section, string param = null, string param2 = null)
         {
             Page page = null;
@@ -154,7 +164,7 @@ namespace RazorEngineCms.Controllers
                     page = new Page
                     {
                         Name = cachedPage.Name,
-                        Variable = cachedPage.Variable,
+                        Section = cachedPage.Section,
                         CompiledModel = cachedPage.CompiledModel,
                         CompiledTemplate = cachedPage.CompiledTemplate,
                         Model = cachedPage.Model,
@@ -164,7 +174,7 @@ namespace RazorEngineCms.Controllers
                 }
             }
 
-            // if we didn't get the page from cache get it from the db
+            // if we couldn't get the page from cache get it from the db
             if (page == null)
             {
                 page = Page.FindPage(name, section);
@@ -201,7 +211,7 @@ namespace RazorEngineCms.Controllers
                 {
                     Id = -1,
                     Name = file.Name,
-                    Variable = file.Variable,
+                    Section = file.Variable,
                     CompiledTemplate = FileHelper.GetFile(file.Name, file.Variable).ToString()
                 });
             }
@@ -228,14 +238,24 @@ namespace RazorEngineCms.Controllers
 
             try
             {
-                // null for modelType parameter since templates are dynamic 
-                page.CompiledTemplate = Engine.Razor.RunCompile(page.Template, cacheName, null, JsonConvert.DeserializeObject(page.CompiledModel));
+                if (!string.IsNullOrEmpty(page.Model))
+                {
+                    // null for modelType parameter since templates are dynamic 
+                    page.CompiledTemplate = Engine.Razor.RunCompile(page.Template, cacheName, null,
+                        JsonConvert.DeserializeObject(page.CompiledModel));
+
+                }
+                else // no template model so do not need to compile
+                {
+                    page.CompiledTemplate = page.Template;
+                }
+                
                 if (saveAsFile)
                 {
-                    var fileName = string.Format("{0}-{1}-template-{2}.html", page.Name, string.IsNullOrEmpty(page.Variable) ? "_" : page.Variable, templateGuid);
+                    var fileName = string.Format("{0}-{1}-template-{2}.html", page.Name, string.IsNullOrEmpty(page.Section) ? "_" : page.Section, templateGuid);
                     var savePath = Server.MapPath("~") + @"\Views\CompiledTemplates\" + fileName;
                     // delete the template if it exists 
-                    var oldFile = FileHelper.GetFile(page.Name, page.Variable);
+                    var oldFile = FileHelper.GetFile(page.Name, page.Section);
                     if (oldFile != null && System.IO.File.Exists(oldFile.Path))
                     {
                         System.IO.File.Delete(oldFile.Path);
@@ -274,7 +294,7 @@ namespace RazorEngineCms.Controllers
             {
                 var pageInDb =
                      _db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                  p.Variable.Equals(page.Variable,
+                                                  p.Section.Equals(page.Section,
                                                   StringComparison.CurrentCultureIgnoreCase));
                 if (pageInDb != null)
                 {

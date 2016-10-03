@@ -193,6 +193,10 @@
     <Compile Include="Migrations\201610022206336_UpdatingPageModelProperties.Designer.cs">
       <DependentUpon>201610022206336_UpdatingPageModelProperties.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610030150315_UpdatingPagePropName.cs" />
+    <Compile Include="Migrations\201610030150315_UpdatingPagePropName.Designer.cs">
+      <DependentUpon>201610030150315_UpdatingPagePropName.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -616,6 +620,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610022206336_UpdatingPageModelProperties.resx">
       <DependentUpon>201610022206336_UpdatingPageModelProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610030150315_UpdatingPagePropName.resx">
+      <DependentUpon>201610030150315_UpdatingPagePropName.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

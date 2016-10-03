@@ -15,7 +15,7 @@ namespace RazorEngineCms.Models
         [Required]
         public string Name { get; set; }
 
-        public string Variable { get; set; }
+        public string Section { get; set; }
 
         public string Model { get; set; }
 
@@ -36,7 +36,7 @@ namespace RazorEngineCms.Models
         public Page(PageRequest pageRequest)
         {
             this.Name = pageRequest.Name;
-            this.Variable = pageRequest.Variable;
+            this.Section = pageRequest.Variable;
             this.Model = pageRequest.Model;
             this.Template = pageRequest.Template;
         }
@@ -44,7 +44,7 @@ namespace RazorEngineCms.Models
         internal static Page FindPage(string name, string variable)
         {
             var db = new ApplicationContext();
-            var page = new Page { Name = name, Variable = variable };
+            var page = new Page { Name = name, Section = variable };
             var fileHelper = new FileHelper();
             // first see if there is a file template 
             if (fileHelper.Files.Any(f => string.Equals(f.Name, name, StringComparison.CurrentCultureIgnoreCase)))
@@ -56,7 +56,7 @@ namespace RazorEngineCms.Models
             {
                 page = db.Page
                                 .FirstOrDefault(p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                        p.Variable.Equals(variable, StringComparison.CurrentCultureIgnoreCase));
+                                                        p.Section.Equals(variable, StringComparison.CurrentCultureIgnoreCase));
             }
 
             return page;

@@ -30,7 +30,7 @@ namespace RazorEngineCms.Models
             this.Id = page.Id;
             this.Model = page.Model;
             this.Name = page.Name;
-            this.Variable = page.Variable;
+            this.Section = page.Section;
             this.Template = page.Template;
             this.CompiledModel = page.CompiledModel;
             this.CompiledTemplate = page.CompiledTemplate;

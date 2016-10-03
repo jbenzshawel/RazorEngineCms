@@ -83,7 +83,7 @@ namespace RazorEngineCms.App_Classes
             {
                 pageCache = this.CacheList.FirstOrDefault(
                 cachedPage => string.Equals(cachedPage.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-                              string.Equals(cachedPage.Variable, section, StringComparison.CurrentCultureIgnoreCase) &&
+                              string.Equals(cachedPage.Section, section, StringComparison.CurrentCultureIgnoreCase) &&
                               string.Equals(cachedPage.Param, param, StringComparison.CurrentCultureIgnoreCase) &&
                               string.Equals(cachedPage.Param2, param2, StringComparison.CurrentCultureIgnoreCase));
 

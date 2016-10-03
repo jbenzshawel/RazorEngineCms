@@ -14,12 +14,13 @@
 }
 else // Show Page List Table 
 {
+    <div id="alertMsgs"></div>
     <table class="table">
         <thead>
             <tr>
                 <th>Page ID</th>
                 <th>Page Name</th>
-                <th>Page Variable</th>
+                <th>Page Section</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
@@ -31,10 +32,10 @@ else // Show Page List Table
                 <tr>
                     <td>@page.Id</td>
                     <td>@page.Name</td>
-                    <td>@page.Variable</td>
-                    <td><a href="/Page/View/@page.Name/@page.Variable" target="_blank">Preview</a></td>
-                    <td><a href="/Page/Edit/@page.Name/@page.Variable">Edit</a></td>
-                    <td><a href="#">Delete</a></td>
+                    <td>@page.Section</td>
+                    <td><a href="/Page/View/@page.Name/@page.Section" target="_blank">Preview</a></td>
+                    <td><a href="/Page/Edit/@page.Name/@page.Section">Edit</a></td>
+                    <td><a href="#" data-pageName="@page.Name" data-pageSection="@page.Section" class="delete-page">Delete</a></td>
 
                 </tr>
             }
@@ -42,3 +43,25 @@ else // Show Page List Table
     </table>
 }
 
+@section Scripts {
+<script type="text/javascript" src="~/Scripts/page.js"></script>
+<script type="text/javascript">
+    "use strict";
+    var page = new Page();
+    $(function() {
+        $("a.delete-page")
+            .click(function(e) {
+                e.preventDefault();
+                var pageName = $(this).attr("data-pageName");
+                var pageSection = $(this).attr("data-pageSection");
+                if (pageName != null) {
+                    var deleteStatus = page.delete(pageName, pageSection, "#alertMsgs");
+                    if (deleteStatus) {
+                        $(this).parent().parent().remove(); // remove row
+                    }
+                }
+                return;
+            });
+    });
+</script>
+}

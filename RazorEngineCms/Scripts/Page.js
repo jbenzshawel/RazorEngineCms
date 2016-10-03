@@ -22,6 +22,7 @@ Page.prototype.init = function () {
     this.$model = $("#model");
     this.$template = $("#template");
     this.createTemplateFile = $("input[name=\"templateFile\"]:checked").val();
+    this.hasParams = $("input[name=\"hasParams\"]:checked").val();
     if (typeof (pageTemplateEditor) != "undefined") {
         this.template = pageTemplateEditor.getValue().trim();
     }
@@ -70,7 +71,8 @@ Page.prototype.save = function () {
             Variable: scopedObject.variable,
             Model: scopedObject.model,
             Template: scopedObject.template,
-            CreateTemplateFile: scopedObject.createTemplateFile
+            CreateTemplateFile: scopedObject.createTemplateFile,
+            HasParams: scopedObject.hasParams
         };
         // callback for successful post request
         var successCallback = function (data) {
@@ -84,11 +86,11 @@ Page.prototype.save = function () {
                 
                 if (data.Errors.length > 0) {
                     var errorMsgBlock = [];
-                    for (var i = 0, error; error = data.Errors[i++];) {
+                    data.Errors.forEach(function(error) {
                         //logger.logError(error);
                         errorMsgBlock.push(error);
                         errorMsgBlock.push(("<br/>"));
-                    }
+                    });
                     $("#new-page-alert").append("<div class\"exception-msg\"><pre><h4>Exception:</h4>" + errorMsgBlock.join("") + "</pre></div>");
 
                 } // end if data.Errors.length > 0 
@@ -109,21 +111,41 @@ Page.prototype.save = function () {
     return;
 };
 
-Page.prototype.delete = function (name, variable) {
-    if (name == undefined || name == null) {
+Page.prototype.delete = function (name, variable, msgSel) {
+    if (name == undefined || name.length === 0) { // if empty get from Page object
         name = this.name;
     }
-    if (variable == undefined || variable == null) {
+    if (variable == undefined || variable.length === 0) { // if empty get from Page object
         variable = this.variable;
     }
+    var callbackReturnStatus = false;
     var successCallback = function (data) {
-        console.log(data);
+        $(msgSel).empty(); // clear any previous messages
+        if (data.Status === true) {
+            var successMsg = "The page /" + name + "/" + variable + " has been deleted.";
+            if (msgSel != undefined && msgSel.length > 0) {
+                _default.alertMsg("success", successMsg, msgSel);
+            }
+            callbackReturnStatus = true;
+            logger.logSuccess(successMsg);
+        } else if (data.Errors.length > 0) {
+            data.Errors.forEach(function(error) {
+                logger.logError(error);
+            });
+            callbackReturnStatus = false;
+        }
+        return callbackReturnStatus;
     }
     var settings = {
         type: "POST",
-        url: "Page/Delete/" + this.name + "/" + this.validate,
-        success: successCallback
+        url: variable != null ? "/Page/Delete/" + name + "/" + variable : "/Page/Delete/" + name,
+        success: successCallback,
+        async: false
     };
-    $.ajax(settings);
-    return;
+
+    if (name != null) {
+       return $.ajax(settings);
+    }
+
+    return false;
 };
