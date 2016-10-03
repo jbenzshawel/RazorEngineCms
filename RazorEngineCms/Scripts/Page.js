@@ -118,8 +118,8 @@ Page.prototype.delete = function (name, variable, msgSel) {
     if (variable == undefined || variable.length === 0) { // if empty get from Page object
         variable = this.variable;
     }
-    var callbackReturnStatus = false;
-    var successCallback = function (data) {
+    var successCallback = function(data) {
+        var callbackReturnStatus = false;
         $(msgSel).empty(); // clear any previous messages
         if (data.Status === true) {
             var successMsg = "The page /" + name + "/" + variable + " has been deleted.";
@@ -135,7 +135,7 @@ Page.prototype.delete = function (name, variable, msgSel) {
             callbackReturnStatus = false;
         }
         return callbackReturnStatus;
-    }
+    };
     var settings = {
         type: "POST",
         url: variable != null ? "/Page/Delete/" + name + "/" + variable : "/Page/Delete/" + name,

@@ -12,7 +12,7 @@
 {
     <p>No pages have been created. <a href="/Page/New">Create a new page?</a></p>
 }
-else // Show Page List Table 
+else // Show Page List Table
 {
     <div id="alertMsgs"></div>
     <table class="table">
@@ -35,7 +35,7 @@ else // Show Page List Table
                     <td>@page.Section</td>
                     <td><a href="/Page/View/@page.Name/@page.Section" target="_blank">Preview</a></td>
                     <td><a href="/Page/Edit/@page.Name/@page.Section">Edit</a></td>
-                    <td><a href="#" data-pageName="@page.Name" data-pageSection="@page.Section" class="delete-page">Delete</a></td>
+                    <td><a href="#" data-pagename="@page.Name" data-pagesection="@page.Section" class="delete-page">Delete</a></td>
 
                 </tr>
             }
@@ -44,13 +44,12 @@ else // Show Page List Table
 }
 
 @section Scripts {
-<script type="text/javascript" src="~/Scripts/page.js"></script>
-<script type="text/javascript">
-    "use strict";
-    var page = new Page();
-    $(function() {
-        $("a.delete-page")
-            .click(function(e) {
+    <script type="text/javascript" src="~/Scripts/page.js"></script>
+    <script type="text/javascript">
+        "use strict";
+        var page = new Page();
+        $(function () {
+            $("a.delete-page").click(function (e) {
                 e.preventDefault();
                 var pageName = $(this).attr("data-pageName");
                 var pageSection = $(this).attr("data-pageSection");
@@ -58,10 +57,9 @@ else // Show Page List Table
                     var deleteStatus = page.delete(pageName, pageSection, "#alertMsgs");
                     if (deleteStatus) {
                         $(this).parent().parent().remove(); // remove row
-                    }
-                }
-                return;
+                    } // end if deleteStatus true
+                } // end if pageName != null
             });
-    });
-</script>
+        }); // end document ready function
+    </script>
 }
