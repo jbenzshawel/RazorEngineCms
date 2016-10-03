@@ -7,6 +7,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using Mono.CSharp;
 using RazorEngineCms.App_Classes;
+using  System.Data;
+using System.Xml;
 
 namespace RazorEngineCMSTests
 {

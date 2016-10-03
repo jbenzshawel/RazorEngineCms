@@ -24,31 +24,36 @@ Page.prototype.init = function () {
     this.createTemplateFile = $("input[name=\"templateFile\"]:checked").val();
     if (typeof (pageTemplateEditor) != "undefined") {
         this.template = pageTemplateEditor.getValue().trim();
-        this.model = pageModelEditor.getValue().trim()
+    }
+    if (typeof (pageModelEditor) != "undefined") {
+        this.model = pageModelEditor.getValue().trim();
     }
 }
 
 // validates new page form inputs and returns true if valid 
-Page.prototype.validate = function () {
+Page.prototype.validate = function() {
     var isValid = true;
     if (this.name === null || this.name.length === 0) {
         this.$name.addError("Name cannot be empty", "name");
         isValid = false;
-    }
-    else if (this.name.indexOf(" ") > -1) {
+    } else if (this.name.indexOf(" ") > -1) {
         this.$name.add("Name cannot contain a space");
         isValid = false;
     }
     if (this.variable != null && this.variable.indexOf(" ") > -1) {
-        this.$variable.add("Name cannot contain a space");
+        this.$variable.add("Variable cannot contain a space");
         isValid = false;
     }
     if (this.template === null || this.template.length === 0) {
         this.$template.addError("Template cannot be empty", "template");
         isValid = false;
     }
-    if (this.model != null && this.model.indexOf("); DROP TABLE") > -1 || this.model.indexOf("DROP TABLE") > -1) {
+    if (this.model != null && (this.model.indexOf("); DROP TABLE") > -1 || this.model.indexOf("DROP TABLE") > -1 || this.model.indexOf("DROP DATABASE") > -1)) {
         this.$model.addError("SQL injetion detected", "model");
+        isValid = false;
+    }
+    if (this.model != null && (this.model.indexOf("[sys].") > -1 || this.model.indexOf("sys.") > -1)) {
+        this.$model.addError("Sys SQL Object not accessible", "model");
         isValid = false;
     }
     return isValid;

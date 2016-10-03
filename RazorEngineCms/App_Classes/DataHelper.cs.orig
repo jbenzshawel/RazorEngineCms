@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Data;
+<<<<<<< HEAD
+using RazorEngineCms.ExtensionClasses;
+=======
+using System.Data.SqlClient;
+>>>>>>> f71bfaa0e57fb21c407300dbb782874361db5f60
 
 namespace RazorEngineCms.App_Classes
 {
@@ -96,5 +101,12 @@ namespace RazorEngineCms.App_Classes
 
             return dataTable;
         }
+
+        void IDisposable.Dispose()
+        {
+           
+        }
+
+       
     }
 }
