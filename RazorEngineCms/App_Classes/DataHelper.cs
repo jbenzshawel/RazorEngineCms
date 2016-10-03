@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace RazorEngineCms.App_Classes
 {
@@ -95,6 +96,11 @@ namespace RazorEngineCms.App_Classes
             }
 
             return dataTable;
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }

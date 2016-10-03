@@ -30,10 +30,11 @@ namespace RazorEngineCms.Controllers
             _db = new ApplicationContext();
             Errors = new List<string>();
             FileHelper = new FileHelper();
-            CacheManager = new CacheManager();
-            AllowCache = ConfigurationManager.AppSettings["AllowPageCaching"] != null ? 
-                         ConfigurationManager.AppSettings["AllowPageCache"] == "true" : 
-                         false;
+            AllowCache = ConfigurationManager.AppSettings["AllowPageCaching"] == "true";
+            if (AllowCache)
+            {
+                CacheManager = new CacheManager();                
+            }
         }
 
         // GET: Page/New
@@ -130,28 +131,38 @@ namespace RazorEngineCms.Controllers
         // GET: Preview/Name/Variable 
         public ActionResult View(string name, string section, string param = null, string param2 = null)
         {
-            Page page;
+            Page page = null;
             var template = new PageTemplate { Content = string.Empty };
-            PageCache cachedPage = CacheManager.FindPage(name, section);
-            if (AllowCache && cachedPage != null)
+
+            if (AllowCache) // only look for page in cache if caching enabled
             {
-                page = new Page
+                PageCache cachedPage = CacheManager.FindPage(name, section);
+                if (cachedPage != null)
                 {
-                    Name = cachedPage.Name,
-                    Variable = cachedPage.Variable,
-                    CompiledModel = cachedPage.CompiledModel,
-                    CompiledTemplate = cachedPage.CompiledTemplate,
-                    Model = cachedPage.Model,
-                    Template = cachedPage.Template,
-                    HasParams = cachedPage.HasParams
-                };
-            } else
-            {
-                page = Page.FindPage(name, section);
-                CacheManager.AddPage(page);
+                    page = new Page
+                    {
+                        Name = cachedPage.Name,
+                        Variable = cachedPage.Variable,
+                        CompiledModel = cachedPage.CompiledModel,
+                        CompiledTemplate = cachedPage.CompiledTemplate,
+                        Model = cachedPage.Model,
+                        Template = cachedPage.Template,
+                        HasParams = cachedPage.HasParams
+                    };
+                }
             }
 
-            if (page != null)
+            // if we didn't get the page from cache get it from the db
+            if (page == null)
+            {
+                page = Page.FindPage(name, section);
+                if (AllowCache)
+                {
+                    CacheManager.AddPage(page);
+                }
+            }
+
+            if (page != null && page.CompiledTemplate != null)
             {
                 template.Content = page.CompiledTemplate;
             }

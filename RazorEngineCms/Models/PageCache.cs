@@ -12,6 +12,10 @@ namespace RazorEngineCms.Models
     [NotMapped]
     public class PageCache : Page
     {
+        public string Param { get; set; }
+
+        public string Param2 { get; set; }
+
         public string QueryString { get; set; }
 
         public DateTime DateTime { get; set; }
@@ -21,17 +25,20 @@ namespace RazorEngineCms.Models
 
         }
 
-        public PageCache(Page page, string queryString)
+        public PageCache(Page page, string param, string param2, string queryString)
         {
             this.Id = page.Id;
             this.Model = page.Model;
             this.Name = page.Name;
             this.Variable = page.Variable;
             this.Template = page.Template;
-            this.QueryString = queryString;
             this.CompiledModel = page.CompiledModel;
             this.CompiledTemplate = page.CompiledTemplate;
             this.DateTime = DateTime.Now;
+            this.Param = param;
+            this.Param2 = param2;
+            this.QueryString = queryString;
+
         }
     }
 }
