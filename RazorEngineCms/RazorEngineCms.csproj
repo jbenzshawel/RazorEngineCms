@@ -600,6 +600,7 @@
     <Content Include="Views\Page\NotFound.cshtml" />
     <Content Include="Views\Page\List.cshtml" />
     <Content Include="Views\Page\Edit.cshtml" />
+    <Content Include="Views\Shared\_ConfiromDeleteModalPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

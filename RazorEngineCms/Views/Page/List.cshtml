@@ -43,22 +43,43 @@ else // Show Page List Table
     </table>
 }
 
+    @Html.Partial("_ConfiromDeleteModalPartial");
+
 @section Scripts {
     <script type="text/javascript" src="~/Scripts/page.js"></script>
     <script type="text/javascript">
         "use strict";
         var page = new Page();
+        // called on confirmation of delete modal
+        // deletes a page using POST: /Page/Delete/{name}/{section}
+        function confirmDelete(sessionKey) {
+            if (sessionKey != null) {
+                var storedPage = JSON.parse(sessionStorage.getItem(sessionKey));
+                var deleteStatus = page.delete(storedPage.pageName, storedPage.pageSection, "#alertMsgs");
+                if (deleteStatus) {
+                    $("a[data-pagename=\"" + storedPage.pageName + "\"][data-pagesection=\"" + storedPage.pageSection + "\"]").parent().parent().remove(); // remove row
+                } // end if deleteStatus true
+                sessionStorage.removeItem(sessionKey);
+            } // end if pageName != null
+            $("#deletePageModal").modal("hide");
+        }
         $(function () {
-            $("a.delete-page").click(function (e) {
+            $("#confirmDeletePage").click(function () {
+                var sessionKey = $(this).attr("data-sessionkey");;
+                confirmDelete(sessionKey);
+            });
+            $("a.delete-page").click(function(e) {
                 e.preventDefault();
-                var pageName = $(this).attr("data-pageName");
-                var pageSection = $(this).attr("data-pageSection");
-                if (pageName != null) {
-                    var deleteStatus = page.delete(pageName, pageSection, "#alertMsgs");
-                    if (deleteStatus) {
-                        $(this).parent().parent().remove(); // remove row
-                    } // end if deleteStatus true
-                } // end if pageName != null
+                var pageItem = {
+                    pageName : $(this).attr("data-pagename"),
+                    pageSection : $(this).attr("data-pagesection"),
+                    thisSel : $(this)
+                };
+                var sessionKey = "/" + pageItem.pageName + "/" + pageItem.pageSection;
+                $("#deletePageName").text(sessionKey);
+                $("#confirmDeletePage").attr("data-sessionkey", sessionKey);
+                sessionStorage.setItem(sessionKey, JSON.stringify(pageItem));
+                $("#deletePageModal").modal("show");
             });
         }); // end document ready function
     </script>
