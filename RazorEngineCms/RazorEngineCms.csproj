@@ -167,6 +167,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Classes\CacheManager.cs" />
     <Compile Include="App_Classes\DataHelper.cs" />
     <Compile Include="App_Classes\FileHelper.cs" />
     <Compile Include="App_Classes\StringCompiler.cs" />
@@ -180,6 +181,7 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\PageController.cs" />
     <Compile Include="DAL\ApplicationContext.cs" />
+    <Compile Include="ExtensionClasses\DataTableToJson.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -187,10 +189,15 @@
     <Compile Include="Migrations\201609251544488_firstMigration.Designer.cs">
       <DependentUpon>201609251544488_firstMigration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610022206336_UpdatingPageModelProperties.cs" />
+    <Compile Include="Migrations\201610022206336_UpdatingPageModelProperties.Designer.cs">
+      <DependentUpon>201610022206336_UpdatingPageModelProperties.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\PageCache.cs" />
     <Compile Include="Models\PageList.cs" />
     <Compile Include="Models\PageTemplate.cs" />
     <Compile Include="Models\RequestModels.cs" />
@@ -585,7 +592,7 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Page\New.cshtml" />
-    <Content Include="Views\Page\Preview.cshtml" />
+    <Content Include="Views\Page\View.cshtml" />
     <Content Include="Views\Page\NotFound.cshtml" />
     <Content Include="Views\Page\List.cshtml" />
     <Content Include="Views\Page\Edit.cshtml" />
@@ -606,6 +613,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201609251544488_firstMigration.resx">
       <DependentUpon>201609251544488_firstMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610022206336_UpdatingPageModelProperties.resx">
+      <DependentUpon>201610022206336_UpdatingPageModelProperties.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

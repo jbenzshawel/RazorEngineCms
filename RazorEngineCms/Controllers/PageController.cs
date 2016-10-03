@@ -1,5 +1,5 @@
 ﻿using System;
-using System.CodeDom;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -17,7 +17,11 @@ namespace RazorEngineCms.Controllers
     {
         public List<string> Errors { get; set; }
 
+        public bool AllowCache { get; set; }
+
         internal FileHelper FileHelper { get; set; }
+
+        internal CacheManager CacheManager { get; set; }
 
         private ApplicationContext _db { get; set; }
 
@@ -26,6 +30,10 @@ namespace RazorEngineCms.Controllers
             _db = new ApplicationContext();
             Errors = new List<string>();
             FileHelper = new FileHelper();
+            CacheManager = new CacheManager();
+            AllowCache = ConfigurationManager.AppSettings["AllowPageCaching"] != null ? 
+                         ConfigurationManager.AppSettings["AllowPageCache"] == "true" : 
+                         false;
         }
 
         // GET: Page/New
@@ -88,18 +96,58 @@ namespace RazorEngineCms.Controllers
             return View("~/Views/Page/NotFound.cshtml");
         }
 
+        [HttpPost]
+        public async Task<ActionResult> Delete(string name, string variable)
+        {
+            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(variable))
+            {
+                try
+                {
+                    var page = Page.FindPage(name, variable);
+                    this._db.Page.Remove(page);
+                    await this._db.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    this.Errors.Add(ex.Message);
+                }
+            }
+
+            return Json(new { Status = this.Errors.Count == 0, this.Errors });
+        }
+
         /// <summary>
         /// Returns view with the template for the passed in name and variable. The
         /// PageTemplate model is passed to the view. 
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="variable"></param>
+        /// <param name="section"></param>
+        /// <param name="param"></param>
+        /// <param name="param2"></param>
         /// <returns></returns>
         // GET: Preview/Name/Variable 
-        public ActionResult Preview(string name, string variable)
+        public ActionResult View(string name, string section, string param = null, string param2 = null)
         {
+            Page page;
             var template = new PageTemplate { Content = string.Empty };
-            var page = Page.FindPage(name, variable);
+            PageCache cachedPage = CacheManager.FindPage(name, section);
+            if (AllowCache && cachedPage != null)
+            {
+                page = new Page
+                {
+                    Name = cachedPage.Name,
+                    Variable = cachedPage.Variable,
+                    CompiledModel = cachedPage.CompiledModel,
+                    CompiledTemplate = cachedPage.CompiledTemplate,
+                    Model = cachedPage.Model,
+                    Template = cachedPage.Template,
+                    HasParams = cachedPage.HasParams
+                };
+            } else
+            {
+                page = Page.FindPage(name, section);
+                CacheManager.AddPage(page);
+            }
 
             if (page != null)
             {
@@ -117,10 +165,10 @@ namespace RazorEngineCms.Controllers
 
         public ActionResult List()
         {
-            var pageModel = new PageList { Pages = new List<Page>() };
+            ICollection<Page> pageList = new PageList(); 
             foreach (var file in FileHelper.Files)
             {
-                pageModel.Pages.Add(new Page
+                pageList.Add(new Page
                 {
                     Id = -1,
                     Name = file.Name,
@@ -130,9 +178,9 @@ namespace RazorEngineCms.Controllers
             }
             foreach (var page in _db.Page)
             {
-                pageModel.Pages.Add(page);
+                pageList.Add(page);
             }
-            return View(pageModel);
+            return View(pageList);
         }
 
         internal async Task<Page> CompileTemplateAndSavePage(Page page, bool saveAsFile = false)

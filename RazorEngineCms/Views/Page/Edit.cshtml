@@ -23,9 +23,16 @@
                 <input type="text" name="pageName" id="pageName" class="form-control" value="@Model.Name" />
             </div>
             <div class="form-group">
-                <label for="pageVar">Page Variable</label>
+                <label for="pageVar">Page Section</label>
                 <input type="text" name="pageVar" id="pageVar" class="form-control" value="@Model.Variable" />
             </div>
+            <div class="form-group">
+                <label for="hasParams">Does this page have url parameters?</label>
+                <p> Default route is /name/section/param/param2 where param and param2 are option parameters.</p>
+                <input type="radio" name="hasParams" id="hasParams-true" value="true" class="formControl"/> True
+                <input type="radio" name="hasParams" id="hasParams-false" value="false" class="formControl" checked/> False
+
+             </div>
             <div class="form-group">
                 <label for="model">Page Model</label>
                 <p>Create an object variable named "Model" to pass .NET code to view</p>
@@ -44,10 +51,30 @@
 
             <div class="form-group">
                 <input type="submit" class="btn btn-default" id="submitNewPage" />
+                <button type="button" class="btn btn-danger" id="deletePage" >Delete Page</button>
             </div>
         </form>
     </div>
 </div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="deletePageModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Delete Pag?</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the page <span id="deletePageName"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Nope</button>
+                <button type="button" class="btn btn-danger" id="confirmDeletePage">Yes delete page</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 @section Scripts {
     <script type="text/javascript" src="~/Scripts/page.js"></script>
     <script type="text/javascript">
@@ -64,7 +91,7 @@
         var pageTemplateEditor = CodeMirror.fromTextArea(document.getElementById("template"), {
             lineNumbers: true,
             matchBrackets: true,
-            mode: "xml",
+            mode: "htmlmixed",
             theme: "material"
         });
         pageTemplateEditor.getDoc().setValue(`@Html.Raw(Model.Template)`);
@@ -77,6 +104,17 @@
                 //return;
                 page = new Page();
             }
+            $("#deletePage").click(function (e) {
+                e.preventDefault();
+                page.init();
+                $("#deletePageName").text('"' + page.name + "/" + page.variable + '"');
+                $("#deletePageModal").modal("show");
+            });
+            $("#confirmDeletePage").click(function () {
+                page.init();
+                page.delete(page.name, page.variable);
+                return;
+            });
             $("#submitNewPage").click(function (e) {
                 e.preventDefault();
                 page.save();

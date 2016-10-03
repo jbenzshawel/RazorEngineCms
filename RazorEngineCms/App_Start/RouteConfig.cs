@@ -15,21 +15,34 @@ namespace RazorEngineCms
 
             routes.MapRoute(
                 name: "Page",
-                url: "Page/{action}/{name}/{variable}",
+                url: "Page/{action}/{name}/{section}",
                 defaults:
                 new
                 {
                     controller = "Page",
                     action = UrlParameter.Optional,
                     name = UrlParameter.Optional,
-                    variable = UrlParameter.Optional
+                    section = UrlParameter.Optional
                 });
 
             routes.MapRoute(
-                name: "Default",
+                name: "CMS",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+
+            routes.MapRoute(
+                name: "Default",
+                url: "{page}/{section}/{param}/{param2}",
+                defaults: new
+                {
+                    controller = "Page",
+                    action = "View",
+                    name = UrlParameter.Optional,
+                    variable = UrlParameter.Optional,
+                    param = UrlParameter.Optional,
+                    param2 = UrlParameter.Optional
+                });
 
 
         }

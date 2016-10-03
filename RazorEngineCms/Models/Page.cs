@@ -26,6 +26,8 @@ namespace RazorEngineCms.Models
 
         public string CompiledTemplate { get; set; }
 
+        public bool HasParams { get; set; }
+
         public Page()
         {
 

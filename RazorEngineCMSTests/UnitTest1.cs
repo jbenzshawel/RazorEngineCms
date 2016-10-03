@@ -66,7 +66,16 @@ namespace RazorEngineCMSTests
             var dataHelper = new DataHelper();
             var results = dataHelper.GetData("prGetPages");
 
-            Assert.IsNotNull(results);
+            Assert.IsTrue(results.Rows.Count > 0);
         }
+
+        //[TestMethod]
+        //public void TestGetDataJson()
+        //{
+        //    var dataHelper = new DataHelper();
+        //    var results = dataHelper.GetDataJson("prGetPages");
+
+        //    Assert.IsNotNull(results);
+        //}
     }
 }

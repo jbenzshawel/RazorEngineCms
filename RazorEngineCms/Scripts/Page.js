@@ -73,7 +73,7 @@ Page.prototype.save = function () {
             // create element to store alerts
             $("#newPage").prepend("<div id=\"new-page-alert\"></div>");
             if (data.Status == true) {
-                _default.alertMsg("success", "New page created. <a href='/Page/Preview/" + scopedObject.name + "/" + scopedObject.variable + "' target='_blank'>Preview</a>", "#new-page-alert")
+                _default.alertMsg("success", "Page has been saved. <a href='/Page/View/" + scopedObject.name + "/" + scopedObject.variable + "' target='_blank'>Preview</a>", "#new-page-alert")
             } else {
                 _default.alertMsg("error", "Something went wrong. Try again?", "#new-page-alert")
                 
@@ -101,5 +101,24 @@ Page.prototype.save = function () {
         // submit post request 
         $.ajax(settings);
     } // end if valid request 
+    return;
+};
+
+Page.prototype.delete = function (name, variable) {
+    if (name == undefined || name == null) {
+        name = this.name;
+    }
+    if (variable == undefined || variable == null) {
+        variable = this.variable;
+    }
+    var successCallback = function (data) {
+        console.log(data);
+    }
+    var settings = {
+        type: "POST",
+        url: "Page/Delete/" + this.name + "/" + this.validate,
+        success: successCallback
+    };
+    $.ajax(settings);
     return;
 };
