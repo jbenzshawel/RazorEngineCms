@@ -281,10 +281,8 @@ namespace RazorEngineCms.Controllers
             } // end catch
 
             // save copy in db regardless of saveAsFile param
-            var pageInDb =
-                        _db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                    p.Section.Equals(page.Section,
-                                                    StringComparison.CurrentCultureIgnoreCase));
+            var pageInDb = _db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
+                                                    p.Section.Equals(page.Section, StringComparison.CurrentCultureIgnoreCase));
             if (pageInDb != null)
             {
                 // update the page if it exists
