@@ -9,9 +9,16 @@ using RazorEngineCms.DAL;
 
 namespace RazorEngineCms.App_Classes
 {
-    [Serializable]
+    /// <summary>
+    /// Contains an IList&gt;PageCache&lt; CacheList property that is parsed from a cached object.
+    /// If cache empty CacheList returns an empty list.
+    /// </summary>
     public class CacheManager
     {
+        /// <summary>
+        /// Contains an IList&gt;PageCache&lt; CacheList property that is parsed from a cached object.
+        /// If cache empty CacheList returns an empty list.
+        /// </summary>
         public IList<PageCache> CacheList { get; set; }
 
         private const string CACHE_KEY = "RazorEngineCms.App_Classes.CacheManager.CacheList";
@@ -24,12 +31,16 @@ namespace RazorEngineCms.App_Classes
             {
                 this.UpdateCacheList();
             }
-            else
+            
+            if (this.CacheList == null)
             {
                 this.CacheList = new List<PageCache>();
             }
         }
 
+        /// <summary>
+        /// Updates CacheList property with latest content in cache 
+        /// </summary>
         public void UpdateCacheList()
         {
             if (Cache[CACHE_KEY] != null)
@@ -42,13 +53,6 @@ namespace RazorEngineCms.App_Classes
                 else // cache exists 
                 {
                     this.CacheList = cacheList;
-                }
-            }
-            else
-            {
-                if (this.CacheList == null)
-                {
-                    this.CacheList = new List<PageCache>();
                 }
             }
 
@@ -65,24 +69,23 @@ namespace RazorEngineCms.App_Classes
 
         public void RemovePage(string name, string section, string param = null, string param2 = null)
         {
-            var pageToRemove = this.CacheList.FirstOrDefault(
-                cachedPage => string.Equals(cachedPage.Name, name, StringComparison.CurrentCultureIgnoreCase) && 
-                              string.Equals(cachedPage.Variable, section, StringComparison.CurrentCultureIgnoreCase) &&
-                              string.Equals(cachedPage.Param, param, StringComparison.CurrentCultureIgnoreCase) &&
-                              string.Equals(cachedPage.Param2, param2, StringComparison.CurrentCultureIgnoreCase));
+            var pageToRemove = this.FindPage(name, section, param, param2);
             this.UpdateCacheList();
             this.CacheList.Remove(pageToRemove);
             Cache[CACHE_KEY] = JsonConvert.SerializeObject(this);
         }
 
-        public PageCache FindPage(string name, string section)
+        public PageCache FindPage(string name, string section, string param = null, string param2 = null)
         {
             PageCache pageCache = null;
 
             if (this.CacheList.Count > 0)
             {
-                pageCache = this.CacheList.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-                                           string.Equals(p.Variable, section, StringComparison.CurrentCultureIgnoreCase));
+                pageCache = this.CacheList.FirstOrDefault(
+                cachedPage => string.Equals(cachedPage.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
+                              string.Equals(cachedPage.Variable, section, StringComparison.CurrentCultureIgnoreCase) &&
+                              string.Equals(cachedPage.Param, param, StringComparison.CurrentCultureIgnoreCase) &&
+                              string.Equals(cachedPage.Param2, param2, StringComparison.CurrentCultureIgnoreCase));
 
             }
 

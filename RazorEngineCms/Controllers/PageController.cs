@@ -86,6 +86,12 @@ namespace RazorEngineCms.Controllers
             return Json(new { Status = Errors.Count == 0, Errors });
         }
 
+        /// <summary>
+        /// Finds a page to edit and returns the page. Returns 404 if not found
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="variable"></param>
+        /// <returns></returns>
         public ActionResult Edit(string name, string variable)
         {
             var page = Page.FindPage(name, variable);
@@ -99,6 +105,12 @@ namespace RazorEngineCms.Controllers
             return View("~/Views/Page/NotFound.cshtml");
         }
 
+        /// <summary>
+        /// Postback for deleting a page 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="variable"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult> Delete(string name, string variable)
         {
@@ -158,7 +170,7 @@ namespace RazorEngineCms.Controllers
                 page = Page.FindPage(name, section);
                 if (AllowCache)
                 {
-                    CacheManager.AddPage(page);
+                    CacheManager.AddPage(page, param, param2);
                 }
             }
 
@@ -176,6 +188,10 @@ namespace RazorEngineCms.Controllers
             return View("~/Views/Page/NotFound.cshtml");
         }
 
+        /// <summary>
+        /// Gets a list of pages from the database and returns a PageList to the View
+        /// </summary>
+        /// <returns></returns>
         public ActionResult List()
         {
             IList<Page> pageList = new PageList(); 
@@ -196,6 +212,14 @@ namespace RazorEngineCms.Controllers
             return View(pageList);
         }
 
+        /// <summary>
+        /// Compiles a page template by parsing a json object in page.CompiledModel and
+        /// uses RazorEngine to compile the Template view. Save results in the database 
+        /// and optional as a file as well
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="saveAsFile"></param>
+        /// <returns></returns>
         internal async Task<Page> CompileTemplateAndSavePage(Page page, bool saveAsFile = false)
         {
 
