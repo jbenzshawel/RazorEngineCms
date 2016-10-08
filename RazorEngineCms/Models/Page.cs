@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using Newtonsoft.Json;
+using RazorEngine;
+using RazorEngine.Templating;
 using RazorEngineCms.App_Classes;
+using RazorEngineCms.Controllers;
 using RazorEngineCms.DAL;
 
 namespace RazorEngineCms.Models
@@ -36,9 +40,10 @@ namespace RazorEngineCms.Models
         public Page(PageRequest pageRequest)
         {
             this.Name = pageRequest.Name;
-            this.Section = pageRequest.Variable;
+            this.Section = pageRequest.Section;
             this.Model = pageRequest.Model;
             this.Template = pageRequest.Template;
+            this.HasParams = pageRequest.HasParams;
         }
 
         internal static Page FindPage(string name, string variable)
@@ -60,6 +65,38 @@ namespace RazorEngineCms.Models
             }
 
             return page;
+        }
+
+        internal void CompileTemplate(ref List<string> errors, string template = null, string jsonModel = null)
+        {
+            if (string.IsNullOrEmpty(template))
+            {
+                template = this.Template;
+            }
+
+            if (string.IsNullOrEmpty(jsonModel))
+            {
+                jsonModel = this.CompiledModel;
+            }
+
+            var templateGuid = Guid.NewGuid().ToString();
+            var cacheName = string.Format("{0}-{1}", this.Name, templateGuid);
+
+            try
+            {
+                // null for modelType parameter since templates are dynamic 
+                this.CompiledTemplate = Engine.Razor.RunCompile(template, cacheName, null,
+                    JsonConvert.DeserializeObject(jsonModel));
+            }
+            catch (Exception ex)
+            {
+                errors.Add(string.Format("Template Compile Error: {0}", ex.Message));
+                if (ex.GetType() == typeof(TemplateParsingException))
+                {
+                    errors.Add(string.Format("Line: {0}", ((TemplateParsingException)ex).Line));
+                }
+                errors.Add(string.Format("Stack Trace: \r\n {0}", ex.StackTrace));
+            }
         }
     }
 }

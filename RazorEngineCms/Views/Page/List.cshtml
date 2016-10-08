@@ -19,8 +19,8 @@ else // Show Page List Table
         <thead>
             <tr>
                 <th>Page ID</th>
-                <th>Page Name</th>
                 <th>Page Section</th>
+                <th>Page Name</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
@@ -31,11 +31,12 @@ else // Show Page List Table
             {
                 <tr>
                     <td>@page.Id</td>
-                    <td>@page.Name</td>
                     <td>@page.Section</td>
+                    <td>@page.Name</td>
                     <td><a href="/@page.Name/@page.Section" target="_blank">View</a></td>
                     <td><a href="/CMS/Page/Edit/@page.Name/@page.Section">Edit</a></td>
                     <td><a href="#"
+                           data-pageid="@page.Id"
                            data-pagename="@page.Name"
                            data-pagesection="@page.Section"
                            class="delete-page">
@@ -60,7 +61,7 @@ else // Show Page List Table
         function confirmDelete(sessionKey) {
             if (sessionKey != null) {
                 var storedPage = JSON.parse(sessionStorage.getItem(sessionKey));
-                var deleteStatus = page.delete(storedPage.pageName, storedPage.pageSection, "#alertMsgs");
+                var deleteStatus = page.delete(storedPage.pageId, storedPage.pageName, storedPage.pageSection, "#alertMsgs");
                 if (deleteStatus) {
                     $("a[data-pagename=\"" + storedPage.pageName + "\"][data-pagesection=\"" + storedPage.pageSection + "\"]")
                         .parent().parent().remove(); // remove deleted row
@@ -78,10 +79,11 @@ else // Show Page List Table
             $("a.delete-page").click(function(e) {
                 e.preventDefault();
                 var pageItem = {
+                    pageId: $(this).attr("data-pageid"),
                     pageName : $(this).attr("data-pagename"),
                     pageSection : $(this).attr("data-pagesection")
                 };
-                var sessionKey = "/" + pageItem.pageName + "/" + pageItem.pageSection;
+                var sessionKey = "page-" + pageItem.pageId;
                 $("#deletePageName").text(sessionKey);
                 $("#confirmDeletePage").attr("data-sessionkey", sessionKey);
                 sessionStorage.setItem(sessionKey, JSON.stringify(pageItem));

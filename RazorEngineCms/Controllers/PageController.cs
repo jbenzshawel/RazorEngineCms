@@ -91,7 +91,7 @@ namespace RazorEngineCms.Controllers
         /// <param name="name"></param>
         /// <param name="section"></param>
         /// <returns></returns>
-        public ActionResult Edit(string name, string section)
+        public ActionResult Edit(string section, string name)
         {
             var page = Page.FindPage(name, section);
 
@@ -111,16 +111,31 @@ namespace RazorEngineCms.Controllers
         /// <param name="variable"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> Delete(string name, string section = null)
+        public async Task<ActionResult> Delete(DeletePageRequest page)
         {
             bool status = false;
-            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(section))
+            Page pageModel = null;
+
+            if (page.Id > 0)
+            {
+                pageModel = this._db.Page.FirstOrDefault(p => p.Id == page.Id);
+            }
+            else if (!string.IsNullOrEmpty(page.Name) && !string.IsNullOrEmpty(page.Section))
+            {
+                pageModel = Page.FindPage(page.Name, page.Section);
+            }
+            else
+            {
+                this.Errors.Add("Page not found");
+            }
+
+            if (pageModel != null)
             {
                 try
                 {
-                    var page = Page.FindPage(name, section);
-                    this._db.Page.Attach(page);
-                    this._db.Page.Remove(page);
+                    
+                    this._db.Page.Attach(pageModel);
+                    this._db.Page.Remove(pageModel);
                     status = await this._db.SaveChangesAsync() > 0;
                 }
                 catch (Exception ex)
@@ -129,11 +144,7 @@ namespace RazorEngineCms.Controllers
                     status = false;
                 }
             }
-            else
-            {
-                this.Errors.Add("Page not found");
-            }
-
+            
             return Json(new { Status = status, this.Errors });
         }
 
@@ -152,7 +163,8 @@ namespace RazorEngineCms.Controllers
             Page page = null;
             var template = new PageTemplate { Content = string.Empty };
 
-            if (AllowCache) // only look for page in cache if caching enabled
+            // if AllowCache enabled in Web.config look for the page in cache
+            if (AllowCache) 
             {
                 CacheManager = new CacheManager();
                 PageCache cachedPage = CacheManager.FindPage(name, section);
@@ -181,10 +193,36 @@ namespace RazorEngineCms.Controllers
                 }
             }
 
-            if (page != null && page.CompiledTemplate != null)
+            // when page doesn't have parameters can use pre-compiled template 
+            if (page != null && page.CompiledTemplate != null && page.HasParams == false)
             {
                 template.Content = page.CompiledTemplate;
-                // return the page with a template if it is found
+            }
+            else if (page != null && page.HasParams) // pass url params to page model and compile template 
+            {
+                using (var stringCompiler = new StringCompiler())
+                {
+                    stringCompiler.CompilePageModel(page.Model, param, param2);
+
+                    // 
+                    if (stringCompiler.IsValid)
+                    {
+                        var jsonModel = stringCompiler.ToString();
+                        List<string> errors = this.Errors;
+                        page.CompileTemplate(ref errors, page.Template, jsonModel);
+                    }
+
+                    if (page.CompiledTemplate != null)
+                    {
+                        template.Content = page.CompiledTemplate;
+                    }
+
+                } // end using stringCompiler
+            } // end else if page has paramaters 
+
+            // return the page with a template if it is found
+            if (!string.IsNullOrEmpty(template.Content))
+            {
                 return View(template);
             }
 
@@ -226,15 +264,13 @@ namespace RazorEngineCms.Controllers
         /// <returns></returns>
         internal async Task<Page> CompileTemplateAndSavePage(Page page, bool saveAsFile = false)
         {
-            var templateGuid = Guid.NewGuid().ToString();
-            var cacheName = string.Format("{0}-{1}", page.Name, templateGuid);
-
+            
             try
             {
                 if (!string.IsNullOrEmpty(page.Model))
                 {
-                    // null for modelType parameter since templates are dynamic 
-                    page.CompiledTemplate = Engine.Razor.RunCompile(page.Template, cacheName, null, JsonConvert.DeserializeObject(page.CompiledModel));
+                    List<string> errors = this.Errors;
+                    page.CompileTemplate(ref errors);
                 }
                 else // no template model so do not need to compile
                 {
@@ -243,7 +279,7 @@ namespace RazorEngineCms.Controllers
                 
                 if (saveAsFile)
                 {
-                    var fileName = string.Format("{0}-{1}-template-{2}.html", page.Name, string.IsNullOrEmpty(page.Section) ? "_" : page.Section, templateGuid);
+                    var fileName = string.Format("{0}-{1}-template-{2}.html", page.Name, string.IsNullOrEmpty(page.Section) ? "_" : page.Section, Guid.NewGuid());
                     var savePath = Server.MapPath("~") + @"\Views\CompiledTemplates\" + fileName;
                     // delete the template if it exists 
                     var oldFile = FileHelper.GetFile(page.Name, page.Section);
@@ -260,12 +296,6 @@ namespace RazorEngineCms.Controllers
             } // end try
             catch (Exception ex) // catch exception from saving as file
             {
-                Errors.Add(string.Format("Template Compile Error: {0}", ex.Message));
-                if (ex.GetType() == typeof(TemplateParsingException))
-                {
-                    Errors.Add(string.Format("Line: {0}", ((TemplateParsingException)ex).Line));
-                }
-                Errors.Add(string.Format("Stack Trace: \r\n {0}", ex.StackTrace));
                 // if failed to save model get why
                 if (_db.GetValidationErrors().Any())
                 {

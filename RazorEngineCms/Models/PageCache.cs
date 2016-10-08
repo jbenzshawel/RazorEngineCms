@@ -27,13 +27,17 @@ namespace RazorEngineCms.Models
 
         public PageCache(Page page, string param, string param2, string queryString)
         {
-            this.Id = page.Id;
-            this.Model = page.Model;
-            this.Name = page.Name;
-            this.Section = page.Section;
-            this.Template = page.Template;
-            this.CompiledModel = page.CompiledModel;
-            this.CompiledTemplate = page.CompiledTemplate;
+            if (page != null)
+            {
+                this.Id = page.Id;
+                this.Model = page.Model;
+                this.Name = page.Name;
+                this.Section = page.Section;
+                this.Template = page.Template;
+                this.CompiledModel = page.CompiledModel;
+                this.CompiledTemplate = page.CompiledTemplate;
+            }
+           
             this.DateTime = DateTime.Now;
             this.Param = param;
             this.Param2 = param2;

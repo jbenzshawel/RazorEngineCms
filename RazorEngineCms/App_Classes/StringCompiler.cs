@@ -26,7 +26,7 @@ namespace RazorEngineCms.App_Classes
             this.Errors = new List<string>();
         }
 
-        public void CompilePageModel(string model)
+        public void CompilePageModel(string model, string param = null, string param2 = null)
         {
             if (string.IsNullOrEmpty(model))
             {
@@ -45,11 +45,12 @@ namespace RazorEngineCms.App_Classes
                     sw.WriteLine("using System.Data.SqlClient;");
                     sw.WriteLine("using System.Collections.Generic;");
                     sw.WriteLine("using System.Linq;");
+                    sw.WriteLine("using System.Web;");
                     sw.WriteLine("using System.Xml.Serialization;");
                     sw.WriteLine("using Newtonsoft.Json;");
                     sw.WriteLine("using RazorEngineCms.App_Classes;");
                     sw.WriteLine("public class ModelClass { ");
-                    sw.WriteLine("public string Execute() { ");
+                    sw.WriteLine("public string Execute(HttpContext httpContext, string param = null, string param2 = null) { ");
                     sw.WriteLine(model);
                     sw.WriteLine("return JsonConvert.SerializeObject(Model);");
                     sw.WriteLine("} ");
@@ -65,10 +66,12 @@ namespace RazorEngineCms.App_Classes
                     OutputAssembly = string.Format("temp-assemly-{0}", compileModelGuid)
                     
                 };
+                // if a reference is added in the above C# string make sure it is also added as a paramater 
                 paramz.ReferencedAssemblies.AddRange(new string[] { "System.dll",
                                                                     "System.Linq.dll",
                                                                     "System.Data.dll",
                                                                     "System.Xml.dll",
+                                                                    "System.Web.dll",
                                                                     @"C:\Git\RazorEngineCms\RazorEngineCms\bin\RazorEngineCms.dll",
                                                                     @"C:\Git\RazorEngineCms\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll" });
 
@@ -78,7 +81,18 @@ namespace RazorEngineCms.App_Classes
                 {
                     var type = providerResult.CompiledAssembly.GetType("ModelClass");
                     var obj = Activator.CreateInstance(type);
-                    var output = type.GetMethod("Execute").Invoke(obj, new object[] { });
+                    // Method ModelClass.Execute has one parameter of type HttpContext 
+                    var httpContextParamater = HttpContext.Current;
+                    // Invoke method. Method returns an object that will be parsed as JSON to pass to the view 
+                    object output = null;
+                    if (string.IsNullOrEmpty(param))
+                    {
+                        output = type.GetMethod("Execute").Invoke(obj, new object[] { httpContextParamater, param, param2 });
+                    }
+                    else
+                    {
+                        output = type.GetMethod("Execute").Invoke(obj, new object[] { httpContextParamater });                        
+                    }
                     this.JsonResult = output.ToString();
                 } // end try compile model
                 catch (Exception ex)

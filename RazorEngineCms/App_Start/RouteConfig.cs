@@ -29,7 +29,7 @@ namespace RazorEngineCms
 
             routes.MapRoute(
                 name: "Default",
-                url: "{name}/{section}/{param}/{param2}",
+                url: "{section}/{name}/{param}/{param2}",
                 defaults: new
                 {
                     controller = "Page",
