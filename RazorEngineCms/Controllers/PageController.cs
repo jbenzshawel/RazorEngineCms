@@ -4,18 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using System.Threading.Tasks;
-using RazorEngine;
-using RazorEngine.Templating;
 using RazorEngineCms.DAL;
 using RazorEngineCms.Models;
 using RazorEngineCms.App_Classes;
-using Newtonsoft.Json;
+using RazorEngineCms.ExtensionClasses;
+using System.Collections.Concurrent;
 
 namespace RazorEngineCms.Controllers
 {
     public class PageController : Controller
     {
-        public List<string> Errors { get; set; }
+        public ConcurrentBag<string> Errors { get; set; }
 
         public bool AllowCache { get; set; }
 
@@ -27,10 +26,10 @@ namespace RazorEngineCms.Controllers
 
         public PageController()
         {
-            _db = new ApplicationContext();
-            Errors = new List<string>();
-            FileHelper = new FileHelper();
-            AllowCache = ConfigurationManager.AppSettings["AllowPageCaching"] == "true";
+            this._db = new ApplicationContext();
+            this.Errors = new ConcurrentBag<string>();
+            this.FileHelper = new FileHelper();
+            this.AllowCache = ConfigurationManager.AppSettings["AllowPageCaching"] == "true";
         }
 
         // GET: Page/New
@@ -57,7 +56,14 @@ namespace RazorEngineCms.Controllers
                     // compile the model from the string Model declaration in pageRequest
                     using (var stringCompiler = new StringCompiler())
                     {
-                        stringCompiler.CompilePageModel(page.Model);
+                        if (page.HasParams)
+                        {
+                            stringCompiler.CompilePageModel(page.Model, string.Empty, string.Empty);
+                        }
+                        else
+                        {
+                            stringCompiler.CompilePageModel(page.Model);
+                        }
                         if (stringCompiler.IsValid)
                         {
                             page.CompiledModel = stringCompiler.ToString();
@@ -99,7 +105,7 @@ namespace RazorEngineCms.Controllers
             }
 
             // return 404 view if could not find page in db or files 
-            return View("~/Views/Page/NotFound.cshtml");
+            return View("~/Views/NotFound.cshtml");
         }
 
         /// <summary>
@@ -165,7 +171,7 @@ namespace RazorEngineCms.Controllers
             var template = new PageTemplate { Content = string.Empty };
 
             // if AllowCache enabled in Web.Config look for the page in cache
-            if (AllowCache)
+            if (this.AllowCache)
             {
                 CacheManager = new CacheManager();
                 PageCache cachedPage = CacheManager.FindPage(name, section);
@@ -188,7 +194,7 @@ namespace RazorEngineCms.Controllers
             if (page == null || page.CompiledTemplate == null)
             {
                 page = Page.FindPage(section, name);
-                if (AllowCache)
+                if (this.AllowCache)
                 {
                     CacheManager.AddPage(page, param, param2);
                 }
@@ -223,12 +229,13 @@ namespace RazorEngineCms.Controllers
 
                 if (templateNeedsCompiled(page))
                 {
-                    List<string> errors = this.Errors;
+                    ConcurrentBag<string> errors = this.Errors;
                     page.CompileTemplate(ref errors, page.Template, page.CompiledModel);
                 }
 
                 template.Content = page.CompiledTemplate;
             } // end else if page has paramaters 
+
 
             // return the page with a template if it is found
             if (!string.IsNullOrEmpty(template.Content))
@@ -236,8 +243,14 @@ namespace RazorEngineCms.Controllers
                 return View(template);
             }
 
+
+            if (Errors.Count > 0)
+            {
+                return View("~/Views/ServerError.cshtml", Errors);
+            }
+
             // return 404 view if could not find page in db or files 
-            return View("~/Views/Page/NotFound.cshtml");
+            return View("~/Views/NotFound.cshtml");
         }
 
         /// <summary>
@@ -276,7 +289,7 @@ namespace RazorEngineCms.Controllers
         {
             if (!string.IsNullOrEmpty(page.Model) && !page.HasParams)
             {
-                List<string> errors = this.Errors;
+                ConcurrentBag<string> errors = this.Errors;
                 page.CompileTemplate(ref errors);
             }
             else if (string.IsNullOrEmpty(page.Model) && !page.HasParams) // no template model so do not need to compile
@@ -314,19 +327,19 @@ namespace RazorEngineCms.Controllers
                                                     p.Section.Equals(page.Section, StringComparison.CurrentCultureIgnoreCase));
 
             // if the page has url parameters do not want to save precompiled template and model
-            if (!page.HasParams)
+            if (page.HasParams)
             {
                 page.CompiledModel = null;
                 page.CompiledTemplate = null;
             }
 
-            if (pageInDb != null)
+            if (pageInDb != null) // update the page if it exists
             {
-                // update the page if it exists
                 pageInDb.Model = page.Model;
                 pageInDb.Template = page.Template;
                 pageInDb.CompiledModel = page.CompiledModel;
                 pageInDb.CompiledTemplate = page.CompiledTemplate;
+                pageInDb.HasParams = page.HasParams;
             }
             else
             {

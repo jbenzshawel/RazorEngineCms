@@ -181,6 +181,7 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\PageController.cs" />
     <Compile Include="DAL\ApplicationContext.cs" />
+    <Compile Include="ExtensionClasses\ConccurentCollections.cs" />
     <Compile Include="ExtensionClasses\DataTableToJson.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -601,11 +602,12 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Page\New.cshtml" />
     <Content Include="Views\Page\View.cshtml" />
-    <Content Include="Views\Page\NotFound.cshtml" />
+    <Content Include="Views\NotFound.cshtml" />
     <Content Include="Views\Page\List.cshtml" />
     <Content Include="Views\Page\Edit.cshtml" />
     <Content Include="Views\Shared\_ConfiromDeleteModal.cshtml" />
     <Content Include="Views\Shared\_ViewPage.cshtml" />
+    <Content Include="Views\ServerError.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

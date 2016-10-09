@@ -9,6 +9,7 @@ using RazorEngine.Templating;
 using RazorEngineCms.App_Classes;
 using RazorEngineCms.Controllers;
 using RazorEngineCms.DAL;
+using System.Collections.Concurrent;
 
 namespace RazorEngineCms.Models
 {
@@ -67,7 +68,7 @@ namespace RazorEngineCms.Models
             return page;
         }
 
-        internal void CompileTemplate(ref List<string> errors, string template = null, string jsonModel = null)
+        internal void CompileTemplate(ref ConcurrentBag<string> errors, string template = null, string jsonModel = null)
         {
             if (string.IsNullOrEmpty(template))
             {

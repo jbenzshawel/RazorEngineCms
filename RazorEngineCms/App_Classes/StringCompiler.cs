@@ -85,7 +85,7 @@ namespace RazorEngineCms.App_Classes
                     var httpContextParamater = HttpContext.Current;
                     // Invoke method. Method returns an object that will be parsed as JSON to pass to the view 
                     object output = null;
-                    if (string.IsNullOrEmpty(param))
+                    if (param != null) // note intentionally did not check for empty string 
                     {
                         output = type.GetMethod("Execute").Invoke(classInstance, new object[] { httpContextParamater, param, param2 });
                     }
