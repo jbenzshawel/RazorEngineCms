@@ -116,7 +116,7 @@ Page.prototype.save = function () {
 };
 
 Page.prototype.delete = function (id, name, section, msgSel) {
-    if (id == undegined || id.length === 0) { // if empty get from Page object
+    if (id == undefined || id.length === 0) { // if empty get from Page object
         id = this.Id;
     }
     if (name == undefined || name.length === 0) { // if empty get from Page object
@@ -154,7 +154,7 @@ Page.prototype.delete = function (id, name, section, msgSel) {
         type: "POST",
         url: "/CMS/Page/Delete",
         data: JSON.stringify(deleteModel),
-        success: successCallbacks
+        success: successCallback
     };
     if (settings != null && settings.data != null) {
         return $.ajax(settings);
