@@ -66,7 +66,7 @@ namespace RazorEngineCms.App_Classes
                     OutputAssembly = string.Format("temp-assemly-{0}", compileModelGuid)
                     
                 };
-                // if a reference is added in the above C# string make sure it is also added as a paramater 
+                // if a reference is added in the above C# code string make sure it is also added as a paramater 
                 paramz.ReferencedAssemblies.AddRange(new string[] { "System.dll",
                                                                     "System.Linq.dll",
                                                                     "System.Data.dll",
@@ -80,18 +80,18 @@ namespace RazorEngineCms.App_Classes
                 try
                 {
                     var type = providerResult.CompiledAssembly.GetType("ModelClass");
-                    var obj = Activator.CreateInstance(type);
+                    var classInstance = Activator.CreateInstance(type);
                     // Method ModelClass.Execute has one parameter of type HttpContext 
                     var httpContextParamater = HttpContext.Current;
                     // Invoke method. Method returns an object that will be parsed as JSON to pass to the view 
                     object output = null;
                     if (string.IsNullOrEmpty(param))
                     {
-                        output = type.GetMethod("Execute").Invoke(obj, new object[] { httpContextParamater, param, param2 });
+                        output = type.GetMethod("Execute").Invoke(classInstance, new object[] { httpContextParamater, param, param2 });
                     }
                     else
                     {
-                        output = type.GetMethod("Execute").Invoke(obj, new object[] { httpContextParamater });                        
+                        output = type.GetMethod("Execute").Invoke(classInstance, new object[] { httpContextParamater });                        
                     }
                     this.JsonResult = output.ToString();
                 } // end try compile model

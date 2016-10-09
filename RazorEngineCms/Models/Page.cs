@@ -46,22 +46,22 @@ namespace RazorEngineCms.Models
             this.HasParams = pageRequest.HasParams;
         }
 
-        internal static Page FindPage(string name, string variable)
+        internal static Page FindPage(string section, string name)
         {
             var db = new ApplicationContext();
-            var page = new Page { Name = name, Section = variable };
+            var page = new Page { Name = name, Section = section };
             var fileHelper = new FileHelper();
             // first see if there is a file template 
             if (fileHelper.Files.Any(f => string.Equals(f.Name, name, StringComparison.CurrentCultureIgnoreCase)))
             {
-                var file = fileHelper.GetFile(name, variable);
+                var file = fileHelper.GetFile(name, section);
                 page.CompiledTemplate = file.ToString();
             }
             else // get page from database if there isn't a file
             {
                 page = db.Page
                                 .FirstOrDefault(p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                        p.Section.Equals(variable, StringComparison.CurrentCultureIgnoreCase));
+                                                        p.Section.Equals(section, StringComparison.CurrentCultureIgnoreCase));
             }
 
             return page;

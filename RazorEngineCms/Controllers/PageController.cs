@@ -68,7 +68,7 @@ namespace RazorEngineCms.Controllers
                         }
                     } // end using StringCompiler
                 } // end if page.Model not empty
-               
+
                 if (Errors.Count == 0)
                 {
                     // compile and save template
@@ -79,8 +79,6 @@ namespace RazorEngineCms.Controllers
             {
                 Errors.Add("Invalid parameters");
             }
-
-
 
             return Json(new { Status = Errors.Count == 0, Errors });
         }
@@ -93,7 +91,7 @@ namespace RazorEngineCms.Controllers
         /// <returns></returns>
         public ActionResult Edit(string section, string name)
         {
-            var page = Page.FindPage(name, section);
+            var page = Page.FindPage(section, name);
 
             if (page != null)
             {
@@ -116,11 +114,11 @@ namespace RazorEngineCms.Controllers
             bool status = false;
             Page pageModel = null;
 
-            if (page.Id > 0)
+            if (page.Id > 0)  // if id is set get model by id 
             {
                 pageModel = this._db.Page.FirstOrDefault(p => p.Id == page.Id);
             }
-            else if (!string.IsNullOrEmpty(page.Name) && !string.IsNullOrEmpty(page.Section))
+            else if (!string.IsNullOrEmpty(page.Name) && !string.IsNullOrEmpty(page.Section)) // else try and get it by name and section 
             {
                 pageModel = Page.FindPage(page.Name, page.Section);
             }
@@ -133,7 +131,6 @@ namespace RazorEngineCms.Controllers
             {
                 try
                 {
-                    
                     this._db.Page.Attach(pageModel);
                     this._db.Page.Remove(pageModel);
                     status = await this._db.SaveChangesAsync() > 0;
@@ -144,7 +141,7 @@ namespace RazorEngineCms.Controllers
                     status = false;
                 }
             }
-            
+
             return Json(new { Status = status, this.Errors });
         }
 
@@ -157,14 +154,18 @@ namespace RazorEngineCms.Controllers
         /// <param name="param"></param>
         /// <param name="param2"></param>
         /// <returns></returns>
-        // GET: Preview/Name/Section 
-        public ActionResult View(string name, string section, string param = null, string param2 = null)
+        // GET: /Section/Name 
+        public ActionResult View(string section, string name, string param = null, string param2 = null)
         {
             Page page = null;
+            Func<Page, bool> templateNeedsCompiled = (iPage) => (string.IsNullOrEmpty(iPage.CompiledTemplate) &&
+                                !string.IsNullOrEmpty(iPage.CompiledModel) &&
+                                !string.IsNullOrEmpty(iPage.Template));
+            // templage model that will be passed to the View
             var template = new PageTemplate { Content = string.Empty };
 
-            // if AllowCache enabled in Web.config look for the page in cache
-            if (AllowCache) 
+            // if AllowCache enabled in Web.Config look for the page in cache
+            if (AllowCache)
             {
                 CacheManager = new CacheManager();
                 PageCache cachedPage = CacheManager.FindPage(name, section);
@@ -186,7 +187,7 @@ namespace RazorEngineCms.Controllers
             // if we couldn't get the page from cache get it from the db
             if (page == null || page.CompiledTemplate == null)
             {
-                page = Page.FindPage(name, section);
+                page = Page.FindPage(section, name);
                 if (AllowCache)
                 {
                     CacheManager.AddPage(page, param, param2);
@@ -194,30 +195,39 @@ namespace RazorEngineCms.Controllers
             }
 
             // when page doesn't have parameters can use pre-compiled template 
-            if (page != null && page.CompiledTemplate != null && page.HasParams == false)
+            var templateIsCompiled = page != null &&
+                                     (!string.IsNullOrEmpty(page.CompiledTemplate) || !templateNeedsCompiled(page)) &&
+                                     !page.HasParams;
+            if (templateIsCompiled)
             {
-                template.Content = page.CompiledTemplate;
+                template.Content = page.CompiledTemplate ?? page.Template;
             }
-            else if (page != null && page.HasParams) // pass url params to page model and compile template 
+            else if (page != null && (page.HasParams || templateNeedsCompiled(page)))
             {
-                using (var stringCompiler = new StringCompiler())
+                // if page has url params pass them to model and compile it
+                if (page.HasParams && string.IsNullOrEmpty(page.CompiledModel) && !string.IsNullOrEmpty(param))
                 {
-                    stringCompiler.CompilePageModel(page.Model, param, param2);
-
-                    // 
-                    if (stringCompiler.IsValid)
+                    using (var stringCompiler = new StringCompiler())
                     {
-                        var jsonModel = stringCompiler.ToString();
-                        List<string> errors = this.Errors;
-                        page.CompileTemplate(ref errors, page.Template, jsonModel);
-                    }
+                        stringCompiler.CompilePageModel(page.Model, param, param2);
+                        if (stringCompiler.IsValid)
+                        {
+                            page.CompiledModel = stringCompiler.ToString();
+                        }
+                        else
+                        {
+                            this.Errors.AddRange(stringCompiler.Errors);
+                        }
+                    } // end using stringCompiler
+                } // end if page.HasParams and page / param are not null
 
-                    if (page.CompiledTemplate != null)
-                    {
-                        template.Content = page.CompiledTemplate;
-                    }
+                if (templateNeedsCompiled(page))
+                {
+                    List<string> errors = this.Errors;
+                    page.CompileTemplate(ref errors, page.Template, page.CompiledModel);
+                }
 
-                } // end using stringCompiler
+                template.Content = page.CompiledTemplate;
             } // end else if page has paramaters 
 
             // return the page with a template if it is found
@@ -236,7 +246,7 @@ namespace RazorEngineCms.Controllers
         /// <returns></returns>
         public ActionResult List()
         {
-            IList<Page> pageList = new PageList(); 
+            IList<Page> pageList = new PageList();
             foreach (var file in FileHelper.Files)
             {
                 pageList.Add(new Page
@@ -264,20 +274,19 @@ namespace RazorEngineCms.Controllers
         /// <returns></returns>
         internal async Task<Page> CompileTemplateAndSavePage(Page page, bool saveAsFile = false)
         {
-            
-            try
+            if (!string.IsNullOrEmpty(page.Model) && !page.HasParams)
             {
-                if (!string.IsNullOrEmpty(page.Model))
-                {
-                    List<string> errors = this.Errors;
-                    page.CompileTemplate(ref errors);
-                }
-                else // no template model so do not need to compile
-                {
-                    page.CompiledTemplate = page.Template;
-                }
-                
-                if (saveAsFile)
+                List<string> errors = this.Errors;
+                page.CompileTemplate(ref errors);
+            }
+            else if (string.IsNullOrEmpty(page.Model) && !page.HasParams) // no template model so do not need to compile
+            {
+                page.CompiledTemplate = page.Template;
+            }
+
+            if (saveAsFile && !page.HasParams)
+            {
+                try
                 {
                     var fileName = string.Format("{0}-{1}-template-{2}.html", page.Name, string.IsNullOrEmpty(page.Section) ? "_" : page.Section, Guid.NewGuid());
                     var savePath = Server.MapPath("~") + @"\Views\CompiledTemplates\" + fileName;
@@ -292,27 +301,25 @@ namespace RazorEngineCms.Controllers
                     {
                         await sw.WriteAsync(page.CompiledTemplate);
                     }
-                } // end if saveAsFile
-            } // end try
-            catch (Exception ex) // catch exception from saving as file
-            {
-                // if failed to save model get why
-                if (_db.GetValidationErrors().Any())
+
+                } // end try
+                catch (Exception ex) // catch exception from saving as file
                 {
-                    foreach (var error in _db.GetValidationErrors())
-                    {
-                        foreach (var valErr in error.ValidationErrors)
-                        {
-                            Errors.Add(string.Format("Model Error: {0}, Model Property: {1}",
-                                valErr.ErrorMessage, valErr.PropertyName));
-                        }
-                    } // end foreach this._db.GetValidationErrors()
-                } // end if have validation errors
-            } // end catch
+                    this.Errors.Add(string.Format("Error Saving Model as File: {0}", ex.Message));
+                } // end catch
+            } // end if saveAsFile
 
             // save copy in db regardless of saveAsFile param
             var pageInDb = _db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
                                                     p.Section.Equals(page.Section, StringComparison.CurrentCultureIgnoreCase));
+
+            // if the page has url parameters do not want to save precompiled template and model
+            if (!page.HasParams)
+            {
+                page.CompiledModel = null;
+                page.CompiledTemplate = null;
+            }
+
             if (pageInDb != null)
             {
                 // update the page if it exists
@@ -329,16 +336,28 @@ namespace RazorEngineCms.Controllers
             try
             {
                 await _db.SaveChangesAsync();
-            } 
+            }
             catch (Exception ex) // catch exception from saving to db
             {
                 this.Errors.Add(string.Format("Error Saving Model: {0}", ex.Message));
+                // if failed to save model get why
+                if (_db.GetValidationErrors().Any())
+                {
+                    foreach (var error in _db.GetValidationErrors())
+                    {
+                        foreach (var valErr in error.ValidationErrors)
+                        {
+                            Errors.Add(string.Format("Model Error: {0}, Model Property: {1}",
+                                valErr.ErrorMessage, valErr.PropertyName));
+                        }
+                    } // end foreach this._db.GetValidationErrors()
+                } // end if have validation errors
             } // end catch
             finally
             {
                 _db.Dispose();
             }
-            
+
             return page;
         }
     }
