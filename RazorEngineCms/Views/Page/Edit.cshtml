@@ -51,18 +51,6 @@
                 </label>
             </div>
             <div class="form-group">
-                <p><strong>Create Template File?</strong>
-                </p>
-                <label for="templateFileTrue" class="weight-normal">
-                    <input type="radio" name="templateFile" id="templateFileTrue" value="true"/>
-                    True
-                </label>
-                <label for="templateFileFalse" class="weight-normal">
-                    <input type="radio" name="templateFile" id="templateFileFalse" value="false" checked/>
-                    False
-                </label>
-            </div>
-            <div class="form-group">
                 <label for="model">Page Model</label> (<a href="#" data-toggle="modal" data-target="#modelEditorInfoModal">More Info</a>)
                 <p>Create an object variable named <code>Model</code> to pass .NET code to view.</p>
                 <textarea class="form-control" id="model" name="model"></textarea>
@@ -72,7 +60,19 @@
                 <p>Access Page Model with Razor Syntax (e.g. <code>@@Model.PropertyName</code>)</p>
                 <textarea class="form-control" id="template" name="template"></textarea>
             </div>
-
+            <div class="form-group">
+                <p>
+                    <strong>Create Template File?</strong>
+                </p>
+                <label for="templateFileTrue" class="weight-normal">
+                    <input type="radio" name="templateFile" id="templateFileTrue" value="true" />
+                    True
+                </label>
+                <label for="templateFileFalse" class="weight-normal">
+                    <input type="radio" name="templateFile" id="templateFileFalse" value="false" checked />
+                    False
+                </label>
+            </div>
             <div class="form-group">
                 <input type="submit" class="btn btn-default" id="submitNewPage"/>
                 <button type="button" class="btn btn-danger" id="deletePage">Delete Page</button>

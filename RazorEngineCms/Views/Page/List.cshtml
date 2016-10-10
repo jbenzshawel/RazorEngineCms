@@ -79,7 +79,7 @@ else // Show Page List Table
         }
         $(function () {
             $("#pageListTable").DataTable({
-                "order" : [[0, "asc"]]
+                "order" : [[3, "desc"]]
             });
             sessionStorage.clear();
             $("#confirmDeletePage").click(function () {
