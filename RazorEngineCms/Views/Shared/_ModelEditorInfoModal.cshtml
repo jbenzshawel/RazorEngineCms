@@ -6,22 +6,21 @@
                 <h4 class="modal-title">Model Editor Information</h4>
             </div>
             <div class="modal-body">
-                <p>Create a Model <code>Object</code> that will be serialezed as json and passed to the view. 
-                The code in the Model Editor will be passed to a C# method along with the UrlParameter _urlParameter and HttpContext 
-                _httpContext parameters then compiled to return the json Model object.</p>
-                <pre>
-// decleration of UrlParameters object
+                <p>The code in the Model Editor has access to parameters <code>UrlParameters _urlParameters</code> and <code>HttpContext 
+                _httpContext</code>. 
+                    <pre>// documentation for UrlParamaters object availble in the Model Editor
 public class UrlParameters
 {
     public string Param { get; set; }
     public string Param2 { get; set; }
     public IDictionary<string,string> QueryString { get; set; }
     public Uri Url { get; set; }
-}
-
+}</pre>
+                <p>To pass data to the view create an <code>Object Model</code> variable. When the code is compiled
+                 the Model will be serialezed as json and passed to the view.</p>
+                <pre>
 // example declaration of Model object 
-var Model = new { Param = _urlParameters.Param };
-                </pre>
+var Model = new { Param = _urlParameters.Param };</pre>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

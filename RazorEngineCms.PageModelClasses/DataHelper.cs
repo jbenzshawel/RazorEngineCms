@@ -5,7 +5,7 @@ using System.Web;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace RazorEngineCms.App_Classes
+namespace RazorEnginePageModelClasses
 {
     public class DataHelper : IDisposable
     {

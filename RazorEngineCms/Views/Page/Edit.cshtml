@@ -18,12 +18,12 @@
 
 <div class="row">
     <div class="col-xs-12">
+        <p>Default route is <code>/section/name/param/param2</code> where <code>param</code> and <code>param2</code> are optional parameters.</p>
         <form id="newPage" action="">
             <div class="form-group">
                 <label for="pageId">Page Id:</label>
                 <span id="pageId">@Model.Id</span>
             </div>
-            <p>Default route is <code>/section/name/param/param2</code> where <code>param</code> and <code>param2</code> are option parameters.</p>
             <div class="form-group">
                 <label for="pageVar">Page Section</label>
                 <input type="text" name="pageVar" id="pageVar" class="form-control" value="@Model.Section"/>
@@ -64,12 +64,12 @@
             </div>
             <div class="form-group">
                 <label for="model">Page Model</label> (<a href="#" data-toggle="modal" data-target="#modelEditorInfoModal">More Info</a>)
-                <p>Create an object variable named "Model" to pass .NET code to view.</p>
+                <p>Create an object variable named <code>Model</code> to pass .NET code to view.</p>
                 <textarea class="form-control" id="model" name="model"></textarea>
             </div>
             <div class="form-group">
                 <label for="template">Page Template </label>
-                <p>Access Page Model with Razor Syntax (e.g. @@Model.PropertyName)</p>
+                <p>Access Page Model with Razor Syntax (e.g. <code>@@Model.PropertyName</code>)</p>
                 <textarea class="form-control" id="template" name="template"></textarea>
             </div>
 

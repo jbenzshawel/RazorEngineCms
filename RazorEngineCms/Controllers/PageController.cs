@@ -211,7 +211,7 @@ namespace RazorEngineCms.Controllers
             else if (page != null && (page.HasParams || templateNeedsCompiled(page)))
             {
                 // if page has url params pass them to model and compile it
-                if (page.HasParams && string.IsNullOrEmpty(page.CompiledModel) && !string.IsNullOrEmpty(param))
+                if (page.HasParams && string.IsNullOrEmpty(page.CompiledModel))
                 {
                     using (var stringCompiler = new StringCompiler())
                     {
