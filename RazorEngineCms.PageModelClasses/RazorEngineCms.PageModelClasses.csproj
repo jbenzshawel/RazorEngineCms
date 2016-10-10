@@ -7,8 +7,8 @@
     <ProjectGuid>{796F19CF-CEAA-4F81-A632-9B9E6493771F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RazorEnginePageModelClasses</RootNamespace>
-    <AssemblyName>RazorEnginePageModelClasses</AssemblyName>
+    <RootNamespace>RazorEngineCms.PageModelClasses</RootNamespace>
+    <AssemblyName>RazorEngineCms.PageModelClasses</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

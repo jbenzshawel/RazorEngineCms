@@ -644,9 +644,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RazorEnginePageModelClasses\RazorEnginePageModelClasses.csproj">
+    <ProjectReference Include="..\RazorEngineCms.PageModelClasses\RazorEngineCms.PageModelClasses.csproj">
       <Project>{796f19cf-ceaa-4f81-a632-9b9e6493771f}</Project>
-      <Name>RazorEnginePageModelClasses</Name>
+      <Name>RazorEngineCms.PageModelClasses</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

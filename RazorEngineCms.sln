@@ -5,9 +5,9 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorEngineCms", "RazorEngineCms\RazorEngineCms.csproj", "{A258A6E9-16B8-4E95-AA8A-B1A16ADF414A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorEngineCmsTests", "RazorEngineCMSTests\RazorEngineCmsTests.csproj", "{59D25ED2-420C-4107-A72F-33EB0511B003}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorEngineCms.Tests", "RazorEngineCms.Tests\RazorEngineCms.Tests.csproj", "{59D25ED2-420C-4107-A72F-33EB0511B003}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorEnginePageModelClasses", "RazorEnginePageModelClasses\RazorEnginePageModelClasses.csproj", "{796F19CF-CEAA-4F81-A632-9B9E6493771F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorEngineCms.PageModelClasses", "RazorEngineCms.PageModelClasses\RazorEngineCms.PageModelClasses.csproj", "{796F19CF-CEAA-4F81-A632-9B9E6493771F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

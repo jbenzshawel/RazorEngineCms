@@ -6,8 +6,8 @@
     <ProjectGuid>{59D25ED2-420C-4107-A72F-33EB0511B003}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RazorEngineCMSTests</RootNamespace>
-    <AssemblyName>RazorEngineCMSTests</AssemblyName>
+    <RootNamespace>RazorEngineCms.Tests</RootNamespace>
+    <AssemblyName>RazorEngineCms.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
