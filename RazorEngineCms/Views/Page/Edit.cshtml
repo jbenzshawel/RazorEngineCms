@@ -23,6 +23,7 @@
                 <label for="pageId">Page Id:</label>
                 <span id="pageId">@Model.Id</span>
             </div>
+            <p>Default route is <code>/section/name/param/param2</code> where <code>param</code> and <code>param2</code> are option parameters.</p>
             <div class="form-group">
                 <label for="pageVar">Page Section</label>
                 <input type="text" name="pageVar" id="pageVar" class="form-control" value="@Model.Section"/>
@@ -32,9 +33,8 @@
                 <input type="text" name="pageName" id="pageName" class="form-control" value="@Model.Name" />
             </div>
             <div class="form-group">
-                <p><strong>Does this page have url parameters?</strong> (pages with url parameters cannot be pre compiled)
-                </p>
-                <p>Default route is /section/name/param/param2 where param and param2 are option parameters.</p>
+                <p><strong>Does this page have url parameters? </strong>(<code>param</code> and/or <code>param2</code>)<br/>
+                Note: pages with url parameters cannot be pre compiled</p>
                 <label for="hasParams-true" class="weight-normal">
                     <input type="radio" name="hasParams" id="hasParams-true" value="true" class="formControl"
                            @if (Model.HasParams)
@@ -63,8 +63,8 @@
                 </label>
             </div>
             <div class="form-group">
-                <label for="model">Page Model</label>
-                <p>Create an object variable named "Model" to pass .NET code to view</p>
+                <label for="model">Page Model</label> (<a href="#" data-toggle="modal" data-target="#modelEditorInfoModal">More Info</a>)
+                <p>Create an object variable named "Model" to pass .NET code to view.</p>
                 <textarea class="form-control" id="model" name="model"></textarea>
             </div>
             <div class="form-group">
@@ -82,6 +82,8 @@
 </div>
 
 @Html.Partial("_ConfiromDeleteModal")
+@Html.Partial("_ModelEditorInfoModal")
+
 
 @section Scripts {
     <script type="text/javascript" src="~/Scripts/page.js"></script>

@@ -5,6 +5,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@section styles {
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.css" />
+}
+
 <h2>Pages</h2>
 
 
@@ -15,12 +19,13 @@
 else // Show Page List Table
 {
     <div id="alertMsgs"></div>
-    <table class="table">
+    <table class="table" id="pageListTable">
         <thead>
             <tr>
                 <th>Page ID</th>
                 <th>Page Section</th>
                 <th>Page Name</th>
+                <th>Last Updated</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
@@ -33,6 +38,7 @@ else // Show Page List Table
                     <td>@page.Id</td>
                     <td>@page.Section</td>
                     <td>@page.Name</td>
+                    <td>@page.Updated.ToString("yyyy/M/dd hh:mm")</td>
                     <td><a href="/@page.Section/@page.Name" target="_blank">View</a></td>
                     <td><a href="/CMS/Page/Edit/@page.Section/@page.Name">Edit</a></td>
                     <td><a href="#"
@@ -52,6 +58,7 @@ else // Show Page List Table
     @Html.Partial("_ConfiromDeleteModal")
 
 @section Scripts {
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.js"></script>
     <script type="text/javascript" src="~/Scripts/page.js"></script>
     <script type="text/javascript">
         "use strict";
@@ -71,6 +78,9 @@ else // Show Page List Table
             $("#deletePageModal").modal("hide");
         }
         $(function () {
+            $("#pageListTable").DataTable({
+                "order" : [[0, "asc"]]
+            });
             sessionStorage.clear();
             $("#confirmDeletePage").click(function () {
                 var sessionKey = $(this).attr("data-sessionkey");;

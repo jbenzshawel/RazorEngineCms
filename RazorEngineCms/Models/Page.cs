@@ -33,6 +33,8 @@ namespace RazorEngineCms.Models
 
         public bool HasParams { get; set; }
 
+        public DateTime Updated { get; set; }
+
         public Page()
         {
 

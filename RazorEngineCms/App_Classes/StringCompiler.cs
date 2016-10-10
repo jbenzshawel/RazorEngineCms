@@ -4,6 +4,8 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Web;
+using RazorEnginePageModelClasses;
+using RazorEngineCms.ExtensionClasses;
 
 namespace RazorEngineCms.App_Classes
 {
@@ -48,9 +50,9 @@ namespace RazorEngineCms.App_Classes
                     sw.WriteLine("using System.Web;");
                     sw.WriteLine("using System.Xml.Serialization;");
                     sw.WriteLine("using Newtonsoft.Json;");
-                    sw.WriteLine("using RazorEngineCms.App_Classes;");
+                    sw.WriteLine("using RazorEnginePageModelClasses;");
                     sw.WriteLine("public class ModelClass { ");
-                    sw.WriteLine("public string Execute(HttpContext httpContext, string param = null, string param2 = null) { ");
+                    sw.WriteLine("public string Execute(UrlParameters _urlParameters, HttpContext _httpContext) { ");
                     sw.WriteLine(model);
                     sw.WriteLine("return JsonConvert.SerializeObject(Model);");
                     sw.WriteLine("} ");
@@ -72,27 +74,29 @@ namespace RazorEngineCms.App_Classes
                                                                     "System.Data.dll",
                                                                     "System.Xml.dll",
                                                                     "System.Web.dll",
-                                                                    @"C:\Git\RazorEngineCms\RazorEngineCms\bin\RazorEngineCms.dll",
+                                                                    @"C:\Git\RazorEngineCms\RazorEngineCms\bin\RazorEnginePageModelClasses.dll",
                                                                     @"C:\Git\RazorEngineCms\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll" });
 
                 // try to compile model 
                 var providerResult = CSharpProvider.CompileAssemblyFromSource(paramz, pageModelSource);
                 try
                 {
-                    var type = providerResult.CompiledAssembly.GetType("ModelClass");
-                    var classInstance = Activator.CreateInstance(type);
+                    var modelClassType = providerResult.CompiledAssembly.GetType("ModelClass");
+                    var classInstance = Activator.CreateInstance(modelClassType);
                     // Method ModelClass.Execute has one parameter of type HttpContext 
                     var httpContextParamater = HttpContext.Current;
                     // Invoke method. Method returns an object that will be parsed as JSON to pass to the view 
                     object output = null;
-                    if (param != null) // note intentionally did not check for empty string 
+                    var urlParameters = new UrlParameters
                     {
-                        output = type.GetMethod("Execute").Invoke(classInstance, new object[] { httpContextParamater, param, param2 });
-                    }
-                    else
-                    {
-                        output = type.GetMethod("Execute").Invoke(classInstance, new object[] { httpContextParamater });                        
-                    }
+                        Param = param,
+                        Param2 = param2,
+                        Url = HttpContext.Current.Request.Url,
+                        QueryString = HttpContext.Current.Request.QueryString.ToDictionary()
+                    };
+                    var httpContext = HttpContext.Current;
+                    // invoke ModelClass.Execute method with paramaters param and param2 
+                    output = modelClassType.GetMethod("Execute").Invoke(classInstance, new object[] { urlParameters, httpContext });
                     this.JsonResult = output.ToString();
                 } // end try compile model
                 catch (Exception ex)

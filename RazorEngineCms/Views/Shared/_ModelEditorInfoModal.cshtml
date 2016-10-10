@@ -1,0 +1,31 @@
+﻿<div class="modal fade" tabindex="-1" role="dialog" id="modelEditorInfoModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Model Editor Information</h4>
+            </div>
+            <div class="modal-body">
+                <p>Create a Model <code>Object</code> that will be serialezed as json and passed to the view. 
+                The code in the Model Editor will be passed to a C# method along with the UrlParameter _urlParameter and HttpContext 
+                _httpContext parameters then compiled to return the json Model object.</p>
+                <pre>
+// decleration of UrlParameters object
+public class UrlParameters
+{
+    public string Param { get; set; }
+    public string Param2 { get; set; }
+    public IDictionary<string,string> QueryString { get; set; }
+    public Uri Url { get; set; }
+}
+
+// example declaration of Model object 
+var Model = new { Param = _urlParameters.Param };
+                </pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

@@ -332,7 +332,8 @@ namespace RazorEngineCms.Controllers
                 page.CompiledModel = null;
                 page.CompiledTemplate = null;
             }
-
+            // set updated to now before upsert 
+            page.Updated = DateTime.Now;
             if (pageInDb != null) // update the page if it exists
             {
                 pageInDb.Model = page.Model;
@@ -340,8 +341,9 @@ namespace RazorEngineCms.Controllers
                 pageInDb.CompiledModel = page.CompiledModel;
                 pageInDb.CompiledTemplate = page.CompiledTemplate;
                 pageInDb.HasParams = page.HasParams;
+                pageInDb.Updated = page.Updated;
             }
-            else
+            else // insert a new page 
             {
                 _db.Page.Add(page);
             }

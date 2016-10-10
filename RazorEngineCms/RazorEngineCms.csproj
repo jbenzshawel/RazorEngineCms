@@ -181,8 +181,7 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\PageController.cs" />
     <Compile Include="DAL\ApplicationContext.cs" />
-    <Compile Include="ExtensionClasses\ConccurentCollections.cs" />
-    <Compile Include="ExtensionClasses\DataTableToJson.cs" />
+    <Compile Include="ExtensionClasses\Extensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -201,6 +200,10 @@
     <Compile Include="Migrations\201610091503405_updatingModels.cs" />
     <Compile Include="Migrations\201610091503405_updatingModels.Designer.cs">
       <DependentUpon>201610091503405_updatingModels.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610092252573_addingUpdatingProperty.cs" />
+    <Compile Include="Migrations\201610092252573_addingUpdatingProperty.Designer.cs">
+      <DependentUpon>201610092252573_addingUpdatingProperty.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -608,6 +611,7 @@
     <Content Include="Views\Shared\_ConfiromDeleteModal.cshtml" />
     <Content Include="Views\Shared\_ViewPage.cshtml" />
     <Content Include="Views\ServerError.cshtml" />
+    <Content Include="Views\Shared\_ModelEditorInfoModal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -635,6 +639,15 @@
     <EmbeddedResource Include="Migrations\201610091503405_updatingModels.resx">
       <DependentUpon>201610091503405_updatingModels.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610092252573_addingUpdatingProperty.resx">
+      <DependentUpon>201610092252573_addingUpdatingProperty.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RazorEnginePageModelClasses\RazorEnginePageModelClasses.csproj">
+      <Project>{796f19cf-ceaa-4f81-a632-9b9e6493771f}</Project>
+      <Name>RazorEnginePageModelClasses</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
