@@ -10,22 +10,22 @@ using Newtonsoft.Json;
 namespace RazorEngineCms.Models
 {
     [NotMapped]
-    public class PageCache : Page
+    public class PageCacheModel : Page
     {
         public string Param { get; set; }
 
         public string Param2 { get; set; }
 
-        public string QueryString { get; set; }
+        public IDictionary<string, string> QueryStringParams { get; set; }
 
         public DateTime DateTime { get; set; }
 
-        public PageCache()
+        public PageCacheModel()
         {
 
         }
 
-        public PageCache(Page page, string param, string param2, string queryString)
+        public PageCacheModel(Page page, string param, string param2, IDictionary<string, string> queryStringParams)
         {
             if (page != null)
             {
@@ -41,8 +41,7 @@ namespace RazorEngineCms.Models
             this.DateTime = DateTime.Now;
             this.Param = param;
             this.Param2 = param2;
-            this.QueryString = queryString;
-
+            this.QueryStringParams = queryStringParams;
         }
     }
 }

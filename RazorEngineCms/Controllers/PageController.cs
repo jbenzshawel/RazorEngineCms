@@ -30,6 +30,10 @@ namespace RazorEngineCms.Controllers
             this.Errors = new ConcurrentBag<string>();
             this.FileHelper = new FileHelper();
             this.AllowCache = ConfigurationManager.AppSettings["AllowPageCaching"] == "true";
+            if (this.AllowCache)
+            {
+                this.CacheManager = new CacheManager();
+            }
         }
 
         // GET: Page/New
@@ -173,8 +177,7 @@ namespace RazorEngineCms.Controllers
             // if AllowCache enabled in Web.Config look for the page in cache
             if (this.AllowCache)
             {
-                CacheManager = new CacheManager();
-                PageCache cachedPage = CacheManager.FindPage(name, section);
+                PageCacheModel cachedPage = this.CacheManager.FindPage(name, section);
                 if (cachedPage != null && cachedPage.CompiledTemplate != null)
                 {
                     page = new Page
@@ -194,10 +197,6 @@ namespace RazorEngineCms.Controllers
             if (page == null || page.CompiledTemplate == null)
             {
                 page = Page.FindPage(section, name);
-                if (this.AllowCache)
-                {
-                    CacheManager.AddPage(page, param, param2);
-                }
             }
 
             // when page doesn't have parameters can use pre-compiled template 
@@ -236,6 +235,14 @@ namespace RazorEngineCms.Controllers
                 template.Content = page.CompiledTemplate;
             } // end else if page has paramaters 
 
+            // cache page before returning template if enabled 
+            if (this.AllowCache)
+            {
+                if (page != null && !this.CacheManager.PageCacheExists(page.Id))
+                {
+                    this.CacheManager.AddPage(page, param, param2);
+                }
+            } 
 
             // return the page with a template if it is found
             if (!string.IsNullOrEmpty(template.Content))

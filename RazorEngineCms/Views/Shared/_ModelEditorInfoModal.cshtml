@@ -7,12 +7,13 @@
             </div>
             <div class="modal-body">
                 <p>The code in the Model Editor has access to parameters <code>UrlParameters _urlParameters</code> and <code>HttpContext 
-                _httpContext</code>. 
-                    <pre>// documentation for UrlParamaters object availble in the Model Editor
+                _httpContext</code>. If code uses the <code>_urlParameters</code> variable the code and model cannot be pre compiled.
+                    <pre>// documentation for UrlParamaters object availble in the Model Editors
+// note route is /section/name/param/param2
 public class UrlParameters
 {
-    public string Param { get; set; }
-    public string Param2 { get; set; }
+    public string Param { get; set; } 
+    public string Param2 { get; set; } 
     public IDictionary<string,string> QueryString { get; set; }
     public Uri Url { get; set; }
 }</pre>

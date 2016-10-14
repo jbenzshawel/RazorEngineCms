@@ -209,7 +209,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
-    <Compile Include="Models\PageCache.cs" />
+    <Compile Include="Models\PageCacheModel.cs" />
     <Compile Include="Models\PageList.cs" />
     <Compile Include="Models\PageTemplate.cs" />
     <Compile Include="Models\RequestModels.cs" />

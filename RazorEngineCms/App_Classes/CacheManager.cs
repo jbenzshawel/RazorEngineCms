@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Caching;
-using Newtonsoft.Json;
 using RazorEngineCms.DAL;
+using RazorEngineCms.ExtensionClasses;
 
 namespace RazorEngineCms.App_Classes
 {
@@ -17,10 +17,10 @@ namespace RazorEngineCms.App_Classes
     public class CacheManager
     {
         /// <summary>
-        /// Contains an IList&gt;PageCache&lt; CacheList property that is parsed from a cached object.
+        /// Contains an IList&gt;PageCache&lt; CacheList proper ,mhwq   ty that is parsed from a cached object.
         /// If cache empty CacheList returns an empty list.
         /// </summary>
-        public IList<PageCache> CacheList { get; set; }
+        public IList<PageCacheModel> CacheList { get; set; }
 
         private const string CACHE_KEY = "RazorEngineCms.App_Classes.CacheManager.CacheList";
 
@@ -28,15 +28,7 @@ namespace RazorEngineCms.App_Classes
 
         public CacheManager()
         {
-            if (Cache != null)
-            {
-                this.UpdateCacheList();
-            }
-            
-            if (this.CacheList == null)
-            {
-                this.CacheList = new List<PageCache>();
-            }
+            this.UpdateCacheList();
         }
 
         /// <summary>
@@ -46,26 +38,26 @@ namespace RazorEngineCms.App_Classes
         {
             if (Cache[CACHE_KEY] != null)
             {
-                IList<PageCache> cacheList = JsonConvert.DeserializeObject<List<PageCache>>(Cache[CACHE_KEY].ToString());
-                if (cacheList == null)
-                {
-                    this.CacheList = new List<PageCache>();
-                }
-                else // cache exists 
+                IList<PageCacheModel> cacheList = Cache[CACHE_KEY] as List<PageCacheModel>;
+                if (cacheList != null)
                 {
                     this.CacheList = cacheList;
                 }
             }
 
+            if (this.CacheList == null)
+            {
+                this.CacheList = new List<PageCacheModel>();
+            }
         }
 
         public void AddPage(Page page, string param = null, string param2 = null)
         {
-            var queryString = HttpContext.Current.Request.QueryString.ToString();
-            var pageCache = new PageCache(page, param, param2, queryString);
+            var queryString = HttpContext.Current.Request.QueryString.ToDictionary();
+            var pageCache = new PageCacheModel(page, param, param2, queryString);
             this.UpdateCacheList();
             this.CacheList.Add(pageCache);
-            Cache[CACHE_KEY] = JsonConvert.SerializeObject(this.CacheList);
+            Cache[CACHE_KEY] = this.CacheList;
         }
 
         public void RemovePage(string name, string section, string param = null, string param2 = null)
@@ -73,12 +65,29 @@ namespace RazorEngineCms.App_Classes
             var pageToRemove = this.FindPage(name, section, param, param2);
             this.UpdateCacheList();
             this.CacheList.Remove(pageToRemove);
-            Cache[CACHE_KEY] = JsonConvert.SerializeObject(this);
+            Cache[CACHE_KEY] = this.CacheList;
         }
 
-        public PageCache FindPage(string name, string section, string param = null, string param2 = null)
+        public bool PageCacheExists(string name, string section, string param, string param2, IDictionary<string,string> queryString)
         {
-            var pageCache = new PageCache();
+            var boolRtn = false;
+            var cachedPage = this.FindPage(name, section, param, param2, queryString);
+
+            if (cachedPage != null && cachedPage.Id > 0)
+            {
+                boolRtn = true;
+            }
+
+            return boolRtn;
+        }
+
+        public PageCacheModel FindPage(string name, string section, string param = null, string param2 = null, IDictionary<string, string> queryString = null)
+        {
+            if (this.CacheList == null)
+            {
+                this.UpdateCacheList();
+            }
+            var pageCache = new PageCacheModel();
 
             if (this.CacheList.Count > 0)
             {
@@ -86,7 +95,8 @@ namespace RazorEngineCms.App_Classes
                 cachedPage => string.Equals(cachedPage.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
                               string.Equals(cachedPage.Section, section, StringComparison.CurrentCultureIgnoreCase) &&
                               string.Equals(cachedPage.Param, param, StringComparison.CurrentCultureIgnoreCase) &&
-                              string.Equals(cachedPage.Param2, param2, StringComparison.CurrentCultureIgnoreCase));
+                              string.Equals(cachedPage.Param2, param2, StringComparison.CurrentCultureIgnoreCase) && 
+                              cachedPage.QueryStringParams.DictionaryEqual(queryString));
 
             }
 
@@ -95,8 +105,8 @@ namespace RazorEngineCms.App_Classes
 
         public void ClearCache()
         {
-            this.CacheList = new List<PageCache>();
-            Cache[CACHE_KEY] = JsonConvert.SerializeObject(this.CacheList);
+            this.CacheList = new List<PageCacheModel>();
+            Cache[CACHE_KEY] = this.CacheList;
         }
     }
 }
