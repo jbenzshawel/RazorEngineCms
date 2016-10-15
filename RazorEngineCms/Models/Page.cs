@@ -101,5 +101,31 @@ namespace RazorEngineCms.Models
                 errors.Add(string.Format("Stack Trace: \r\n {0}", ex.StackTrace));
             }
         }
+
+        /// <summary>
+        /// Clones a page in the database. Returns boolean status 
+        /// </summary>
+        /// <param name="page"></param>
+        /// <returns></returns>
+        internal static bool Copy(Page page)
+        {
+            var boolRtn = false;
+            if (page != null)
+            {
+                using (var db = new ApplicationContext())
+                {
+                    var origPage = db.Page.FirstOrDefault(p => p.Id == page.Id);
+                    if (origPage != null)
+                    {
+                        // clone the page 
+                        origPage.Updated = DateTime.Now;
+                        db.Page.Add(origPage);
+                        boolRtn = db.SaveChanges() > 0;
+                    } // end if origPage != null
+                } // end using db application context 
+            } // end if page != null 
+
+            return boolRtn;
+        }
     }
 }

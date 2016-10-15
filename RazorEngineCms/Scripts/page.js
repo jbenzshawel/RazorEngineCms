@@ -115,7 +115,15 @@ Page.prototype.save = function () {
     return;
 };
 
-Page.prototype.delete = function (id, name, section, msgSel) {
+Page.prototype.delete = function (id, section, name, msgSel) {
+    return this.ajaxPost(id, name, section, msgSel, "Delete");
+};
+
+Page.prototype.copy = function (id, section, name, msgSel) {
+    return this.ajaxPost(id, name, section, msgSel, "Copy");
+}
+
+Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {
     if (id == undefined || id.length === 0) { // if empty get from Page object
         id = this.Id;
     }
@@ -125,40 +133,52 @@ Page.prototype.delete = function (id, name, section, msgSel) {
     if (section == undefined || section.length === 0) { // if empty get from Page object
         section = this.section;
     }
-    // callback function for ajax request. If message deleted alert message displayed 
-    // else errors are logged 
-    var successCallback = function (data) {
-        var callbackReturnStatus = false;
-        $(msgSel).empty(); // clear any previous messages
-        if (data.Status === true) {
-            var successMsg = "The page /" + name + "/" + section + " has been deleted.";
-            if (msgSel != undefined && msgSel.length > 0) {
-                _default.alertMsg("success", successMsg, msgSel);
-            }
-            callbackReturnStatus = true;
-            logger.logSuccess(successMsg);
-        } else if (data.Errors.length > 0) {
-            data.Errors.forEach(function (error) {
-                logger.logError(error);
-            });
-            callbackReturnStatus = false;
-        }
-        return callbackReturnStatus;
-    };
-    var deleteModel = {
+
+    var pageModel = {
         Id: id,
         Section: section,
         Name: name
     };
+    var scopedObj = this;
     var settings = {
         type: "POST",
-        url: "/CMS/Page/Delete",
-        data: JSON.stringify(deleteModel),
-        success: successCallback
+        contentType:"application/json",
+        url: "/CMS/Page/" + action,
+        data: JSON.stringify(pageModel),
+        success: function (data) {
+            return scopedObj.successCallback(data, msgSel, action);
+        }
     };
     if (settings != null && settings.data != null) {
         return $.ajax(settings);
     }
 
     return false;
+};
+
+// callback function for ajax request. If message success alert message displayed 
+// else errors are logged 
+Page.prototype.successCallback = function (data, msgSel, action) {
+    var callbackReturnStatus = false;
+    $(msgSel).empty(); // clear any previous messages
+    if (data.Status === true) {
+        var msgAction = "";
+        if (action != null && action.toLowerCase() == "copy") {
+            msgAction = "copied";
+        } else if (action != null && action.toLowerCase() == "delete") {
+            msgAction = "deleted";
+        }
+        var successMsg = "The page /" + this.section + "/" + this.name + " has been " + msgAction + ".";
+        if (msgSel != undefined && msgSel.length > 0) {
+            _default.alertMsg("success", successMsg, msgSel);
+        }
+        callbackReturnStatus = true;
+        logger.logSuccess(successMsg);
+    } else if (data.Errors.length > 0) {
+        data.Errors.forEach(function (error) {
+            logger.logError(error);
+        });
+        callbackReturnStatus = false;
+    }
+    return callbackReturnStatus;
 };

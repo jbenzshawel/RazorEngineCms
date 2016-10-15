@@ -19,7 +19,7 @@ namespace RazorEngineCms.Models
         public string Template { get; set; }
     }
 
-    public class DeletePageRequest
+    public class AjaxPageRequest
     {
         public int Id { get; set; }
 

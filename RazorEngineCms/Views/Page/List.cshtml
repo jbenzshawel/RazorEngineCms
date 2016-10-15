@@ -29,6 +29,7 @@ else // Show Page List Table
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
                 <th>&nbsp;</th>
+                <th>&nbsp;</th>
             </tr>
         </thead>
         <tbody>
@@ -45,10 +46,16 @@ else // Show Page List Table
                            data-pageid="@page.Id"
                            data-pagename="@page.Name"
                            data-pagesection="@page.Section"
+                           class="copy-page">
+                        Copy
+                        </a></td>
+                    <td><a href="#"
+                           data-pageid="@page.Id"
+                           data-pagename="@page.Name"
+                           data-pagesection="@page.Section"
                            class="delete-page">
                         Delete
                     </a></td>
-
                 </tr>
             }
         </tbody>
@@ -68,7 +75,7 @@ else // Show Page List Table
         function confirmDelete(sessionKey) {
             if (sessionKey != null) {
                 var storedPage = JSON.parse(sessionStorage.getItem(sessionKey));
-                var deleteStatus = page.delete(storedPage.pageId, storedPage.pageName, storedPage.pageSection, "#alertMsgs");
+                var deleteStatus = page.delete(storedPage.pageId, storedPage.pageSection, storedPage.pageName, "#alertMsgs");
                 if (deleteStatus) {
                     $("a[data-pagename=\"" + storedPage.pageName + "\"][data-pagesection=\"" + storedPage.pageSection + "\"]")
                         .parent().parent().remove(); // remove deleted row
@@ -76,6 +83,13 @@ else // Show Page List Table
                 sessionStorage.removeItem(sessionKey);
             } // end if pageName != null
             $("#deletePageModal").modal("hide");
+        }
+        function copyPage(id, section, name) {
+            var copyStatus = false;
+            if (id > 0 && section != null && section.length > 0) {
+                copyStatus = page.copy(id, section, name, "#alertMsgs");
+            }
+            return copyStatus;
         }
         $(function () {
             $("#pageListTable").DataTable({
@@ -86,6 +100,15 @@ else // Show Page List Table
                 var sessionKey = $(this).attr("data-sessionkey");;
                 confirmDelete(sessionKey);
             });
+            $("a.copy-page").click(function (e) {
+                e.preventDefault();
+                var pageItem = {
+                    pageId: $(this).attr("data-pageid"),
+                    pageName: $(this).attr("data-pagename"),
+                    pageSection: $(this).attr("data-pagesection")
+                };
+                copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
+            })
             $("a.delete-page").click(function(e) {
                 e.preventDefault();
                 var pageItem = {

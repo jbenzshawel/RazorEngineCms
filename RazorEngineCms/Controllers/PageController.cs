@@ -122,7 +122,7 @@ namespace RazorEngineCms.Controllers
         /// <param name="variable"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> Delete(DeletePageRequest page)
+        public async Task<ActionResult> Delete(AjaxPageRequest page)
         {
             bool status = false;
             Page pageModel = null;
@@ -262,6 +262,36 @@ namespace RazorEngineCms.Controllers
 
             // return 404 view if could not find page in db or files 
             return View("~/Views/NotFound.cshtml");
+        }
+
+        [HttpPost]
+        public ActionResult Copy(AjaxPageRequest pageRequest)
+        {
+            var boolRtn = false;
+            Page pageModel = null;
+            if (pageRequest.Id > 0)
+            {
+                pageModel = this._db.Page.FirstOrDefault(p => p.Id == pageRequest.Id); 
+            }
+            else if (!string.IsNullOrEmpty(pageRequest.Section))
+            {
+                pageModel = Page.FindPage(pageRequest.Section, pageRequest.Name);
+            }
+
+            if (pageModel != null)
+            {
+                boolRtn = Page.Copy(pageModel);
+                if (!boolRtn)
+                {
+                    this.Errors.Add("Server error copying page.");
+                }
+            }
+            else
+            {
+                this.Errors.Add("Could not find page.");
+            }
+
+            return Json(new { Status = boolRtn, Errors = this.Errors });
         }
 
         /// <summary>
