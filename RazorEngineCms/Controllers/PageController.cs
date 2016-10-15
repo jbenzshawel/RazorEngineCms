@@ -18,6 +18,8 @@ namespace RazorEngineCms.Controllers
 
         public bool AllowCache { get; set; }
 
+        public IDictionary<string,string> QueryStringParams { get; set; }
+
         internal FileHelper FileHelper { get; set; }
 
         internal CacheManager CacheManager { get; set; }
@@ -34,6 +36,7 @@ namespace RazorEngineCms.Controllers
             {
                 this.CacheManager = new CacheManager();
             }
+            this.QueryStringParams = System.Web.HttpContext.Current.Request.QueryString.ToDictionary();
         }
 
         // GET: Page/New
@@ -177,7 +180,7 @@ namespace RazorEngineCms.Controllers
             // if AllowCache enabled in Web.Config look for the page in cache
             if (this.AllowCache)
             {
-                PageCacheModel cachedPage = this.CacheManager.FindPage(name, section);
+                PageCacheModel cachedPage = this.CacheManager.FindPage(name, section, param, param2, this.QueryStringParams);
                 if (cachedPage != null && cachedPage.CompiledTemplate != null)
                 {
                     page = new Page
@@ -238,7 +241,8 @@ namespace RazorEngineCms.Controllers
             // cache page before returning template if enabled 
             if (this.AllowCache)
             {
-                if (page != null && !this.CacheManager.PageCacheExists(page.Id))
+                
+                if (page != null && !this.CacheManager.PageCacheExists(page.Name, page.Section, param, param2, this.QueryStringParams))
                 {
                     this.CacheManager.AddPage(page, param, param2);
                 }
