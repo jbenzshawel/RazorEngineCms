@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 using Newtonsoft.Json;
+using RazorEngineCms.Models;
 
 namespace RazorEngineCms.ExtensionClasses
 {
@@ -14,9 +15,9 @@ namespace RazorEngineCms.ExtensionClasses
         /// </summary>
         /// <param name="collection"></param>
         /// <returns></returns>
-        public static IDictionary<string, string> ToDictionary(this NameValueCollection collection)
+        public static IDictionary<string, string> ToDictionary(this NameValueCollection @this)
         {
-            return collection.Cast<string>().ToDictionary(k => k, v => collection[v]);
+            return @this.Cast<string>().ToDictionary(k => k, v => @this[v]);
         }
 
         public static bool DictionaryEqual<TKey, TValue>(this IDictionary<TKey, TValue> first, IDictionary<TKey, TValue> second)
@@ -48,6 +49,21 @@ namespace RazorEngineCms.ExtensionClasses
                 if (!valueComparer.Equals(kvp.Value, secondValue)) return false;
             }
             return true;
+        }
+
+        public static Page ToPage(this PageCacheModel @this)
+        {
+            var page = new Page
+            {
+                Name = @this.Name,
+                Section = @this.Section,
+                CompiledModel = @this.CompiledModel,
+                CompiledTemplate = @this.CompiledTemplate,
+                Model = @this.Model,
+                Template = @this.Template,
+                HasParams = @this.HasParams
+            };
+            return page;
         }
 
         /// <summary>

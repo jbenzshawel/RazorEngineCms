@@ -20,8 +20,17 @@
                         Razor Engine CMS
                     </a>
                 </li>
-                <li><a href="/CMS/Page/New">New Page</a></li>
-                <li><a href="/CMS/Page/List">List Pages</a></li>
+                <li><a href="/CMS/Home/Index">Dashboard</a></li>
+                @if (HttpContext.Current.User != null && HttpContext.Current.Request.IsAuthenticated)
+                {
+                    <li><a href="/CMS/Page/New">New Page</a></li>
+                    <li><a href="/CMS/Page/List">List Pages</a></li>
+                    <li><a href="/CMS/Account/LogOff">Logout</a></li>
+                }
+                else
+                {
+                    <li><a href="/CMS/Account/Login">Login</a></li>
+                }
             </ul>
             @*Html.Partial("_LoginPartial")*@
         </div>

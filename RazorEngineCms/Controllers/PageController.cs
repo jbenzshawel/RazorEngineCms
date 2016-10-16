@@ -12,13 +12,14 @@ using System.Collections.Concurrent;
 
 namespace RazorEngineCms.Controllers
 {
+    [Authorize]
     public class PageController : Controller
     {
         public ConcurrentBag<string> Errors { get; set; }
 
-        public bool AllowCache { get; set; }
-
         public IDictionary<string,string> QueryStringParams { get; set; }
+
+        internal bool AllowCache { get; set; }
 
         internal FileHelper FileHelper { get; set; }
 
@@ -183,16 +184,7 @@ namespace RazorEngineCms.Controllers
                 PageCacheModel cachedPage = this.CacheManager.FindPage(name, section, param, param2, this.QueryStringParams);
                 if (cachedPage != null && cachedPage.CompiledTemplate != null)
                 {
-                    page = new Page
-                    {
-                        Name = cachedPage.Name,
-                        Section = cachedPage.Section,
-                        CompiledModel = cachedPage.CompiledModel,
-                        CompiledTemplate = cachedPage.CompiledTemplate,
-                        Model = cachedPage.Model,
-                        Template = cachedPage.Template,
-                        HasParams = cachedPage.HasParams
-                    };
+                    page = cachedPage.ToPage(); 
                 }
             }
 
@@ -366,7 +358,7 @@ namespace RazorEngineCms.Controllers
             } // end if saveAsFile
 
             // save copy in db regardless of saveAsFile param
-            var pageInDb = _db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
+            var pageInDb = this._db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
                                                     p.Section.Equals(page.Section, StringComparison.CurrentCultureIgnoreCase));
 
             // if the page has url parameters do not want to save precompiled template and model
@@ -388,24 +380,24 @@ namespace RazorEngineCms.Controllers
             }
             else // insert a new page 
             {
-                _db.Page.Add(page);
+                this._db.Page.Add(page);
             }
 
             try
             {
-                await _db.SaveChangesAsync();
+                await this._db.SaveChangesAsync();
             }
             catch (Exception ex) // catch exception from saving to db
             {
                 this.Errors.Add(string.Format("Error Saving Model: {0}", ex.Message));
                 // if failed to save model get why
-                if (_db.GetValidationErrors().Any())
+                if (this._db.GetValidationErrors().Any())
                 {
-                    foreach (var error in _db.GetValidationErrors())
+                    foreach (var error in this._db.GetValidationErrors())
                     {
                         foreach (var valErr in error.ValidationErrors)
                         {
-                            Errors.Add(string.Format("Model Error: {0}, Model Property: {1}",
+                            this.Errors.Add(string.Format("Model Error: {0}, Model Property: {1}",
                                 valErr.ErrorMessage, valErr.PropertyName));
                         }
                     } // end foreach this._db.GetValidationErrors()
@@ -413,7 +405,7 @@ namespace RazorEngineCms.Controllers
             } // end catch
             finally
             {
-                _db.Dispose();
+                this._db.Dispose();
             }
 
             return page;

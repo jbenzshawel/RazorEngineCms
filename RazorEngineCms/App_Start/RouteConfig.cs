@@ -11,7 +11,7 @@ namespace RazorEngineCms
 
             routes.MapRoute(
                 name: "CMS",
-                url: "CMS/Page/{action}/{section}/{name}/{param}/{param2}",
+                url: "CMS/{controller}/{action}/{section}/{name}/{param}/{param2}",
                 defaults:
                 new
                 {

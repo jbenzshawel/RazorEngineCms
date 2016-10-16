@@ -5,3 +5,11 @@
 .weight-normal {
     font-weight: normal;
 }
+
+.sidebar-nav > .sidebar-brand {
+    border-bottom: 1px solid #999;
+}
+
+.sidebar-nav li:last-child {
+    border-top: 1px solid #999;
+}
