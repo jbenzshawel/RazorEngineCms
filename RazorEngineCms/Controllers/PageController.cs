@@ -312,6 +312,17 @@ namespace RazorEngineCms.Controllers
             return View(pageList);
         }
 
+        public ActionResult ClearCache()
+        {
+            if (this.AllowCache)
+            {
+                CacheManager.ClearCache();
+            }
+
+            System.Web.HttpContext.Current.Response.Write("<h1>Page cache has been cleared</h1>");
+            return new EmptyResult();
+        }
+
         /// <summary>
         /// Compiles a page template by parsing a json object in page.CompiledModel and
         /// uses RazorEngine to compile the Template view. Save results in the database 

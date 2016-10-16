@@ -24,10 +24,11 @@ namespace RazorEngineCms.App_Classes
 
         private const string CACHE_KEY = "RazorEngineCms.App_Classes.CacheManager.CacheList";
 
-        private Cache Cache { get { return HttpContext.Current.Cache; } }
+        private Cache Cache { get; set; }
 
         public CacheManager()
         {
+            this.Cache = HttpContext.Current.Cache;
             this.UpdateCacheList();
         }
 
@@ -51,6 +52,12 @@ namespace RazorEngineCms.App_Classes
             }
         }
 
+        /// <summary>
+        /// Adds a page to CacheList and Cache[CACHE_KEY]
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="param"></param>
+        /// <param name="param2"></param>
         public void AddPage(Page page, string param = null, string param2 = null)
         {
             var queryString = HttpContext.Current.Request.QueryString.ToDictionary();
@@ -60,6 +67,13 @@ namespace RazorEngineCms.App_Classes
             Cache[CACHE_KEY] = this.CacheList;
         }
 
+        /// <summary>
+        /// Removes a page from CacheList and Cache[CACHE_KEY]
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="section"></param>
+        /// <param name="param"></param>
+        /// <param name="param2"></param>
         public void RemovePage(string name, string section, string param = null, string param2 = null)
         {
             var pageToRemove = this.FindPage(name, section, param, param2);
@@ -81,6 +95,15 @@ namespace RazorEngineCms.App_Classes
             return boolRtn;
         }
 
+        /// <summary>
+        /// Searches CacheList and returns a PageCacheModel of the page if found 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="section"></param>
+        /// <param name="param"></param>
+        /// <param name="param2"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
         public PageCacheModel FindPage(string name, string section, string param = null, string param2 = null, IDictionary<string, string> queryString = null)
         {
             if (this.CacheList == null)
@@ -103,6 +126,9 @@ namespace RazorEngineCms.App_Classes
             return pageCache;
         }
 
+        /// <summary>
+        /// Clears CacheList and Cache[CACHE_KEY]
+        /// </summary>
         public void ClearCache()
         {
             this.CacheList = new List<PageCacheModel>();
