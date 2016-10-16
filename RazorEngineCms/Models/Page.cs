@@ -103,13 +103,14 @@ namespace RazorEngineCms.Models
         }
 
         /// <summary>
-        /// Clones a page in the database. Returns boolean status 
+        /// Clones a page in the database. Returns new integer id of copied page  
         /// </summary>
         /// <param name="page"></param>
         /// <returns></returns>
-        internal static bool Copy(Page page)
+        internal static int? Copy(Page page)
         {
             var boolRtn = false;
+            int? copiedPageId = null; 
             if (page != null)
             {
                 using (var db = new ApplicationContext())
@@ -121,11 +122,12 @@ namespace RazorEngineCms.Models
                         origPage.Updated = DateTime.Now;
                         db.Page.Add(origPage);
                         boolRtn = db.SaveChanges() > 0;
+                        copiedPageId = origPage.Id;
                     } // end if origPage != null
                 } // end using db application context 
             } // end if page != null 
 
-            return boolRtn;
+            return copiedPageId;
         }
     }
 }

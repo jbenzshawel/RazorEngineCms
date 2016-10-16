@@ -267,7 +267,8 @@ namespace RazorEngineCms.Controllers
         [HttpPost]
         public ActionResult Copy(AjaxPageRequest pageRequest)
         {
-            var boolRtn = false;
+            var status = false;
+            int? copiedPageId = null;
             Page pageModel = null;
             if (pageRequest.Id > 0)
             {
@@ -280,8 +281,9 @@ namespace RazorEngineCms.Controllers
 
             if (pageModel != null)
             {
-                boolRtn = Page.Copy(pageModel);
-                if (!boolRtn)
+                copiedPageId = Page.Copy(pageModel);
+                status = copiedPageId != null ? true : false;
+                if (!status)
                 {
                     this.Errors.Add("Server error copying page.");
                 }
@@ -291,7 +293,7 @@ namespace RazorEngineCms.Controllers
                 this.Errors.Add("Could not find page.");
             }
 
-            return Json(new { Status = boolRtn, Errors = this.Errors });
+            return Json(new { Status = status, NewId = copiedPageId, Errors = this.Errors });
         }
 
         /// <summary>

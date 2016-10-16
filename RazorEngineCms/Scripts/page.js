@@ -116,10 +116,16 @@ Page.prototype.save = function () {
 };
 
 Page.prototype.delete = function (id, section, name, msgSel) {
+    this.Id = id,
+    this.section = section;
+    this.name = name;
     return this.ajaxPost(id, name, section, msgSel, "Delete");
 };
 
 Page.prototype.copy = function (id, section, name, msgSel) {
+    this.Id = id,
+    this.section = section;
+    this.name = name;
     return this.ajaxPost(id, name, section, msgSel, "Copy");
 }
 
@@ -142,9 +148,10 @@ Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {
     var scopedObj = this;
     var settings = {
         type: "POST",
-        contentType:"application/json",
+        contentType: "application/json",
         url: "/CMS/Page/" + action,
         data: JSON.stringify(pageModel),
+        async: false,
         success: function (data) {
             return scopedObj.successCallback(data, msgSel, action);
         }
@@ -165,14 +172,15 @@ Page.prototype.successCallback = function (data, msgSel, action) {
         var msgAction = "";
         if (action != null && action.toLowerCase() == "copy") {
             msgAction = "copied";
+            callbackReturnStatus = data.newId; // for copy return new id of copied page
         } else if (action != null && action.toLowerCase() == "delete") {
             msgAction = "deleted";
+            callbackReturnStatus = true;
         }
         var successMsg = "The page /" + this.section + "/" + this.name + " has been " + msgAction + ".";
         if (msgSel != undefined && msgSel.length > 0) {
             _default.alertMsg("success", successMsg, msgSel);
         }
-        callbackReturnStatus = true;
         logger.logSuccess(successMsg);
     } else if (data.Errors.length > 0) {
         data.Errors.forEach(function (error) {
