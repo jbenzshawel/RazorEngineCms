@@ -77,16 +77,13 @@ namespace RazorEngineCms.App_Classes
                                                                     @"C:\Git\RazorEngineCms\RazorEngineCms\bin\RazorEngineCms.PageModelClasses.dll",
                                                                     @"C:\Git\RazorEngineCms\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll" });
 
-                // try to compile model 
+                // try to compile model and invoke Execute method
                 var providerResult = CSharpProvider.CompileAssemblyFromSource(paramz, pageModelSource);
                 try
                 {
                     var modelClassType = providerResult.CompiledAssembly.GetType("ModelClass");
                     var classInstance = Activator.CreateInstance(modelClassType);
-                    // Method ModelClass.Execute has one parameter of type HttpContext 
-                    var httpContextParamater = HttpContext.Current;
-                    // Invoke method. Method returns an object that will be parsed as JSON to pass to the view 
-                    object output = null;
+                    // Method ModelClass.Execute has two parameters UrlParameters and HttpContext
                     var urlParameters = new UrlParameters
                     {
                         Param = param,
@@ -95,8 +92,9 @@ namespace RazorEngineCms.App_Classes
                         QueryString = HttpContext.Current.Request.QueryString.ToDictionary()
                     };
                     var httpContext = HttpContext.Current;
-                    // invoke ModelClass.Execute method with paramaters param and param2 
-                    output = modelClassType.GetMethod("Execute").Invoke(classInstance, new object[] { urlParameters, httpContext });
+                    // Invoke ModelClass.Execute method with paramaters UrlParameters and HttpContext
+                    // Method returns an object that will be parsed as JSON to pass to the view 
+                    object output = modelClassType.GetMethod("Execute").Invoke(classInstance, new object[] { urlParameters, httpContext });
                     this.JsonResult = output.ToString();
                 } // end try compile model
                 catch (Exception ex)

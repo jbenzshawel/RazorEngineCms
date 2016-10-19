@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Caching;
-using RazorEngineCms.DAL;
 using RazorEngineCms.ExtensionClasses;
 
 namespace RazorEngineCms.App_Classes
 {
-    // ToDo: Refactor how cache works to rely less on parsing json models
     /// <summary>
     /// Contains an IList&gt;PageCache&lt; CacheList property that is parsed from a cached object.
     /// If cache empty CacheList returns an empty list.
