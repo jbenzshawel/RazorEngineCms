@@ -9,6 +9,13 @@ using RazorEngineCms.ExtensionClasses;
 
 namespace RazorEngineCms.App_Classes
 {
+    internal struct StringCompilerModel
+    {
+        public string Template { get; set; }
+
+        public CompilerParameters CopilerParams { get; set; }
+    }
+
     /// <summary>
     /// Compiles C# code then returns what is assigned to the string
     /// "Model" object (e.g. "var Model = new { Test = \"example\" }").
@@ -38,47 +45,10 @@ namespace RazorEngineCms.App_Classes
 
             using (var CSharpProvider = new CSharpCodeProvider())
             {
-                var compileModelGuid = Guid.NewGuid().ToString();
-                var pageModelSource = string.Empty;
-                using (var sw = new StringWriter())
-                {
-                    sw.WriteLine("using System;");
-                    sw.WriteLine("using System.Data;");
-                    sw.WriteLine("using System.Data.SqlClient;");
-                    sw.WriteLine("using System.Collections.Generic;");
-                    sw.WriteLine("using System.Linq;");
-                    sw.WriteLine("using System.Web;");
-                    sw.WriteLine("using System.Xml.Serialization;");
-                    sw.WriteLine("using Newtonsoft.Json;");
-                    sw.WriteLine("using RazorEnginePageModelClasses;");
-                    sw.WriteLine("public class ModelClass { ");
-                    sw.WriteLine("public string Execute(UrlParameters _urlParameters, HttpContext _httpContext) { ");
-                    sw.WriteLine(model);
-                    sw.WriteLine("return JsonConvert.SerializeObject(Model);");
-                    sw.WriteLine("} ");
-                    sw.WriteLine("}");
-                    pageModelSource = sw.ToString();
-                } // end using StringWriter
-            
-                // define parameters for CSharpCodeProvider
-                var paramz = new CompilerParameters()
-                {
-                    GenerateInMemory = true,
-                    GenerateExecutable = false,
-                    OutputAssembly = string.Format("temp-assemly-{0}", compileModelGuid)
-                    
-                };
-                // if a reference is added in the above C# code string make sure it is also added as a paramater 
-                paramz.ReferencedAssemblies.AddRange(new string[] { "System.dll",
-                                                                    "System.Linq.dll",
-                                                                    "System.Data.dll",
-                                                                    "System.Xml.dll",
-                                                                    "System.Web.dll",
-                                                                    @"C:\Git\RazorEngineCms\RazorEngineCms\bin\RazorEngineCms.PageModelClasses.dll",
-                                                                    @"C:\Git\RazorEngineCms\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll" });
+                StringCompilerModel stringCompilerModel = this._AddModelToCodeTemplate(model);
 
                 // try to compile model and invoke Execute method
-                var providerResult = CSharpProvider.CompileAssemblyFromSource(paramz, pageModelSource);
+                var providerResult = CSharpProvider.CompileAssemblyFromSource(stringCompilerModel.CopilerParams, stringCompilerModel.Template);
                 try
                 {
                     var modelClassType = providerResult.CompiledAssembly.GetType("ModelClass");
@@ -88,8 +58,8 @@ namespace RazorEngineCms.App_Classes
                     {
                         Param = param,
                         Param2 = param2,
-                        Url = HttpContext.Current.Request.Url,
-                        QueryString = HttpContext.Current.Request.QueryString.ToDictionary()
+                        Url = HttpContext.Current != null ? HttpContext.Current.Request.Url : null,
+                        QueryString = HttpContext.Current != null ? HttpContext.Current.Request.QueryString.ToDictionary() : null
                     };
                     var httpContext = HttpContext.Current;
                     // Invoke ModelClass.Execute method with paramaters UrlParameters and HttpContext
@@ -129,6 +99,56 @@ namespace RazorEngineCms.App_Classes
         {
             this.JsonResult = string.Empty;
             this.Errors.Clear();
+        }
+
+        /// <summary>
+        /// If a reference is added in the C# code string template below  
+        /// make sure it is also added as a CSharpCodeProvider reference 
+        /// as a string[] in StringCompilerModel.CompilerParams
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private StringCompilerModel _AddModelToCodeTemplate(string model)
+        {
+            var compilerModel = new StringCompilerModel();
+            using (var sw = new StringWriter())
+            {
+                sw.WriteLine("using System;");
+                sw.WriteLine("using System.Data;");
+                sw.WriteLine("using System.Data.SqlClient;");
+                sw.WriteLine("using System.Collections.Generic;");
+                sw.WriteLine("using System.Linq;");
+                sw.WriteLine("using System.Web;");
+                sw.WriteLine("using System.Xml.Serialization;");
+                sw.WriteLine("using Newtonsoft.Json;");
+                sw.WriteLine("using RazorEnginePageModelClasses;");
+                sw.WriteLine("public class ModelClass { ");
+                sw.WriteLine("public string Execute(UrlParameters _urlParameters, HttpContext _httpContext) { ");
+                sw.WriteLine(model);
+                sw.WriteLine("return JsonConvert.SerializeObject(Model);");
+                sw.WriteLine("} ");
+                sw.WriteLine("}");
+                compilerModel.Template = sw.ToString();
+            } // end using StringWriter
+            
+            // define parameters for CSharpCodeProvider
+            var paramz = new CompilerParameters()
+            {
+                GenerateInMemory = true,
+                GenerateExecutable = false,
+                OutputAssembly = string.Format("temp-assemly-{0}", Guid.NewGuid().ToString())
+
+            };
+            paramz.ReferencedAssemblies.AddRange(new string[] { "System.dll",
+                                                        "System.Linq.dll",
+                                                        "System.Data.dll",
+                                                        "System.Xml.dll",
+                                                        "System.Web.dll",
+                                                        @"C:\Git\RazorEngineCms\RazorEngineCms\bin\RazorEngineCms.PageModelClasses.dll",
+                                                        @"C:\Git\RazorEngineCms\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll" });
+
+            compilerModel.CopilerParams = paramz;
+            return compilerModel;
         }
     }
 }
