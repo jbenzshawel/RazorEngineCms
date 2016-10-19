@@ -190,3 +190,19 @@ Page.prototype.successCallback = function (data, msgSel, action) {
     }
     return callbackReturnStatus;
 };
+
+// hides save template as file option if page uses url params
+Page.prototype.checkPageVariables = function () {
+    var toggleTemplateFileOption = $("input[name='hasParams']:checked").val() === "true";
+    if (toggleTemplateFileOption) {
+        document.getElementById("templateFileTrue").checked = false;
+        document.getElementById("templateFileFalse").checked = true;
+        document.getElementsByName("templateFile").forEach(function (elem) {
+            elem.setAttribute("disabled", "disabled");
+        });
+    } else {
+        document.getElementsByName("templateFile").forEach(function (elem) {
+            elem.removeAttribute("disabled");
+        });
+    }
+};

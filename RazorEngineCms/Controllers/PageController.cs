@@ -12,7 +12,6 @@ using System.Collections.Concurrent;
 
 namespace RazorEngineCms.Controllers
 {
-    [Authorize]
     public class PageController : Controller
     {
         public ConcurrentBag<string> Errors { get; set; }
@@ -41,6 +40,7 @@ namespace RazorEngineCms.Controllers
         }
 
         // GET: Page/New
+        [AuthRedirect]
         public ActionResult New()
         {
             return View();
@@ -54,6 +54,7 @@ namespace RazorEngineCms.Controllers
         /// <returns>JsonResult with boolean status and list of errors</returns>
         // POST: Page/New
         [HttpPost]
+        [AuthRedirect]
         public async Task<ActionResult> Save(PageRequest pageRequest)
         {
             var page = new Page(pageRequest);
@@ -103,6 +104,7 @@ namespace RazorEngineCms.Controllers
         /// <param name="name"></param>
         /// <param name="section"></param>
         /// <returns></returns>
+        [AuthRedirect]
         public ActionResult Edit(string section, string name)
         {
             var page = Page.FindPage(section, name);
@@ -123,6 +125,7 @@ namespace RazorEngineCms.Controllers
         /// <param name="variable"></param>
         /// <returns></returns>
         [HttpPost]
+        [AuthRedirect]
         public async Task<ActionResult> Delete(AjaxPageRequest page)
         {
             bool status = false;
@@ -257,6 +260,7 @@ namespace RazorEngineCms.Controllers
         }
 
         [HttpPost]
+        [AuthRedirect]
         public ActionResult Copy(AjaxPageRequest pageRequest)
         {
             var status = false;
@@ -292,6 +296,7 @@ namespace RazorEngineCms.Controllers
         /// Gets a list of pages from the database and returns a PageList to the View
         /// </summary>
         /// <returns></returns>
+        [AuthRedirect]
         public ActionResult List()
         {
             IList<Page> pageList = new PageList();
@@ -312,14 +317,19 @@ namespace RazorEngineCms.Controllers
             return View(pageList);
         }
 
+        /// <summary>
+        /// If caching enabled clears CacheList and Cache[CACHE_KEY]
+        /// </summary>
+        /// <returns></returns>
+        [AuthRedirect]
         public ActionResult ClearCache()
         {
             if (this.AllowCache)
             {
                 CacheManager.ClearCache();
+                System.Web.HttpContext.Current.Response.Write("<h1>Page cache has been cleared</h1>");
             }
 
-            System.Web.HttpContext.Current.Response.Write("<h1>Page cache has been cleared</h1>");
             return new EmptyResult();
         }
 

@@ -57,6 +57,10 @@ namespace RazorEngineCms.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
+            if (!string.IsNullOrEmpty(returnUrl) && !returnUrl.Contains("CMS"))
+            {
+                returnUrl = "/CMS/Page/" + returnUrl;
+            }
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }

@@ -168,6 +168,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Classes\AuthRedirect.cs" />
     <Compile Include="App_Classes\CacheManager.cs" />
     <Compile Include="App_Classes\DataHelper.cs" />
     <Compile Include="App_Classes\FileHelper.cs" />

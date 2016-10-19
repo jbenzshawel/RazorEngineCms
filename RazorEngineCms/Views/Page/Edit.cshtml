@@ -60,7 +60,7 @@
                 <p>Access Page Model with Razor Syntax (e.g. <code>@@Model.PropertyName</code>)</p>
                 <textarea class="form-control" id="template" name="template"></textarea>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="template-file-option">
                 <p>
                     <strong>Create Template File?</strong>
                 </p>
@@ -98,6 +98,7 @@
             theme: "material"
         });
         pageModelEditor.getDoc().setValue(`@Html.Raw(Model.Model)`);
+        pageModelEditor.setSize("100%", "80%");
         var pageTemplateEditor = CodeMirror.fromTextArea(document.getElementById("template"), {
             lineNumbers: true,
             matchBrackets: true,
@@ -105,12 +106,15 @@
             theme: "material"
         });
         pageTemplateEditor.getDoc().setValue(`@Html.Raw(Model.Template)`);
-        pageModelEditor.setSize("100%", "80%");
         // onload jquery events (events only attached if page object exists else user notifed of error)
         $(function () {
             if (!(page instanceof Page)) {
                 page = new Page();
             }
+            page.checkPageVariables();
+            $("input[name='hasParams']").change(function () {
+                page.checkPageVariables();
+            });
             $("#deletePage").click(function (e) {
                 e.preventDefault();
                 page.init();

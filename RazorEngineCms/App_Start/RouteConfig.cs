@@ -10,6 +10,17 @@ namespace RazorEngineCms
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+                name: "LoginRedirect",
+                url: "CMS/Account/Login/{returnUrl}",
+                defaults:
+                new
+                {
+                    controller = "Account",
+                    action = "Login",
+                    returnUrl = UrlParameter.Optional
+                });
+
+            routes.MapRoute(
                 name: "CMS",
                 url: "CMS/{controller}/{action}/{section}/{name}/{param}/{param2}",
                 defaults:
@@ -35,8 +46,6 @@ namespace RazorEngineCms
                     param = UrlParameter.Optional,
                     param2 = UrlParameter.Optional
                 });
-
-
         }
     }
 }
