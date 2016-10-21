@@ -2,6 +2,7 @@
 using System.Linq;
 using RazorEngineCms.DAL;
 using RazorEngineCms.App_Classes;
+using Newtonsoft.Json;
 
 namespace RazorEngineCms.Models
 {
@@ -37,6 +38,11 @@ namespace RazorEngineCms.Models
             }
 
             return content;
+        }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this);
         }
     }
 }

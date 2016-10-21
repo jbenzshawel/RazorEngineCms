@@ -1,9 +1,11 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using RazorEngineCms.DAL;
+using Newtonsoft.Json;
 
 namespace RazorEngineCms.Models
 {
@@ -11,6 +13,16 @@ namespace RazorEngineCms.Models
     public class ApplicationUser : IdentityUser
     {
         private static ApplicationContext _db = new ApplicationContext();
+        
+
+        public string ToJson()
+        {
+            // remove sensitive info before adding exposing as JSON 
+            this.PasswordHash = null;
+            this.SecurityStamp = null;
+            this.Id = null;
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
+        }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {

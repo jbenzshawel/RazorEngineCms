@@ -29,13 +29,24 @@
                         Note: pages with url parameters cannot be pre compiled
                     </p>
                     <label for="hasParams-true" class="weight-normal">
-                        <input type="radio" name="hasParams" id="hasParams-true" value="true" class="formControl" /> True
+                        <input type="radio" name="hasParams" id="hasParams-true" value="true" class="formControl" /> Yes
                     </label>
                     <label for="hasParams-false" class="weight-normal">
-                        <input type="radio" name="hasParams" id="hasParams-false" value="false" class="formControl" checked /> False
+                        <input type="radio" name="hasParams" id="hasParams-false" value="false" class="formControl" checked /> No
                     </label>
                 </div>
-                
+                <div class="form-group">
+                    <p>
+                        <strong>Does this page use an include? </strong><br />
+                        Pages with includes have the model format <code>@@Model.PageModel</code> for model created below and <code>@@Model.Includes</code>
+                    </p>
+                    <label for="hasInclude-true" class="weight-normal">
+                        <input type="radio" name="hasInclude" id="hasInclude-true" value="true" class="formControl" /> Yes
+                    </label>
+                    <label for="hasInclude-false" class="weight-normal">
+                        <input type="radio" name="hasInclude" id="hasInclude-false" value="false" class="formControl" checked /> No
+                    </label>
+                </div>
                 <div class="form-group">
                     <label for="model">Page Model</label> (<a href="#" data-toggle="modal" data-target="#modelEditorInfoModal">More Info</a>)
                     <p>Create an object variable named <code>Model</code> to pass .NET code to view.</p>
@@ -50,11 +61,11 @@
                     <p><strong>Create Template File?</strong></p>
                     <label for="templateFileTrue" class="weight-normal">
                         <input type="radio" name="templateFile" id="templateFileTrue" value="true" />
-                        True
+                        Yes
                     </label>
                     <label for="templateFileFalse" class="weight-normal">
                         <input type="radio" name="templateFile" id="templateFileFalse" value="false" checked />
-                        False
+                        No
                     </label>
                 </div>
                 <div class="form-group">
@@ -68,7 +79,7 @@
 
 
 @section Scripts {
-                <script type="text/javascript" src="~/Scripts/page.js"></script>
+    <script type="text/javascript" src="~/Scripts/page.js"></script>
     <script type="text/javascript">
         // page object for validating and submitting a new page request 
         var page = new Page();

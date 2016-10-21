@@ -21,11 +21,16 @@
                 <li><a href="/CMS/Home/Index">Dashboard</a></li>
                 @if (HttpContext.Current.User != null && HttpContext.Current.Request.IsAuthenticated)
                 {
-                    <li  class="sidebar-header">
+                    <li class="sidebar-header">
                         <h4>Pages</h4>
                     </li>
                     <li><a href="/CMS/Page/New">New Page</a></li>
                     <li><a href="/CMS/Page/List">List Pages</a></li>
+                    <li class="sidebar-header">
+                        <h4>Includes</h4>
+                    </li>
+                    <li><a href="/CMS/Incude/New">New Include</a></li>
+                    <li><a href="/CMS/Include/List">List Includes</a></li>
                     <li class="sidebar-header">
                         <h4>Account</h4>
                     </li>

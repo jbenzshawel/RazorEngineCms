@@ -10,7 +10,7 @@ namespace RazorEngineCms.DAL
             : base("ApplicationContext")
         {
         }
-
+        
         public DbSet<Page> Page { get; set; }
 
         public DbSet<Include> Include { get; set; }

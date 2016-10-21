@@ -24,6 +24,7 @@ Page.prototype.init = function () {
     this.$template = $("#template");
     this.createTemplateFile = $("input[name=\"templateFile\"]:checked").val();
     this.hasParams = $("input[name=\"hasParams\"]:checked").val();
+    this.hasIncludes = $("input[name=\"hasInclude\"]:checked").val();
     if (typeof (pageTemplateEditor) != "undefined") {
         this.template = pageTemplateEditor.getValue().trim();
     }
@@ -73,7 +74,8 @@ Page.prototype.save = function () {
             Model: scopedObject.model,
             Template: scopedObject.template,
             CreateTemplateFile: scopedObject.createTemplateFile,
-            HasParams: scopedObject.hasParams
+            HasParams: scopedObject.hasParams,
+            HasInclude: scopedObject.hasInclude
         };
         if (this.Id != "") {
             pageModel.Id = this.Id;

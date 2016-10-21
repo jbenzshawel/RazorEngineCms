@@ -20,6 +20,11 @@ namespace RazorEngineCms.ExtensionClasses
             return @this.Cast<string>().ToDictionary(k => k, v => @this[v]);
         }
 
+        public static string ToJson(this ApplicationUser @this)
+        {
+            return JsonConvert.SerializeObject(@this);
+        }
+
         public static bool DictionaryEqual<TKey, TValue>(this IDictionary<TKey, TValue> first, IDictionary<TKey, TValue> second)
         {
             return first.DictionaryEqual(second, null);
