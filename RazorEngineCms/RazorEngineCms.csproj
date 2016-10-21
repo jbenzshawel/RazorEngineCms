@@ -168,6 +168,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Classes\AppExceptions.cs" />
     <Compile Include="App_Classes\AuthRedirect.cs" />
     <Compile Include="App_Classes\CacheManager.cs" />
     <Compile Include="App_Classes\DataHelper.cs" />
@@ -207,15 +208,25 @@
     <Compile Include="Migrations\201610092252573_addingUpdatingProperty.Designer.cs">
       <DependentUpon>201610092252573_addingUpdatingProperty.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610210131012_AddingIncludes.cs" />
+    <Compile Include="Migrations\201610210131012_AddingIncludes.Designer.cs">
+      <DependentUpon>201610210131012_AddingIncludes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610210211254_UpdatingPageModelToHaveHasInclude.cs" />
+    <Compile Include="Migrations\201610210211254_UpdatingPageModelToHaveHasInclude.Designer.cs">
+      <DependentUpon>201610210211254_UpdatingPageModelToHaveHasInclude.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\Include.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\PageCacheModel.cs" />
     <Compile Include="Models\PageList.cs" />
     <Compile Include="Models\PageTemplate.cs" />
     <Compile Include="Models\RequestModels.cs" />
     <Compile Include="Models\Page.cs" />
+    <Compile Include="Models\TemplateModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -643,6 +654,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610092252573_addingUpdatingProperty.resx">
       <DependentUpon>201610092252573_addingUpdatingProperty.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610210131012_AddingIncludes.resx">
+      <DependentUpon>201610210131012_AddingIncludes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610210211254_UpdatingPageModelToHaveHasInclude.resx">
+      <DependentUpon>201610210211254_UpdatingPageModelToHaveHasInclude.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -33,6 +33,8 @@ namespace RazorEngineCms.Models
 
         public bool HasParams { get; set; }
 
+        public bool HasInclude { get; set; }
+
         public DateTime Updated { get; set; }
 
         public Page()
@@ -87,9 +89,22 @@ namespace RazorEngineCms.Models
 
             try
             {
-                // null for modelType parameter since templates are dynamic 
-                this.CompiledTemplate = Engine.Razor.RunCompile(template, cacheName, null,
-                    JsonConvert.DeserializeObject(jsonModel));
+                if (this.HasInclude)
+                {
+                    var templateModel = new TemplateModel
+                    {
+                        PageModel = JsonConvert.DeserializeObject(jsonModel),
+                        Includes = new Include()
+                    };
+
+                    this.CompiledTemplate = Engine.Razor.RunCompile(template, cacheName, typeof(TemplateModel), templateModel);
+                }
+                else
+                {
+                    // null for modelType parameter since templates are dynamic 
+                    this.CompiledTemplate = Engine.Razor.RunCompile(template, cacheName, null,
+                        JsonConvert.DeserializeObject(jsonModel));
+                }
             }
             catch (Exception ex)
             {
@@ -103,7 +118,7 @@ namespace RazorEngineCms.Models
         }
 
         /// <summary>
-        /// Clones a page in the database. Returns new integer id of copied page  
+        /// Copies a page in the database. Returns new integer id of copied page  
         /// </summary>
         /// <param name="page"></param>
         /// <returns></returns>

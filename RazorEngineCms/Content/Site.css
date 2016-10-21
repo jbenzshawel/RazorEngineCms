@@ -6,10 +6,24 @@
     font-weight: normal;
 }
 
+
+#sidebar-wrapper {
+    background: #F7F6F3 !important;
+}
+
+.sidebar-nav li a:hover {
+    color:#888 !important;
+}
 .sidebar-nav > .sidebar-brand {
+    color: #333 !important;
     border-bottom: 1px solid #999;
 }
 
-.sidebar-nav li:last-child {
+.sidebar-nav > .sidebar-header {
     border-top: 1px solid #999;
+    border-bottom: 1px solid #999;
+}
+
+.sidebar-nav li h4 {
+    color: #666;
 }

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using RazorEngineCms.DAL;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace RazorEngineCms.Models
 {
@@ -26,5 +28,21 @@ namespace RazorEngineCms.Models
         public string Section { get; set; }
 
         public string Name { get; set; }
+
+        internal Page GetPage()
+        {
+            Page pageModel = null;
+            ApplicationContext _db = new ApplicationContext(); 
+            if (this.Id > 0)  // if id is set get model by id 
+            {
+                pageModel = _db.Page.FirstOrDefault(p => p.Id == this.Id);
+            }
+            else if (!string.IsNullOrEmpty(this.Name) && !string.IsNullOrEmpty(this.Section)) // else try and get it by name and section 
+            {
+                pageModel = Page.FindPage(this.Name, this.Section);
+            }
+
+            return pageModel;
+        }
     }
 }

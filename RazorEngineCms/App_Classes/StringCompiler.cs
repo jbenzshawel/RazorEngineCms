@@ -35,7 +35,7 @@ namespace RazorEngineCms.App_Classes
             this.Errors = new List<string>();
         }
 
-        public void CompilePageModel(string model, string param = null, string param2 = null)
+        public void CompilePageModel(string model, string param = "", string param2 = "")
         {
             if (string.IsNullOrEmpty(model))
             {

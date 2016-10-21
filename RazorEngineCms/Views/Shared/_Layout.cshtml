@@ -16,15 +16,26 @@
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
-                    <a href="#">
-                        Razor Engine CMS
-                    </a>
+                    <a href="#">Razor Engine CMS</a>
                 </li>
                 <li><a href="/CMS/Home/Index">Dashboard</a></li>
                 @if (HttpContext.Current.User != null && HttpContext.Current.Request.IsAuthenticated)
                 {
+                    <li  class="sidebar-header">
+                        <h4>Pages</h4>
+                    </li>
                     <li><a href="/CMS/Page/New">New Page</a></li>
                     <li><a href="/CMS/Page/List">List Pages</a></li>
+                    <li  class="sidebar-header">
+                        <h4>Includes</h4>
+                    </li>
+                    <li><a href="/CMS/Incude/New">New Include</a></li>
+                    <li><a href="/CMS/Include
+                           
+                           sdfasdf/List">List Includes</a></li>
+                    <li class="sidebar-header">
+                        <h4>Account</h4>
+                    </li>
                     <li><a href="/CMS/Account/LogOff">Logout</a></li>
                 }
                 else

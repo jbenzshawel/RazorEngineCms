@@ -13,6 +13,8 @@ namespace RazorEngineCms.DAL
 
         public DbSet<Page> Page { get; set; }
 
+        public DbSet<Include> Include { get; set; }
+
         public static ApplicationContext Create()
         {
             return new ApplicationContext();

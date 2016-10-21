@@ -63,16 +63,10 @@ namespace RazorEngineCms.Controllers
                 if (!string.IsNullOrEmpty(page.Model))
                 {
                     // compile the model from the string Model declaration in pageRequest
+                    // always want to compile model before saving to catch any compile errors
                     using (var stringCompiler = new StringCompiler())
                     {
-                        if (page.HasParams)
-                        {
-                            stringCompiler.CompilePageModel(page.Model, string.Empty, string.Empty);
-                        }
-                        else
-                        {
-                            stringCompiler.CompilePageModel(page.Model);
-                        }
+                        stringCompiler.CompilePageModel(page.Model);   
                         if (stringCompiler.IsValid)
                         {
                             page.CompiledModel = stringCompiler.ToString();
@@ -86,7 +80,6 @@ namespace RazorEngineCms.Controllers
 
                 if (Errors.Count == 0)
                 {
-                    // compile and save template
                     page = await CompileTemplateAndSavePage(page, saveAsFile: pageRequest.CreateTemplateFile);
                 }  // end if no errors after compiling model
             } // end if valid model state 
@@ -126,25 +119,16 @@ namespace RazorEngineCms.Controllers
         /// <returns></returns>
         [HttpPost]
         [AuthRedirect]
-        public async Task<ActionResult> Delete(AjaxPageRequest page)
+        public async Task<ActionResult> Delete(AjaxPageRequest pageRequest)
         {
             bool status = false;
-            Page pageModel = null;
+            Page pageModel = pageRequest.GetPage();
 
-            if (page.Id > 0)  // if id is set get model by id 
-            {
-                pageModel = this._db.Page.FirstOrDefault(p => p.Id == page.Id);
-            }
-            else if (!string.IsNullOrEmpty(page.Name) && !string.IsNullOrEmpty(page.Section)) // else try and get it by name and section 
-            {
-                pageModel = Page.FindPage(page.Name, page.Section);
-            }
-            else
+            if (pageModel == null)          
             {
                 this.Errors.Add("Page not found");
             }
-
-            if (pageModel != null)
+            else
             {
                 try
                 {
@@ -174,7 +158,7 @@ namespace RazorEngineCms.Controllers
         // GET: /Section/Name 
         public ActionResult View(string section, string name, string param = null, string param2 = null)
         {
-            Page page = null;
+            Page page = null; // will store the page once we find it
             Func<Page, bool> templateNeedsCompiled = (iPage) => (string.IsNullOrEmpty(iPage.CompiledTemplate) &&
                                 !string.IsNullOrEmpty(iPage.CompiledModel) &&
                                 !string.IsNullOrEmpty(iPage.Template));
@@ -265,15 +249,7 @@ namespace RazorEngineCms.Controllers
         {
             var status = false;
             int? copiedPageId = null;
-            Page pageModel = null;
-            if (pageRequest.Id > 0)
-            {
-                pageModel = this._db.Page.FirstOrDefault(p => p.Id == pageRequest.Id); 
-            }
-            else if (!string.IsNullOrEmpty(pageRequest.Section))
-            {
-                pageModel = Page.FindPage(pageRequest.Section, pageRequest.Name);
-            }
+            Page pageModel = pageRequest.GetPage();
 
             if (pageModel != null)
             {
@@ -300,20 +276,28 @@ namespace RazorEngineCms.Controllers
         public ActionResult List()
         {
             IList<Page> pageList = new PageList();
-            foreach (var file in FileHelper.Files)
+            if (FileHelper.Files.Count > 0)
             {
-                pageList.Add(new Page
+                foreach (var file in FileHelper.Files)
                 {
-                    Id = -1,
-                    Name = file.Name,
-                    Section = file.Variable,
-                    CompiledTemplate = FileHelper.GetFile(file.Name, file.Variable).ToString()
-                });
+                    pageList.Add(new Page
+                    {
+                        Id = -1,
+                        Name = file.Name,
+                        Section = file.Variable,
+                        CompiledTemplate = FileHelper.GetFile(file.Name, file.Variable).ToString()
+                    });
+                }
             }
-            foreach (var page in _db.Page)
+            
+            if (_db.Page.Count() > 0)
+            {
+                foreach (var page in _db.Page)
             {
                 pageList.Add(page);
             }
+            }
+            
             return View(pageList);
         }
 
