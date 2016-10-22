@@ -4,7 +4,6 @@
  * Methods: init, validate, and save
  * Dependencies: jQuery, default.js, an initialized code mirror object 
  *               called pageTemplateEditor
- * LastUpdated : 9/18/2016
  */
 
 "use strict";
@@ -89,7 +88,6 @@ Page.prototype.save = function () {
                 _default.alertMsg("success", "Page has been saved. <a href='/" + scopedObject.section + "/" + scopedObject.name + "' target='_blank'>View</a>", "#new-page-alert")
             } else {
                 _default.alertMsg("error", "Something went wrong. Try again?", "#new-page-alert")
-
                 if (data.Errors.length > 0) {
                     var errorMsgBlock = [];
                     data.Errors.forEach(function (error) {
@@ -107,7 +105,6 @@ Page.prototype.save = function () {
                         errorMsgBlock.push(("<br/>"));
                     });
                     $("#new-page-alert").append("<div class\"exception-msg\"><pre><h4>Exception:</h4>" + errorMsgBlock.join("") + "</pre></div>");
-
                 } // end if data.Errors.length > 0 
             } // end else 
             $("html, body").animate({ scrollTop: 0 }, "slow");
@@ -150,7 +147,6 @@ Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {
     if (section == undefined || section.length === 0) { // if empty get from Page object
         section = this.section;
     }
-
     var pageModel = {
         Id: id,
         Section: section,
@@ -164,7 +160,7 @@ Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {
         data: JSON.stringify(pageModel),
         async: false,
         success: function (data) {
-            return scopedObj.successCallback(data, msgSel, action);
+            return scopedObj.ajaxSuccessCallback(data, msgSel, action);
         }
     };
     if (settings != null && settings.data != null) {
@@ -176,7 +172,7 @@ Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {
 
 // callback function for ajax request. If message success alert message displayed 
 // else errors are logged 
-Page.prototype.successCallback = function (data, msgSel, action) {
+Page.prototype.ajaxSuccessCallback = function (data, msgSel, action) {
     var callbackReturnStatus = false;
     $(msgSel).empty(); // clear any previous messages
     if (data.Status === true) {
