@@ -27,3 +27,7 @@
 .sidebar-nav li h4 {
     color: #666;
 }
+
+.line-error {
+    background: #C04B4B;
+}

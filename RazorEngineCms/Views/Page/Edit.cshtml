@@ -84,10 +84,10 @@
 @Html.Partial("_ConfiromDeleteModal")
 @Html.Partial("_ModelEditorInfoModal")
 
-
 @section Scripts {
     <script type="text/javascript" src="~/Scripts/page.js"></script>
     <script type="text/javascript">
+        "use strict";
         // page object for validating and submitting a new page request
         var page = new Page();
         // setup code mirror editors
@@ -106,7 +106,7 @@
             theme: "material"
         });
         pageTemplateEditor.getDoc().setValue(`@Html.Raw(Model.Template)`);
-        // onload jquery events (events only attached if page object exists else user notifed of error)
+        pageTemplateEditor.setSize("100%", "80%");
         $(function () {
             if (!(page instanceof Page)) {
                 page = new Page();

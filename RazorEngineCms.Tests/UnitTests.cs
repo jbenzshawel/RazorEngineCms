@@ -1,27 +1,20 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.CSharp;
-using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
-using Mono.CSharp;
 using RazorEngineCms.App_Classes;
-using System.Data;
-using System.Xml;
-using RazorEngineCms;
 
 namespace RazorEngineCMSTests
 {
     [TestClass]
     public class UnitTests
     {
-        [TestMethod]
-        public void TestApplicationUserToJson()
-        {
-            ApplicationUserManager = new ApplicationUserManager();
-            var user = 
-        }
+        //[TestMethod]
+        //public void TestApplicationUserToJson()
+        //{
+        //    ApplicationUserManager = new ApplicationUserManager();
+        //    var user = 
+        //}
 
         [TestMethod]
         public void TestCompile()

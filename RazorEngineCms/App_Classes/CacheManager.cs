@@ -117,7 +117,7 @@ namespace RazorEngineCms.App_Classes
                               string.Equals(cachedPage.Section, section, StringComparison.CurrentCultureIgnoreCase) &&
                               string.Equals(cachedPage.Param, param, StringComparison.CurrentCultureIgnoreCase) &&
                               string.Equals(cachedPage.Param2, param2, StringComparison.CurrentCultureIgnoreCase) && 
-                              cachedPage.QueryStringParams.DictionaryEqual(queryString));
+                              cachedPage.QueryStringParams.Equal(queryString));
 
             }
 

@@ -93,7 +93,16 @@ Page.prototype.save = function () {
                 if (data.Errors.length > 0) {
                     var errorMsgBlock = [];
                     data.Errors.forEach(function (error) {
-                        //logger.logError(error);
+                        var lineNumRegex = /Line: \d?\d?\d?\d/g;
+                        if (error.search(lineNumRegex) != -1) {
+                            var lineNumText = error.match(lineNumRegex)[0]
+                            var lineNum = parseInt(lineNumText.replace("Line:", ""), 10) - 1; // line numbers start at 0 in CodeMirror API
+                            pageModelEditor.addLineClass(lineNum, "background", "line-error");
+                            // add change event to remove line error
+                            pageModelEditor.on('change', function (cMirror) {
+                                pageModelEditor.removeLineClass(lineNum, "background", "line-error");
+                            });
+                        }
                         errorMsgBlock.push(error);
                         errorMsgBlock.push(("<br/>"));
                     });

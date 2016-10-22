@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
@@ -8,7 +9,7 @@ using RazorEngineCms.Models;
 
 namespace RazorEngineCms.ExtensionClasses
 {
-    public static class Extensions
+    public static class ExtensionsClasses
     {
         /// <summary>
         /// NameValueCollection.ToDictionary 
@@ -20,20 +21,17 @@ namespace RazorEngineCms.ExtensionClasses
             return @this.Cast<string>().ToDictionary(k => k, v => @this[v]);
         }
 
-        
-        public static string ToJson<T>(this T @this, bool withPadding = false)
+        /// <summary>
+        /// http://stackoverflow.com/questions/3928822/comparing-2-dictionarystring-string-instances
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="first"></param>
+        /// <param name="second"></param>
+        /// <returns></returns>
+        public static bool Equal<TKey, TValue>(this IDictionary<TKey, TValue> first, IDictionary<TKey, TValue> second)
         {
-            if (withPadding)
-            {
-                return JsonConvert.SerializeObject(@this, Formatting.Indented);
-
-            }
-            return JsonConvert.SerializeObject(@this);
-        }
-
-        public static bool DictionaryEqual<TKey, TValue>(this IDictionary<TKey, TValue> first, IDictionary<TKey, TValue> second)
-        {
-            return first.DictionaryEqual(second, null);
+            return first.Equal(second, null);
         }
 
         /// <summary>
@@ -45,7 +43,7 @@ namespace RazorEngineCms.ExtensionClasses
         /// <param name="second"></param>
         /// <param name="valueComparer"></param>
         /// <returns></returns>
-        public static bool DictionaryEqual<TKey, TValue>(this IDictionary<TKey, TValue> first, IDictionary<TKey, TValue> second, IEqualityComparer<TValue> valueComparer)
+        public static bool Equal<TKey, TValue>(this IDictionary<TKey, TValue> first, IDictionary<TKey, TValue> second, IEqualityComparer<TValue> valueComparer)
         {
             if (first == second) return true;
             if ((first == null) || (second == null)) return false;
@@ -62,6 +60,11 @@ namespace RazorEngineCms.ExtensionClasses
             return true;
         }
 
+        /// <summary>
+        /// Cast a PageCacheModel to a Page type
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
         public static Page ToPage(this PageCacheModel @this)
         {
             var page = new Page
@@ -92,6 +95,23 @@ namespace RazorEngineCms.ExtensionClasses
         }
 
         /// <summary>
+        /// Returns a Json Serialized object of this as a string
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="withPadding"></param>
+        /// <returns></returns>
+        public static string ToJson<T>(this T @this, bool withPadding = false)
+        {
+            if (withPadding)
+            {
+                return JsonConvert.SerializeObject(@this, Formatting.Indented);
+
+            }
+            return JsonConvert.SerializeObject(@this);
+        }
+
+        /// <summary>
         /// Returns a Json Serialized JsonResultObject with DataTable
         /// Rows in the Data property. Other properties in returned object
         /// include Status, HasRows, and Errors. 
@@ -118,6 +138,10 @@ namespace RazorEngineCms.ExtensionClasses
             return JsonConvert.SerializeObject(resultObject);
         }
     }
+
+    /// <summary>
+    /// Model used for Serializing DataTable Json
+    /// </summary>
     public class JsonResultObject
     {
         public IList<object> Data { get; set; }

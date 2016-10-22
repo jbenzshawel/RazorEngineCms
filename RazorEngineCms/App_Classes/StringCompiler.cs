@@ -76,9 +76,9 @@ namespace RazorEngineCms.App_Classes
                         {
                             var errorLine = providerResult.Errors[i].Line > 4 ? providerResult.Errors[i].Line - 4 : providerResult.Errors[i].Line;
                             // need to adjust error lines since ui editor is offset  
-                            if (errorLine > 4)
+                            if (errorLine > 6)
                             {
-                                errorLine = errorLine - 5;
+                                errorLine = errorLine - 7;
                             }
                             this.Errors.Add(string.Format("Model Compile Error: {0}, Line: {1}", providerResult.Errors[i].ErrorText, errorLine)); 
                         }

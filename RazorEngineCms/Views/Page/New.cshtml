@@ -79,42 +79,43 @@
 
 
 @section Scripts {
-    <script type="text/javascript" src="~/Scripts/page.js"></script>
-    <script type="text/javascript">
-        // page object for validating and submitting a new page request 
-        var page = new Page();
-        // setup code mirror editors 
-        var pageModelEditor = CodeMirror.fromTextArea(document.getElementById("model"), {
-            lineNumbers: true,
-            matchBrackets: true,
-            mode: "text/x-csharp",
-            theme: "material"
+<script type="text/javascript" src="~/Scripts/page.js"></script>
+<script type="text/javascript">
+    "use strict";
+    // page object for validating and submitting a new page request 
+    var page = new Page();
+    // setup code mirror editors 
+    var pageModelEditor = CodeMirror.fromTextArea(document.getElementById("model"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        mode: "text/x-csharp",
+        theme: "material"
+    });
+    pageModelEditor.setSize("100%", "80%");
+    var pageTemplateEditor = CodeMirror.fromTextArea(document.getElementById("template"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        mode: "xml",
+        theme: "material"
+    });
+    pageTemplateEditor.setSize("100%", "80%");
+    $(function () {
+        if (!(page instanceof Page)) {
+            page = new Page(); 
+        }
+        page.checkPageVariables();
+        $("input[name='hasParams']").change(function () {
+            page.checkPageVariables(this);
         });
-        var pageTemplateEditor = CodeMirror.fromTextArea(document.getElementById("template"), {
-            lineNumbers: true,
-            matchBrackets: true,
-            mode: "xml",
-            theme: "material"
+        $("#submitNewPage").click(function (e) {
+            e.preventDefault();
+            page.save();
         });
-        pageModelEditor.setSize("100%", "80%");
-        // onload jquery events (events only attached if page object exists else user notifed of error) 
-        $(function () {
-            if (!(page instanceof Page)) {
-                page = new Page(); 
-            }
-            page.checkPageVariables();
-            $("input[name='hasParams']").change(function () {
-                page.checkPageVariables(this);
-            });
-            $("#submitNewPage").click(function (e) {
-                e.preventDefault();
-                page.save();
-            });
-            // clears errors after an input field has been updated 
-            var fields = ["#pageName", "#pageVar", "#model", "#template"]
-            for (var i = 0, inputField; inputField = fields[i++];) {
-                _default.updateInputField(inputField);
-            }
-        });
-    </script>
+        // clears errors after an input field has been updated 
+        var fields = ["#pageName", "#pageVar", "#model", "#template"]
+        for (var i = 0, inputField; inputField = fields[i++];) {
+            _default.updateInputField(inputField);
+        }
+    });
+</script>
 }
