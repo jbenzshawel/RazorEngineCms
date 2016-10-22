@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using System.Threading.Tasks;
-using RazorEngineCms.DAL;
 using RazorEngineCms.Models;
 using RazorEngineCms.App_Classes;
 using RazorEngineCms.ExtensionClasses;
@@ -12,30 +10,12 @@ using System.Collections.Concurrent;
 
 namespace RazorEngineCms.Controllers
 {
-    public class PageController : Controller
+    public class PageController : BaseController
     {
-        public ConcurrentBag<string> Errors { get; set; }
-
         public IDictionary<string,string> QueryStringParams { get; set; }
-
-        internal bool AllowCache { get; set; }
-
-        internal FileHelper FileHelper { get; set; }
-
-        internal CacheManager CacheManager { get; set; }
-
-        private ApplicationContext _db { get; set; }
 
         public PageController()
         {
-            this._db = new ApplicationContext();
-            this.Errors = new ConcurrentBag<string>();
-            this.FileHelper = new FileHelper();
-            this.AllowCache = ConfigurationManager.AppSettings["AllowPageCaching"] == "true";
-            if (this.AllowCache)
-            {
-                this.CacheManager = new CacheManager();
-            }
             this.QueryStringParams = System.Web.HttpContext.Current.Request.QueryString.ToDictionary();
         }
 

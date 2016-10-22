@@ -1,0 +1,62 @@
+﻿using System;
+using System.Linq;
+using System.Web.Mvc;
+using RazorEngineCms.App_Classes;
+using RazorEngineCms.Models;
+using System.Threading.Tasks;
+
+namespace RazorEngineCms.Controllers
+{
+    public class IncludeController : BaseController
+    {
+
+        // GET: Include/New
+        [AuthRedirect]
+        public ActionResult New()
+        {
+            return View();
+        }
+
+        // POST: Include/Save
+        [Authorize]
+        public async Task<ActionResult> Save(Include includeModel)
+        {
+            bool isValid = false;
+            
+            if (ModelState.IsValid)
+            {
+                var includeInDb = this._db.Include.FirstOrDefault(i => i.Id == includeModel.Id);
+                // set updated to now before upsert 
+                includeModel.Updated = DateTime.Now;
+                if (includeInDb != null) // update the include if it exists
+                {
+                    includeInDb.Name = includeModel.Name;
+                    includeInDb.Type = includeModel.Type;
+                    includeInDb.Content = includeModel.Content;
+                    includeInDb.Updated = includeModel.Updated;
+
+                }
+                else // insert a new include 
+                {
+                    this._db.Include.Add(includeModel);
+                }
+
+                try
+                {
+                    isValid = await this._db.SaveChangesAsync() > 0;
+                }
+                catch (Exception ex)
+                {
+                    this.Errors.Add("Internal server error saving Include.");
+                    this.Errors.Add(ex.Message);
+                }
+            }
+            else
+            {
+                this.Errors.Add("Invalid model parameter.");
+            }
+
+            return Json(new { Status = isValid, Errors });
+        }
+    }
+}

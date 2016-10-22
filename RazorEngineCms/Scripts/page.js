@@ -93,7 +93,7 @@ Page.prototype.save = function () {
                     data.Errors.forEach(function (error) {
                         var lineNumRegex = /Line: \d?\d?\d?\d/g;
                         if (error.search(lineNumRegex) != -1) {
-                            var lineNumText = error.match(lineNumRegex)[0]
+                            var lineNumText = error.match(lineNumRegex)[0];
                             var lineNum = parseInt(lineNumText.replace("Line:", ""), 10) - 1; // line numbers start at 0 in CodeMirror API
                             pageModelEditor.addLineClass(lineNum, "background", "line-error");
                             // add change event to remove line error
