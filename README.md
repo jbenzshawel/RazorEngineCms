@@ -4,10 +4,10 @@ Content Management System built on top of [Razor Engine](https://github.com/Anta
 
 Example of creating / editing a page in cms:
 
-![Page](http://i.imgur.com/YQlCMIf.png)
+![Page](http://i.imgur.com/MLYw3WM.png)
 
 Example compiled template from above code:
 
-![Compiled Template](http://i.imgur.com/BBXiTr9.png)
+![Compiled Template](http://i.imgur.com/dD12fmu.png)
 
 More to come!

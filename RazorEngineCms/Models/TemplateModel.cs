@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
+using RazorEngineCms.ExtensionClasses;
 
 namespace RazorEngineCms.Models
 {
@@ -29,9 +30,9 @@ namespace RazorEngineCms.Models
             }
         }
 
-        public string ToJson()
+        public string ToJson(bool withPadding = false)
         {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
+            return this.ToJson<TemplateModel>(withPadding);
         }
     }
 }

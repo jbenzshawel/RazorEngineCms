@@ -20,8 +20,14 @@ namespace RazorEngineCms.ExtensionClasses
             return @this.Cast<string>().ToDictionary(k => k, v => @this[v]);
         }
 
-        public static string ToJson(this ApplicationUser @this)
+        
+        public static string ToJson<T>(this T @this, bool withPadding = false)
         {
+            if (withPadding)
+            {
+                return JsonConvert.SerializeObject(@this, Formatting.Indented);
+
+            }
             return JsonConvert.SerializeObject(@this);
         }
 
