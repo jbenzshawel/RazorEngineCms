@@ -1,0 +1,108 @@
+﻿@model List<Include>
+
+@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>List</h2>
+
+@if (Model.Count == 0) // Show message if no pages
+{
+    <p>No includes have been created. <a href="/Include/New">Create a new include?</a></p>
+}
+else // Show Include List Table
+{
+    <div id="alertMsgs"></div>
+    <table class="table" id="includeListTable">
+        <thead>
+            <tr>
+                <th>Include ID</th>
+                <th>Include Name</th>
+                <th>Include Type</th>
+                <th>Include Updated</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var include in Model)
+            {
+                <tr>
+                    <td>@include.Id</td>
+                    <td>@include.Name</td>
+                    <td>@include.Type</td>
+                    <td>@include.Updated.ToString("yyyy/M/dd hh:mm")</td>
+                    <td><a href="/CMS/Page/Include/@include.Id">Edit</a></td>
+                    <td>
+                        <a href="#"
+                           data-includeid="@include.Id"
+                           class="copy-include">
+                            Copy
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#"
+                           data-includeid="@include.Id"
+                           class="delete-include">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@Html.Partial("_ConfiromDeleteModal")
+
+@section Scripts {
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/include.js"></script>
+    <script type="text/javascript">
+        "use strict";
+        var include = new Include();
+        var deleteModalVue = new Vue({
+            data: {
+                type: "include",
+                modalHeader: "Delete Include?",
+                name: ""
+            }
+        });
+        // called on confirmation of delete modal
+        function confirmDelete(sessionKey) {
+            if (sessionKey != null) {
+                var storedPage = JSON.parse(sessionStorage.getItem(sessionKey));
+                //var deleteResult = include.delete(storedPage.pageId, storedPage.pageSection, storedPage.pageName, "#alertMsgs");
+                //var deleteStatus = deleteResult != null ? deleteResult.responseJSON.Status : false;
+                //if (deleteStatus) {
+                //    $("a[data-pageid=\"+ storedPage.pageId + "\"]").parent().parent().remove(); // remove deleted row
+                //} // end if deleteStatus true
+                //sessionStorage.removeItem(sessionKey);
+            //} // end if pageName != null
+            $("#deletePage").modal("hide");
+        }
+
+        $(function () {
+            $("#includeListTable").DataTable({
+                "order" : [[3, "desc"]]
+            });
+            sessionStorage.clear();
+            $("#confirmDelete").click(function () {
+                confirmDelete("selectedInclude");
+            });
+            $("a.copy-include").click(function (e) {
+                e.preventDefault();
+                
+                //copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
+            });
+            $("a.delete-include").click(function(e) {
+                e.preventDefault();
+                var selInclude = { id: $(this).attr("data-includeid") };
+                sessionStorage.setItem("selectedInclude", JSON.stringify(selInclude));
+                $("#deletePageModal").modal("show");
+            });
+        }); // end document ready function
+    </script>
+}

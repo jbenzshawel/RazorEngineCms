@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using RazorEngineCms.App_Classes;
@@ -9,7 +10,6 @@ namespace RazorEngineCms.Controllers
 {
     public class IncludeController : BaseController
     {
-
         // GET: Include/New
         [AuthRedirect]
         public ActionResult New()
@@ -18,6 +18,7 @@ namespace RazorEngineCms.Controllers
         }
 
         // POST: Include/Save
+        [HttpPost]
         [Authorize]
         public async Task<ActionResult> Save(Include includeModel)
         {
@@ -57,6 +58,20 @@ namespace RazorEngineCms.Controllers
             }
 
             return Json(new { Status = isValid, Errors });
+        }
+
+        [AuthRedirect]
+        public ActionResult List()
+        {
+            var includes = new List<Include>(); 
+
+            if (this._db.Include.Any())
+            {
+                includes = this._db.Include.OrderByDescending(i => i.Updated).ToList(); 
+            }
+
+
+            return View(includes);
         }
     }
 }

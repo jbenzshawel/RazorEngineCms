@@ -70,6 +70,49 @@ else // Show Page List Table
     <script type="text/javascript">
         "use strict";
         var page = new Page();
+        var deleteModalVue = new Vue({
+            data: {
+                type: "page",
+                modalHeader: "Delete Page?",
+                name: ""
+            }
+        });
+        $(function () {
+            $("#pageListTable").DataTable({
+                "order": [[3, "desc"]]
+            });
+            sessionStorage.clear();
+            $("#confirmDelete").click(function () {
+                var sessionKey = $(this).attr("data-sessionkey");;
+                confirmDelete(sessionKey);
+            });
+            $("a.copy-page").click(function (e) {
+                e.preventDefault();
+                var pageItem = {
+                    pageId: $(this).attr("data-pageid"),
+                    pageName: $(this).attr("data-pagename"),
+                    pageSection: $(this).attr("data-pagesection")
+                };
+                copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
+            })
+            $("a.delete-page").click(function (e) {
+                e.preventDefault();
+                var pageItem = {
+                    pageId: $(this).attr("data-pageid"),
+                    pageName: $(this).attr("data-pagename"),
+                    pageSection: $(this).attr("data-pagesection")
+                };
+                var sessionKey = "page-" + pageItem.pageId;
+                $("#confirmDeletePage").attr("data-sessionkey", sessionKey);
+                sessionStorage.setItem(sessionKey, JSON.stringify(pageItem));
+                // set tokens in vue modal and show it
+                deleteModalVue.name = " /" + pageItem.pageSection + "/" + pageItem.pageName
+                deleteModalVue.$mount("#deleteModal");
+                Vue.nextTick(function () {
+                    $("#deleteModal").modal("show");
+                });
+            });
+        }); // end document ready function
         // called on confirmation of delete modal
         function confirmDelete(sessionKey) {
             if (sessionKey != null) {
@@ -81,7 +124,7 @@ else // Show Page List Table
                 } // end if deleteStatus true
                 sessionStorage.removeItem(sessionKey);
             } // end if pageName != null
-            $("#deletePageModal").modal("hide");
+            $("#deletePage").modal("hide");
         }
         // called by "a.copy-page" click event 
         function copyPage(id, section, name) {
@@ -117,38 +160,5 @@ else // Show Page List Table
 
             return copiedPageId;
         }
-
-        $(function () {
-            $("#pageListTable").DataTable({
-                "order" : [[3, "desc"]]
-            });
-            sessionStorage.clear();
-            $("#confirmDeletePage").click(function () {
-                var sessionKey = $(this).attr("data-sessionkey");;
-                confirmDelete(sessionKey);
-            });
-            $("a.copy-page").click(function (e) {
-                e.preventDefault();
-                var pageItem = {
-                    pageId: $(this).attr("data-pageid"),
-                    pageName: $(this).attr("data-pagename"),
-                    pageSection: $(this).attr("data-pagesection")
-                };
-                copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
-            })
-            $("a.delete-page").click(function(e) {
-                e.preventDefault();
-                var pageItem = {
-                    pageId: $(this).attr("data-pageid"),
-                    pageName : $(this).attr("data-pagename"),
-                    pageSection : $(this).attr("data-pagesection")
-                };
-                var sessionKey = "page-" + pageItem.pageId;
-                $("#deletePageName").text(" /" + pageItem.pageSection + "/" + pageItem.pageName);
-                $("#confirmDeletePage").attr("data-sessionkey", sessionKey);
-                sessionStorage.setItem(sessionKey, JSON.stringify(pageItem));
-                $("#deletePageModal").modal("show");
-            });
-        }); // end document ready function
     </script>
 }

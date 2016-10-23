@@ -256,7 +256,7 @@ namespace RazorEngineCms.Controllers
         public ActionResult List()
         {
             IList<Page> pageList = new PageList();
-            if (FileHelper.Files.Count > 0)
+            if (FileHelper.Files.Any())
             {
                 foreach (var file in FileHelper.Files)
                 {
@@ -270,7 +270,7 @@ namespace RazorEngineCms.Controllers
                 }
             }
             
-            if (_db.Page.Count() > 0)
+            if (_db.Page.Any())
             {
                 foreach (var page in _db.Page)
             {
