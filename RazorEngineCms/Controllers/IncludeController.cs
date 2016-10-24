@@ -17,6 +17,13 @@ namespace RazorEngineCms.Controllers
             return View();
         }
 
+        [AuthRedirect]
+        public ActionResult Edit(int id)
+        {
+            var Include = this._db.Include.FirstOrDefault(i => i.Id == id);
+            return View(Include);
+        }
+
         // POST: Include/Save
         [HttpPost]
         [Authorize]

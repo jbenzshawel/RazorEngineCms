@@ -21,8 +21,8 @@ namespace RazorEngineCms
                 });
 
             routes.MapRoute(
-                name: "CMS",
-                url: "CMS/{controller}/{action}/{section}/{name}/{param}/{param2}",
+                name: "Page",
+                url: "CMS/Page/{action}/{section}/{name}/{param}/{param2}",
                 defaults:
                 new
                 {
@@ -32,6 +32,17 @@ namespace RazorEngineCms
                     name = UrlParameter.Optional,
                     param = UrlParameter.Optional,
                     param2 = UrlParameter.Optional
+                });
+
+            routes.MapRoute(
+                name: "Include",
+                url: "CMS/Include/{action}/{id}",
+                defaults:
+                new
+                {
+                    controller = "Include",
+                    action = UrlParameter.Optional,
+                    id = UrlParameter.Optional
                 });
 
             routes.MapRoute(

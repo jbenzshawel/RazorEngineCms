@@ -34,7 +34,7 @@ else // Show Include List Table
                     <td>@include.Name</td>
                     <td>@include.Type</td>
                     <td>@include.Updated.ToString("yyyy/M/dd hh:mm")</td>
-                    <td><a href="/CMS/Page/Include/@include.Id">Edit</a></td>
+                    <td><a href="/CMS/Include/Edit/@include.Id">Edit</a></td>
                     <td>
                         <a href="#"
                            data-includeid="@include.Id"
@@ -70,6 +70,7 @@ else // Show Include List Table
                 name: ""
             }
         });
+        var SESSION_KEY = "selectedInclude";
         // called on confirmation of delete modal
         function confirmDelete(sessionKey) {
             if (sessionKey != null) {
@@ -90,7 +91,7 @@ else // Show Include List Table
             });
             sessionStorage.clear();
             $("#confirmDelete").click(function () {
-                confirmDelete("selectedInclude");
+                confirmDelete(SESSION_KEY);
             });
             $("a.copy-include").click(function (e) {
                 e.preventDefault();
@@ -100,7 +101,7 @@ else // Show Include List Table
             $("a.delete-include").click(function(e) {
                 e.preventDefault();
                 var selInclude = { id: $(this).attr("data-includeid") };
-                sessionStorage.setItem("selectedInclude", JSON.stringify(selInclude));
+                sessionStorage.setItem(SESSION_KEY, JSON.stringify(selInclude));
                 $("#deletePageModal").modal("show");
             });
         }); // end document ready function

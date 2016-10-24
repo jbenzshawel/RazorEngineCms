@@ -588,6 +588,7 @@
     <Content Include="Scripts\vendor\respond.min.js" />
     <Content Include="Scripts\vendor\vue.js" />
     <Content Include="Scripts\vendor\_references.js" />
+    <Content Include="Scripts\vue.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -635,6 +636,7 @@
     <Content Include="Views\Shared\_ModelEditorInfoModal.cshtml" />
     <Content Include="Views\Include\New.cshtml" />
     <Content Include="Views\Include\List.cshtml" />
+    <Content Include="Views\Include\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
