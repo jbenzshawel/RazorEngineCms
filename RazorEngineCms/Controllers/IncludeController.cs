@@ -64,7 +64,7 @@ namespace RazorEngineCms.Controllers
                 this.Errors.Add("Invalid model parameter.");
             }
 
-            return Json(new { Status = isValid, Errors });
+            return Json(new { Status = isValid, Errors, Data = new { IncludeId = includeModel.Id } });
         }
 
         [AuthRedirect]

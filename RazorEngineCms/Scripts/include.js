@@ -34,8 +34,11 @@ Include.prototype.validate = function () {
     return isValid;
 }
 // calls Include.validate() then saves Include using /Include/New post request
-Include.prototype.save = function () {
+Include.prototype.save = function (async) {
     this.init();
+    if (typeof (async) == "undefined") {
+        async = true;
+    }
     _default.clearErrors();
     if (this.validate()) {
         var scopedObject = this;
@@ -49,17 +52,21 @@ Include.prototype.save = function () {
             IncludeModel.Id = this.Id;
         }
         // callback for successful post request
-        var successCallback = function (data) {
+        var successCallback = function (result) {
+            var idReturn = null;
             $("#new-include-alert").remove();
             // create element to store alerts
             $("#newInclude").prepend("<div id=\"new-include-alert\"></div>");
-            if (data.Status == true) {
-                _default.alertMsg("success", "Include has been saved.", "#new-include-alert")
+            if (result.Status == true) {
+                _default.alertMsg("success", "Include has been saved.", "#new-include-alert");
+                if (result.Data.IncludeId != null) {
+                    idReturn = result.Data.IncludeId; 
+                }
             } else {
                 _default.alertMsg("error", "Something went wrong. Try again?", "#new-include-alert")
-                if (data.Errors.length > 0) {
+                if (result.Errors.length > 0) {
                     var errorMsgBlock = [];
-                    data.Errors.forEach(function (error) {
+                    result.Errors.forEach(function (error) {
                         errorMsgBlock.push(error);
                         errorMsgBlock.push(("<br/>"));
                     });
@@ -67,6 +74,8 @@ Include.prototype.save = function () {
                 } // end if data.Errors.length > 0 
             } // end else 
             $("html, body").animate({ scrollTop: 0 }, "slow");
+
+            return idReturn;
         };
         // set params for ajax request 
         var settings = {
@@ -74,10 +83,11 @@ Include.prototype.save = function () {
             contentType: "application/json",
             url: "/CMS/Include/Save",
             data: JSON.stringify(IncludeModel),
-            success: successCallback
+            success: successCallback,
+            async: async
         };
         // submit post request 
-        $.ajax(settings);
+        return $.ajax(settings);
     } // end if valid request 
     return;
 };
