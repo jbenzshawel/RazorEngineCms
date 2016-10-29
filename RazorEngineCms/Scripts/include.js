@@ -36,10 +36,11 @@ Include.prototype.validate = function () {
 // calls Include.validate() then saves Include using /Include/New post request
 Include.prototype.save = function (async) {
     this.init();
+    _default.clearErrors();
     if (typeof (async) == "undefined") {
         async = true;
     }
-    _default.clearErrors();
+    var idReturn = null; // int return value of id of page saved (new id if created) 
     if (this.validate()) {
         var scopedObject = this;
         // create Include object model for post request 
@@ -53,13 +54,13 @@ Include.prototype.save = function (async) {
         }
         // callback for successful post request
         var successCallback = function (result) {
-            var idReturn = null;
             $("#new-include-alert").remove();
             // create element to store alerts
             $("#newInclude").prepend("<div id=\"new-include-alert\"></div>");
             if (result.Status == true) {
                 _default.alertMsg("success", "Include has been saved.", "#new-include-alert");
                 if (result.Data.IncludeId != null) {
+                    // set idReturn value declared at start of save function
                     idReturn = result.Data.IncludeId; 
                 }
             } else {
@@ -74,59 +75,41 @@ Include.prototype.save = function (async) {
                 } // end if data.Errors.length > 0 
             } // end else 
             $("html, body").animate({ scrollTop: 0 }, "slow");
-
-            return idReturn;
         };
-        // set params for ajax request 
-        var settings = {
+        // successCallback sets idReturn
+        $.ajax({
             type: "POST",
             contentType: "application/json",
             url: "/CMS/Include/Save",
             data: JSON.stringify(IncludeModel),
             success: successCallback,
             async: async
-        };
-        // submit post request 
-        return $.ajax(settings);
+        });
     } // end if valid request 
-    return;
+    return idReturn;
 };
 
-Include.prototype.delete = function (id, section, name, msgSel) {
-    this.Id = id,
-    this.section = section;
-    this.name = name;
-    return this.ajaxPost(id, name, section, msgSel, "Delete");
+Include.prototype.delete = function (id, msgSel) {
+    this.Id = id;
+    return this.ajaxPost(id, msgSel, "Delete");
 };
 
-Include.prototype.copy = function (id, section, name, msgSel) {
-    this.Id = id,
-    this.section = section;
-    this.name = name;
-    return this.ajaxPost(id, name, section, msgSel, "Copy");
+Include.prototype.copy = function (id, msgSel) {
+    this.Id = id;
+    return this.ajaxPost(id, msgSel, "Copy");
 }
 
-Include.prototype.ajaxPost = function (id, section, name, msgSel, action) {
+Include.prototype.ajaxPost = function (id, msgSel, action) {
     if (id == undefined || id.length === 0) { // if empty get from Include object
         id = this.Id;
     }
-    if (name == undefined || name.length === 0) { // if empty get from Include object
-        name = this.name;
-    }
-    if (section == undefined || section.length === 0) { // if empty get from Include object
-        section = this.section;
-    }
-    var IncludeModel = {
-        Id: id,
-        Section: section,
-        Name: name
-    };
+    var returnId = null;
+    
     var scopedObj = this;
     var settings = {
         type: "POST",
         contentType: "application/json",
-        url: "/CMS/Include/" + action,
-        data: JSON.stringify(IncludeModel),
+        url: "/CMS/Include/" + action + "/" + id,
         async: false,
         success: function (data) {
             return scopedObj.ajaxSuccessCallback(data, msgSel, action);

@@ -1,4 +1,4 @@
-﻿@model RazorEngineCms.Models.PageList
+﻿@model List<RazorEngineCms.Models.Page>
 
 @{
     ViewBag.Title = "List";
@@ -82,7 +82,7 @@ else // Show Page List Table
                 "order": [[3, "desc"]]
             });
             sessionStorage.clear();
-            $("#confirmDelete").click(function () {
+            $("body").on("click", "#confirmDelete", function () {
                 var sessionKey = $(this).attr("data-sessionkey");;
                 confirmDelete(sessionKey);
             });
@@ -116,12 +116,20 @@ else // Show Page List Table
         // called on confirmation of delete modal
         function confirmDelete(sessionKey) {
             if (sessionKey != null) {
-                var storedPage = JSON.parse(sessionStorage.getItem(sessionKey));
-                var deleteResult = page.delete(storedPage.pageId, storedPage.pageSection, storedPage.pageName, "#alertMsgs");
-                var deleteStatus = deleteResult != null ? deleteResult.responseJSON.Status : false;
-                if (deleteStatus) {
-                    $("a[data-pageid=\"" + storedPage.pageId + "\"]").parent().parent().remove(); // remove deleted row
-                } // end if deleteStatus true
+                var storedPage = null;
+                try {
+                    storedPage = JSON.parse(sessionStorage.getItem(sessionKey));
+                }
+                catch (ex) {
+                    console.log(ex);
+                }
+                if (storedPage != null && storedPage.hasOwnProperty(pageId)) {
+                    var deleteResult = page.delete(storedPage.pageId, storedPage.pageSection, storedPage.pageName, "#alertMsgs");
+                    var deleteStatus = deleteResult != null ? deleteResult.responseJSON.Status : false;
+                    if (deleteStatus) {
+                        $("a[data-pageid=\"" + storedPage.pageId + "\"]").parent().parent().remove(); // remove deleted row
+                    } // end if deleteStatus true
+                }
                 sessionStorage.removeItem(sessionKey);
             } // end if pageName != null
             $("#deletePage").modal("hide");
@@ -130,25 +138,24 @@ else // Show Page List Table
         function copyPage(id, section, name) {
             var copiedPageId; 
             if (id > 0 && section != null && section.length > 0) {
-                var copyResult = page.copy(id, section, name, "#alertMsgs");
-                copiedPageId = copyResult != null ? copyResult.responseJSON.NewId : -1;
-                if (copiedPageId > 0) {
+                var newPageId = page.copy(id, section, name, "#alertMsgs");
+                if (newPageId > 0) {
                     var dataTable = $("#pageListTable").DataTable();
                     dataTable.row.add([
-                                        copiedPageId,
+                                        newPageId,
                                         section,
                                         name,
                                         _default.dateTime(),
                                         "<a href=\"/" + section + "/" + name + "\">View</a>",
                                         "<a href=\"/CMS/Edit/" + section + "/" + name + "\">Edit</a>",
                                         "<a href=\"#\"" +
-                                        "data-pageid=\"" + copiedPageId + "\"" +
+                                        "data-pageid=\"" + newPageId + "\"" +
                                         "data-pagename=\"" + name + "\"" +
                                         "data-pagesection=\"" + section + "\"" +
                                         "class=\"copy-page\">" +
                                         "Copy</a>",
                                         "<a href=\"#\"" +
-                                        "data-pageid=\"" + copiedPageId + "\"" +
+                                        "data-pageid=\"" + newPageId + "\"" +
                                         "data-pagename=\"" + name + "\"" +
                                         "data-pagesection=\"" + section + "\"" +
                                         "class=\"delete-page\">" +

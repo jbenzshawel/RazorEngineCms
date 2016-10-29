@@ -38,6 +38,7 @@ else // Show Include List Table
                     <td>
                         <a href="#"
                            data-includeid="@include.Id"
+                           data-includename="@include.Name"
                            class="copy-include">
                             Copy
                         </a>
@@ -45,6 +46,7 @@ else // Show Include List Table
                     <td>
                         <a href="#"
                            data-includeid="@include.Id"
+                           data-includename="@include.Name"
                            class="delete-include">
                             Delete
                         </a>
@@ -73,15 +75,18 @@ else // Show Include List Table
         var SESSION_KEY = "selectedInclude";
         // called on confirmation of delete modal
         function confirmDelete(sessionKey) {
-            if (sessionKey != null) {
-                var storedPage = JSON.parse(sessionStorage.getItem(sessionKey));
-                //var deleteResult = include.delete(storedPage.pageId, storedPage.pageSection, storedPage.pageName, "#alertMsgs");
-                //var deleteStatus = deleteResult != null ? deleteResult.responseJSON.Status : false;
-                //if (deleteStatus) {
-                //    $("a[data-pageid=\"+ storedPage.pageId + "\"]").parent().parent().remove(); // remove deleted row
-                //} // end if deleteStatus true
-                //sessionStorage.removeItem(sessionKey);
-            //} // end if pageName != null
+            if (SESSION_KEY != null) {
+                var storedInclude = null;
+                try {
+                    storedInclude = JSON.parse(sessionStorage.getItem(SESSION_KEY))
+                }
+                catch (ex) {
+                    console.log(ex);
+                }
+                if (storedInclude != null) {
+
+                }
+            }
             $("#deletePage").modal("hide");
         }
 
@@ -91,7 +96,7 @@ else // Show Include List Table
             });
             sessionStorage.clear();
             $("#confirmDelete").click(function () {
-                confirmDelete(SESSION_KEY);
+                confirmDelete();
             });
             $("a.copy-include").click(function (e) {
                 e.preventDefault();
@@ -102,7 +107,12 @@ else // Show Include List Table
                 e.preventDefault();
                 var selInclude = { id: $(this).attr("data-includeid") };
                 sessionStorage.setItem(SESSION_KEY, JSON.stringify(selInclude));
-                $("#deletePageModal").modal("show");
+                // set tokens in vue modal and show it
+                deleteModalVue.name = $(this).attr("data-includename");
+                deleteModalVue.$mount("#deleteModal");
+                Vue.nextTick(function () {
+                    $("#deleteModal").modal("show");
+                });
             });
         }); // end document ready function
     </script>

@@ -57,17 +57,14 @@
         }
         $("#submitNewInclude").click(function (e) {
             e.preventDefault();
-            var saveRes = include.save(false); // async: false 
-            if (saveRes.responseJSON.Status == true) {
-                var newId = saveRes.responseJSON.Data.IncludeId; 
-                if (parseInt(newId, 10) > 0) {
-                    // redirect to edit page after create
-                    var redirectToEdit = function () {
-                        location.href = "/CMS/Include/Edit/" + newId;
-                    };
-                    setTimeout(redirectToEdit, 500);
-                } // end if newId > 0 
-            } // end if savRes.responseJSON.Status == true 
+            var newId = include.save(false); // async: false 
+            if (parseInt(newId, 10) > 0) {
+                // redirect to edit page after create
+                var redirectToEdit = function () {
+                    location.href = "/CMS/Include/Edit/" + newId;
+                };
+                setTimeout(redirectToEdit, 500);
+            } // end if newId > 0 
         });
         // clears errors after an input field has been updated 
         var fields = ["#includeName", "#includeType", "#content"]

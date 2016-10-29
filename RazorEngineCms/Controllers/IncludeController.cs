@@ -80,5 +80,38 @@ namespace RazorEngineCms.Controllers
 
             return View(includes);
         }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult> Delete(string param)
+        {
+            bool status = false;
+            int includeId;
+            
+            if (int.TryParse(param, out includeId))
+            {
+                var includeModel = this._db.Include.FirstOrDefault(i => i.Id == includeId);
+                if (includeModel != null)
+                {
+                    try
+                    {
+                        this._db.Include.Attach(includeModel);
+                        this._db.Include.Remove(includeModel);
+                        status = await this._db.SaveChangesAsync() > 0;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Errors.Add(ex.Message);
+                    }
+                }
+                else
+                {
+                    this.Errors.Add("Include not found");
+                }
+            } // end try parse includeId 
+
+            return Json(new { Status = status, this.Errors });
+        }
     }
 }

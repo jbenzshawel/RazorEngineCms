@@ -119,7 +119,6 @@ namespace RazorEngineCms.Controllers
                 catch (Exception ex)
                 {
                     this.Errors.Add(ex.Message);
-                    status = false;
                 }
             }
 
@@ -255,7 +254,7 @@ namespace RazorEngineCms.Controllers
         [AuthRedirect]
         public ActionResult List()
         {
-            IList<Page> pageList = new PageList();
+            List<Page> pageList = new List<Page>();
             if (FileHelper.Files.Any())
             {
                 foreach (var file in FileHelper.Files)
@@ -272,10 +271,8 @@ namespace RazorEngineCms.Controllers
             
             if (_db.Page.Any())
             {
-                foreach (var page in _db.Page)
-            {
-                pageList.Add(page);
-            }
+                pageList = _db.Page.ToList();
+               
             }
             
             return View(pageList);
