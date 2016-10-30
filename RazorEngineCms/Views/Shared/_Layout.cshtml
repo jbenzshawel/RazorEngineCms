@@ -28,7 +28,7 @@
                     <li class="sidebar-header">
                         <h4>Includes</h4>
                     </li>
-                    <li><a href="/CMS/Incude/New">New Include</a></li>
+                    <li><a href="/CMS/Include/New">New Include</a></li>
                     <li><a href="/CMS/Include/List">List Includes</a></li>
                     <li class="sidebar-header">
                         <h4>Account</h4>
@@ -53,8 +53,9 @@
     </div>
     <!-- /#wrapper -->
     <!-- Scripts -->
-    @Scripts.Render("~/Scripts/vendor/jquery.js");
+    @Scripts.Render("~/Scripts/vendor/jquery.js")
     @Scripts.Render("~/Scripts/vendor/bootstrap.min.js")
+    @Scripts.Render("~/Scripts/vue.js")
     @Scripts.Render("~/Scripts/default.js")
     @RenderSection("scripts", required: false)
 </body>

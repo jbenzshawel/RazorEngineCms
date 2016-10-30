@@ -1,4 +1,4 @@
-﻿@model RazorEngineCms.Models.PageList
+﻿@model List<RazorEngineCms.Models.Page>
 
 @{
     ViewBag.Title = "List";
@@ -6,7 +6,7 @@
 }
 
 @section styles {
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.css" />
 }
 
 <h2>Pages</h2>
@@ -65,47 +65,95 @@ else // Show Page List Table
     @Html.Partial("_ConfiromDeleteModal")
 
 @section Scripts {
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.js"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.js"></script>
     <script type="text/javascript" src="~/Scripts/page.js"></script>
     <script type="text/javascript">
         "use strict";
         var page = new Page();
+        var deleteModalVue = new Vue({
+            data: {
+                type: "page",
+                modalHeader: "Delete Page?",
+                name: ""
+            }
+        });
+        var SESSION_KEY = "selectedPage";
+        $(function () {
+            $("#pageListTable").DataTable({
+                "order": [[3, "desc"]]
+            });
+            sessionStorage.clear();
+            $("body").on("click", "#confirmDelete", function () {
+                confirmDelete();
+            });
+            $("a.copy-page").click(function (e) {
+                e.preventDefault();
+                var pageItem = {
+                    pageId: $(this).attr("data-pageid"),
+                    pageName: $(this).attr("data-pagename"),
+                    pageSection: $(this).attr("data-pagesection")
+                };
+                copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
+            })
+            $("a.delete-page").click(function (e) {
+                e.preventDefault();
+                var pageItem = {
+                    pageId: $(this).attr("data-pageid"),
+                    pageName: $(this).attr("data-pagename"),
+                    pageSection: $(this).attr("data-pagesection")
+                };
+                sessionStorage.setItem(SESSION_KEY, JSON.stringify(pageItem));
+                // set tokens in vue modal and show it
+                deleteModalVue.name = " /" + pageItem.pageSection + "/" + pageItem.pageName
+                deleteModalVue.$mount("#deleteModal");
+                Vue.nextTick(function () {
+                    $("#deleteModal").modal("show");
+                });
+            });
+        }); // end document ready function
         // called on confirmation of delete modal
-        function confirmDelete(sessionKey) {
-            if (sessionKey != null) {
-                var storedPage = JSON.parse(sessionStorage.getItem(sessionKey));
-                var deleteResult = page.delete(storedPage.pageId, storedPage.pageSection, storedPage.pageName, "#alertMsgs");
-                var deleteStatus = deleteResult != null ? deleteResult.responseJSON.Status : false;
-                if (deleteStatus) {
-                    $("a[data-pageid=\"" + storedPage.pageId + "\"]").parent().parent().remove(); // remove deleted row
-                } // end if deleteStatus true
-                sessionStorage.removeItem(sessionKey);
+        function confirmDelete() {
+            if (SESSION_KEY != null) {
+                var storedPage = null;
+                try {
+                    storedPage = JSON.parse(sessionStorage.getItem(SESSION_KEY));
+                }
+                catch (ex) {
+                    console.log(ex);
+                }
+                if (storedPage != null && storedPage.hasOwnProperty("pageId")) {
+                    var deleteResult = page.delete(storedPage.pageId, storedPage.pageSection, storedPage.pageName, "#alertMsgs");
+                    var deleteStatus = deleteResult != null ? deleteResult.responseJSON.Status : false;
+                    if (deleteStatus) {
+                        $("a[data-pageid=\"" + storedPage.pageId + "\"]").parent().parent().remove(); // remove deleted row
+                    } // end if deleteStatus true
+                }
+                sessionStorage.removeItem(SESSION_KEY);
             } // end if pageName != null
-            $("#deletePageModal").modal("hide");
+            $("#deleteModal").modal("hide");
         }
         // called by "a.copy-page" click event 
         function copyPage(id, section, name) {
             var copiedPageId; 
             if (id > 0 && section != null && section.length > 0) {
-                var copyResult = page.copy(id, section, name, "#alertMsgs");
-                copiedPageId = copyResult != null ? copyResult.responseJSON.NewId : -1;
-                if (copiedPageId > 0) {
+                var newPageId = page.copy(id, section, name, "#alertMsgs");
+                if (newPageId > 0) {
                     var dataTable = $("#pageListTable").DataTable();
                     dataTable.row.add([
-                                        copiedPageId,
+                                        newPageId,
                                         section,
                                         name,
                                         _default.dateTime(),
                                         "<a href=\"/" + section + "/" + name + "\">View</a>",
                                         "<a href=\"/CMS/Edit/" + section + "/" + name + "\">Edit</a>",
                                         "<a href=\"#\"" +
-                                        "data-pageid=\"" + copiedPageId + "\"" +
+                                        "data-pageid=\"" + newPageId + "\"" +
                                         "data-pagename=\"" + name + "\"" +
                                         "data-pagesection=\"" + section + "\"" +
                                         "class=\"copy-page\">" +
                                         "Copy</a>",
                                         "<a href=\"#\"" +
-                                        "data-pageid=\"" + copiedPageId + "\"" +
+                                        "data-pageid=\"" + newPageId + "\"" +
                                         "data-pagename=\"" + name + "\"" +
                                         "data-pagesection=\"" + section + "\"" +
                                         "class=\"delete-page\">" +
@@ -117,38 +165,5 @@ else // Show Page List Table
 
             return copiedPageId;
         }
-
-        $(function () {
-            $("#pageListTable").DataTable({
-                "order" : [[3, "desc"]]
-            });
-            sessionStorage.clear();
-            $("#confirmDeletePage").click(function () {
-                var sessionKey = $(this).attr("data-sessionkey");;
-                confirmDelete(sessionKey);
-            });
-            $("a.copy-page").click(function (e) {
-                e.preventDefault();
-                var pageItem = {
-                    pageId: $(this).attr("data-pageid"),
-                    pageName: $(this).attr("data-pagename"),
-                    pageSection: $(this).attr("data-pagesection")
-                };
-                copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
-            })
-            $("a.delete-page").click(function(e) {
-                e.preventDefault();
-                var pageItem = {
-                    pageId: $(this).attr("data-pageid"),
-                    pageName : $(this).attr("data-pagename"),
-                    pageSection : $(this).attr("data-pagesection")
-                };
-                var sessionKey = "page-" + pageItem.pageId;
-                $("#deletePageName").text(" /" + pageItem.pageSection + "/" + pageItem.pageName);
-                $("#confirmDeletePage").attr("data-sessionkey", sessionKey);
-                sessionStorage.setItem(sessionKey, JSON.stringify(pageItem));
-                $("#deletePageModal").modal("show");
-            });
-        }); // end document ready function
     </script>
 }

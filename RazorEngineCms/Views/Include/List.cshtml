@@ -1,0 +1,129 @@
+﻿@model List<Include>
+
+@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.css" />
+}
+
+<h2>List</h2>
+
+@if (Model.Count == 0) // Show message if no pages
+{
+    <p>No includes have been created. <a href="/Include/New">Create a new include?</a></p>
+}
+else // Show Include List Table
+{
+    <div id="alertMsgs"></div>
+    <table class="table" id="includeListTable">
+        <thead>
+            <tr>
+                <th>Include ID</th>
+                <th>Include Name</th>
+                <th>Include Type</th>
+                <th>Include Updated</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var include in Model)
+            {
+                <tr>
+                    <td>@include.Id</td>
+                    <td>@include.Name</td>
+                    <td>@include.Type</td>
+                    <td>@include.Updated.ToString("yyyy/M/dd hh:mm")</td>
+                    <td><a href="/CMS/Include/Edit/@include.Id">Edit</a></td>
+                    <td>
+                        <a href="#"
+                           data-includeid="@include.Id"
+                           data-includename="@include.Name"
+                           class="copy-include">
+                            Copy
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#"
+                           data-includeid="@include.Id"
+                           data-includename="@include.Name"
+                           class="delete-include">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@Html.Partial("_ConfiromDeleteModal")
+
+@section Scripts {
+    <script type="text/javascript" src="//cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/include.js"></script>
+    <script type="text/javascript">
+        "use strict";
+        var include = new Include();
+        var deleteModalVue = new Vue({
+            data: {
+                type: "include",
+                modalHeader: "Delete Include?",
+                name: ""
+            }
+        });
+        var SESSION_KEY = "selectedInclude";
+        $(function () {
+            $("#includeListTable").DataTable({
+                "order": [[3, "desc"]]
+            });
+            sessionStorage.clear();
+            $("body").on("click", "#confirmDelete", function () {
+                confirmDelete();
+            });
+            $("a.copy-include").click(function (e) {
+                e.preventDefault();
+
+                //copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
+            });
+            $("a.delete-include").click(function (e) {
+                e.preventDefault();
+                var selInclude = { id: $(this).attr("data-includeid") };
+                sessionStorage.setItem(SESSION_KEY, JSON.stringify(selInclude));
+                // set tokens in vue modal and show it
+                deleteModalVue.name = $(this).attr("data-includename");
+                deleteModalVue.$mount("#deleteModal");
+                Vue.nextTick(function () {
+                    $("#deleteModal").modal("show");
+                });
+            });
+        }); // end document ready function
+
+        // called on confirmation of delete modal
+        function confirmDelete() {
+            if (SESSION_KEY != null) {
+                var storedInclude = null;
+                try {
+                    storedInclude = JSON.parse(sessionStorage.getItem(SESSION_KEY))
+                }
+                catch (ex) {
+                    console.log(ex);
+                }
+                if (storedInclude != null) {
+                    var response = include.delete(storedInclude.id, "#alertMsgs").responseJSON;
+                    if (response != null && response.Status != true && typeof (response.Errors) === "object") {
+                        response.Errors.forEach(function (err) { console.log(err); });
+                    } else {
+                        $("[data-includeid=\"" + storedInclude.id + "\"]").parent().parent().remove();
+                    }
+                    sessionStorage.removeItem(SESSION_KEY);
+                }
+            }
+            $("#deleteModal").modal("hide");
+        }
+    </script>
+}

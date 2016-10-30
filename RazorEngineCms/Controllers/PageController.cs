@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using System.Threading.Tasks;
-using RazorEngineCms.DAL;
 using RazorEngineCms.Models;
 using RazorEngineCms.App_Classes;
 using RazorEngineCms.ExtensionClasses;
@@ -12,139 +10,16 @@ using System.Collections.Concurrent;
 
 namespace RazorEngineCms.Controllers
 {
-    public class PageController : Controller
+    public class PageController : BaseController
     {
-        public ConcurrentBag<string> Errors { get; set; }
-
         public IDictionary<string,string> QueryStringParams { get; set; }
-
-        internal bool AllowCache { get; set; }
-
-        internal FileHelper FileHelper { get; set; }
-
-        internal CacheManager CacheManager { get; set; }
-
-        private ApplicationContext _db { get; set; }
 
         public PageController()
         {
-            this._db = new ApplicationContext();
-            this.Errors = new ConcurrentBag<string>();
-            this.FileHelper = new FileHelper();
-            this.AllowCache = ConfigurationManager.AppSettings["AllowPageCaching"] == "true";
-            if (this.AllowCache)
-            {
-                this.CacheManager = new CacheManager();
-            }
             this.QueryStringParams = System.Web.HttpContext.Current.Request.QueryString.ToDictionary();
         }
 
-        // GET: Page/New
-        [AuthRedirect]
-        public ActionResult New()
-        {
-            return View();
-        }
-
-        /// <summary>
-        /// Compiles template model and template then saves results in Pages table
-        /// or as a file in /Views/CompiledTemplates/
-        /// </summary>
-        /// <param name="pageRequest"></param>
-        /// <returns>JsonResult with boolean status and list of errors</returns>
-        // POST: Page/New
-        [HttpPost]
-        [AuthRedirect]
-        public async Task<ActionResult> Save(PageRequest pageRequest)
-        {
-            var page = new Page(pageRequest);
-            if (ModelState.IsValid)
-            {
-                if (!string.IsNullOrEmpty(page.Model))
-                {
-                    // compile the model from the string Model declaration in pageRequest
-                    // always want to compile model before saving to catch any compile errors
-                    using (var stringCompiler = new StringCompiler())
-                    {
-                        stringCompiler.CompilePageModel(page.Model);   
-                        if (stringCompiler.IsValid)
-                        {
-                            page.CompiledModel = stringCompiler.ToString();
-                        }
-                        else
-                        {
-                            Errors.AddRange(stringCompiler.Errors);
-                        }
-                    } // end using StringCompiler
-                } // end if page.Model not empty
-
-                if (Errors.Count == 0)
-                {
-                    page = await CompileTemplateAndSavePage(page, saveAsFile: pageRequest.CreateTemplateFile);
-                }  // end if no errors after compiling model
-            } // end if valid model state 
-            else
-            {
-                Errors.Add("Invalid parameters");
-            }
-
-            return Json(new { Status = Errors.Count == 0, Errors });
-        }
-
-        /// <summary>
-        /// Finds a page to edit and returns the page. Returns 404 if not found
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="section"></param>
-        /// <returns></returns>
-        [AuthRedirect]
-        public ActionResult Edit(string section, string name)
-        {
-            var page = Page.FindPage(section, name);
-
-            if (page != null)
-            {
-                return View(page);
-            }
-
-            // return 404 view if could not find page in db or files 
-            return View("~/Views/NotFound.cshtml");
-        }
-
-        /// <summary>
-        /// Postback for deleting a page 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="variable"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [AuthRedirect]
-        public async Task<ActionResult> Delete(AjaxPageRequest pageRequest)
-        {
-            bool status = false;
-            Page pageModel = pageRequest.GetPage();
-
-            if (pageModel == null)          
-            {
-                this.Errors.Add("Page not found");
-            }
-            else
-            {
-                try
-                {
-                    this._db.Page.Attach(pageModel);
-                    this._db.Page.Remove(pageModel);
-                    status = await this._db.SaveChangesAsync() > 0;
-                }
-                catch (Exception ex)
-                {
-                    this.Errors.Add(ex.Message);
-                    status = false;
-                }
-            }
-
-            return Json(new { Status = status, this.Errors });
-        }
+        #region Shared Actions
 
         /// <summary>
         /// Returns view with the template for the passed in name and variable. The
@@ -171,7 +46,7 @@ namespace RazorEngineCms.Controllers
                 PageCacheModel cachedPage = this.CacheManager.FindPage(name, section, param, param2, this.QueryStringParams);
                 if (cachedPage != null && cachedPage.CompiledTemplate != null)
                 {
-                    page = cachedPage.ToPage(); 
+                    page = cachedPage.ToPage();
                 }
             }
 
@@ -220,12 +95,12 @@ namespace RazorEngineCms.Controllers
             // cache page before returning template if enabled 
             if (this.AllowCache)
             {
-                
+
                 if (page != null && !this.CacheManager.PageCacheExists(page.Name, page.Section, param, param2, this.QueryStringParams))
                 {
                     this.CacheManager.AddPage(page, param, param2);
                 }
-            } 
+            }
 
             // return the page with a template if it is found
             if (!string.IsNullOrEmpty(template.Content))
@@ -243,8 +118,164 @@ namespace RazorEngineCms.Controllers
             return View("~/Views/NotFound.cshtml");
         }
 
-        [HttpPost]
+        /// <summary>
+        /// If caching enabled clears CacheList and Cache[CACHE_KEY]
+        /// </summary>
+        /// <returns></returns>
         [AuthRedirect]
+        public ActionResult ClearCache()
+        {
+            if (this.AllowCache)
+            {
+                CacheManager.ClearCache();
+                System.Web.HttpContext.Current.Response.Write("<h1>Page cache has been cleared</h1>");
+            }
+
+            return new EmptyResult();
+        }
+        #endregion
+
+        #region CMS Pages
+
+        /// <summary>
+        /// Gets a list of pages from the database and returns a PageList to the View
+        /// </summary>
+        /// <returns></returns>
+        [AuthRedirect]
+        public ActionResult List()
+        {
+            List<Page> pageList = new List<Page>();
+            if (FileHelper.Files.Any())
+            {
+                foreach (var file in FileHelper.Files)
+                {
+                    pageList.Add(new Page
+                    {
+                        Id = -1,
+                        Name = file.Name,
+                        Section = file.Variable,
+                        CompiledTemplate = FileHelper.GetFile(file.Name, file.Variable).ToString()
+                    });
+                }
+            }
+
+            if (_db.Page.Any())
+            {
+                pageList = _db.Page.ToList();
+
+            }
+
+            return View(pageList);
+        }
+
+        // GET: Page/New
+        [AuthRedirect]
+        public ActionResult New()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Finds a page to edit and returns the page. Returns 404 if not found
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="section"></param>
+        /// <returns></returns>
+        [AuthRedirect]
+        public ActionResult Edit(string section, string name)
+        {
+            var page = Page.FindPage(section, name);
+
+            if (page != null)
+            {
+                return View(page);
+            }
+
+            // return 404 view if could not find page in db or files 
+            return View("~/Views/NotFound.cshtml");
+        }
+
+        /// <summary>
+        /// Compiles template model and template then saves results in Pages table
+        /// or as a file in /Views/CompiledTemplates/
+        /// </summary>
+        /// <param name="pageRequest"></param>
+        /// <returns>JsonResult with boolean status and list of errors</returns>
+        // POST: Page/New
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult> Save(PageRequest pageRequest)
+        {
+            var page = new Page(pageRequest);
+            if (ModelState.IsValid)
+            {
+                if (!string.IsNullOrEmpty(page.Model))
+                {
+                    // compile the model from the string Model declaration in pageRequest
+                    // always want to compile model before saving to catch any compile errors
+                    using (var stringCompiler = new StringCompiler())
+                    {
+                        stringCompiler.CompilePageModel(page.Model);   
+                        if (stringCompiler.IsValid)
+                        {
+                            page.CompiledModel = stringCompiler.ToString();
+                        }
+                        else
+                        {
+                            Errors.AddRange(stringCompiler.Errors);
+                        }
+                    } // end using StringCompiler
+                } // end if page.Model not empty
+
+                if (Errors.Count == 0)
+                {
+                    page = await _CompileTemplateAndSavePage(page, saveAsFile: pageRequest.CreateTemplateFile);
+                }  // end if no errors after compiling model
+            } // end if valid model state 
+            else
+            {
+                Errors.Add("Invalid parameters");
+            }
+
+            return Json(new { Status = Errors.Count == 0, Errors });
+        }
+
+        /// <summary>
+        /// Postback for deleting a page 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="variable"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult> Delete(AjaxPageRequest pageRequest)
+        {
+            bool status = false;
+            Page pageModel = pageRequest.GetPage();
+
+            if (pageModel == null)          
+            {
+                this.Errors.Add("Page not found");
+            }
+            else
+            {
+                try
+                {
+                    this._db.Page.Attach(pageModel);
+                    this._db.Page.Remove(pageModel);
+                    status = await this._db.SaveChangesAsync() > 0;
+                }
+                catch (Exception ex)
+                {
+                    this.Errors.Add(ex.Message);
+                }
+            }
+
+            return Json(new { Status = status, this.Errors });
+        }
+
+        [HttpPost]
+        [Authorize]
         public ActionResult Copy(AjaxPageRequest pageRequest)
         {
             var status = false;
@@ -269,55 +300,6 @@ namespace RazorEngineCms.Controllers
         }
 
         /// <summary>
-        /// Gets a list of pages from the database and returns a PageList to the View
-        /// </summary>
-        /// <returns></returns>
-        [AuthRedirect]
-        public ActionResult List()
-        {
-            IList<Page> pageList = new PageList();
-            if (FileHelper.Files.Count > 0)
-            {
-                foreach (var file in FileHelper.Files)
-                {
-                    pageList.Add(new Page
-                    {
-                        Id = -1,
-                        Name = file.Name,
-                        Section = file.Variable,
-                        CompiledTemplate = FileHelper.GetFile(file.Name, file.Variable).ToString()
-                    });
-                }
-            }
-            
-            if (_db.Page.Count() > 0)
-            {
-                foreach (var page in _db.Page)
-            {
-                pageList.Add(page);
-            }
-            }
-            
-            return View(pageList);
-        }
-
-        /// <summary>
-        /// If caching enabled clears CacheList and Cache[CACHE_KEY]
-        /// </summary>
-        /// <returns></returns>
-        [AuthRedirect]
-        public ActionResult ClearCache()
-        {
-            if (this.AllowCache)
-            {
-                CacheManager.ClearCache();
-                System.Web.HttpContext.Current.Response.Write("<h1>Page cache has been cleared</h1>");
-            }
-
-            return new EmptyResult();
-        }
-
-        /// <summary>
         /// Compiles a page template by parsing a json object in page.CompiledModel and
         /// uses RazorEngine to compile the Template view. Save results in the database 
         /// and optional as a file as well
@@ -325,7 +307,7 @@ namespace RazorEngineCms.Controllers
         /// <param name="page"></param>
         /// <param name="saveAsFile"></param>
         /// <returns></returns>
-        internal async Task<Page> CompileTemplateAndSavePage(Page page, bool saveAsFile = false)
+        private async Task<Page> _CompileTemplateAndSavePage(Page page, bool saveAsFile = false)
         {
             if (!string.IsNullOrEmpty(page.Model) && !page.HasParams)
             {
@@ -416,4 +398,6 @@ namespace RazorEngineCms.Controllers
             return page;
         }
     }
+
+    #endregion
 }

@@ -34,5 +34,10 @@ namespace RazorEngineCms.Models
         {
             return this.ToJson<TemplateModel>(withPadding);
         }
+
+        public string GetInclude(string name, string type)
+        {
+            return Include.GetContent(name, type);
+        }
     }
 }

@@ -93,7 +93,7 @@ Page.prototype.save = function () {
                     data.Errors.forEach(function (error) {
                         var lineNumRegex = /Line: \d?\d?\d?\d/g;
                         if (error.search(lineNumRegex) != -1) {
-                            var lineNumText = error.match(lineNumRegex)[0]
+                            var lineNumText = error.match(lineNumRegex)[0];
                             var lineNum = parseInt(lineNumText.replace("Line:", ""), 10) - 1; // line numbers start at 0 in CodeMirror API
                             pageModelEditor.addLineClass(lineNum, "background", "line-error");
                             // add change event to remove line error
@@ -152,6 +152,7 @@ Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {
         Section: section,
         Name: name
     };
+    var returnId = null;
     var scopedObj = this;
     var settings = {
         type: "POST",
@@ -160,29 +161,31 @@ Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {
         data: JSON.stringify(pageModel),
         async: false,
         success: function (data) {
-            return scopedObj.ajaxSuccessCallback(data, msgSel, action);
+            return scopedObj.ajaxSuccessCallback(data, msgSel, action, returnId);
         }
     };
     if (settings != null && settings.data != null) {
-        return $.ajax(settings);
+        if (action == "copy") {
+            $.ajax(settings);
+        } else { // if delete don't need to return new id
+            return $.ajax(settings);
+        }
     }
 
-    return false;
+    return returnId;
 };
 
 // callback function for ajax request. If message success alert message displayed 
 // else errors are logged 
-Page.prototype.ajaxSuccessCallback = function (data, msgSel, action) {
-    var callbackReturnStatus = false;
+Page.prototype.ajaxSuccessCallback = function (data, msgSel, action, returnId) {
     $(msgSel).empty(); // clear any previous messages
     if (data.Status === true) {
         var msgAction = "";
         if (action != null && action.toLowerCase() == "copy") {
             msgAction = "copied";
-            callbackReturnStatus = data.newId; // for copy return new id of copied page
+            returnId = data.newId; // for copy return new id of copied page
         } else if (action != null && action.toLowerCase() == "delete") {
             msgAction = "deleted";
-            callbackReturnStatus = true;
         }
         var successMsg = "The page /" + this.section + "/" + this.name + " has been " + msgAction + ".";
         if (msgSel != undefined && msgSel.length > 0) {
@@ -193,9 +196,7 @@ Page.prototype.ajaxSuccessCallback = function (data, msgSel, action) {
         data.Errors.forEach(function (error) {
             logger.logError(error);
         });
-        callbackReturnStatus = false;
     }
-    return callbackReturnStatus;
 };
 
 // hides save template as file option if page uses url params
