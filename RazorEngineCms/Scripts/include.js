@@ -115,7 +115,7 @@ Include.prototype.ajaxPost = function (id, msgSel, action) {
             return scopedObj.ajaxSuccessCallback(data, msgSel, action);
         }
     };
-    if (settings != null && settings.data != null) {
+    if (settings != null) {
         return $.ajax(settings);
     }
 

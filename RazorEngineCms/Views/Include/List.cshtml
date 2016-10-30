@@ -5,6 +5,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@section styles {
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.css" />
+}
+
 <h2>List</h2>
 
 @if (Model.Count == 0) // Show message if no pages
@@ -60,7 +64,7 @@ else // Show Include List Table
 @Html.Partial("_ConfiromDeleteModal")
 
 @section Scripts {
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.js"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.js"></script>
     <script type="text/javascript" src="~/Scripts/include.js"></script>
     <script type="text/javascript">
         "use strict";
@@ -73,37 +77,20 @@ else // Show Include List Table
             }
         });
         var SESSION_KEY = "selectedInclude";
-        // called on confirmation of delete modal
-        function confirmDelete(sessionKey) {
-            if (SESSION_KEY != null) {
-                var storedInclude = null;
-                try {
-                    storedInclude = JSON.parse(sessionStorage.getItem(SESSION_KEY))
-                }
-                catch (ex) {
-                    console.log(ex);
-                }
-                if (storedInclude != null) {
-
-                }
-            }
-            $("#deletePage").modal("hide");
-        }
-
         $(function () {
             $("#includeListTable").DataTable({
-                "order" : [[3, "desc"]]
+                "order": [[3, "desc"]]
             });
             sessionStorage.clear();
-            $("#confirmDelete").click(function () {
+            $("body").on("click", "#confirmDelete", function () {
                 confirmDelete();
             });
             $("a.copy-include").click(function (e) {
                 e.preventDefault();
-                
+
                 //copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
             });
-            $("a.delete-include").click(function(e) {
+            $("a.delete-include").click(function (e) {
                 e.preventDefault();
                 var selInclude = { id: $(this).attr("data-includeid") };
                 sessionStorage.setItem(SESSION_KEY, JSON.stringify(selInclude));
@@ -115,5 +102,28 @@ else // Show Include List Table
                 });
             });
         }); // end document ready function
+
+        // called on confirmation of delete modal
+        function confirmDelete() {
+            if (SESSION_KEY != null) {
+                var storedInclude = null;
+                try {
+                    storedInclude = JSON.parse(sessionStorage.getItem(SESSION_KEY))
+                }
+                catch (ex) {
+                    console.log(ex);
+                }
+                if (storedInclude != null) {
+                    var response = include.delete(storedInclude.id, "#alertMsgs").responseJSON;
+                    if (response != null && response.Status != true && typeof (response.Errors) === "object") {
+                        response.Errors.forEach(function (err) { console.log(err); });
+                    } else {
+                        $("[data-includeid=\"" + storedInclude.id + "\"]").parent().parent().remove();
+                    }
+                    sessionStorage.removeItem(SESSION_KEY);
+                }
+            }
+            $("#deleteModal").modal("hide");
+        }
     </script>
 }

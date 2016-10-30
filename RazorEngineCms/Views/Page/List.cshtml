@@ -6,7 +6,7 @@
 }
 
 @section styles {
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.css" />
 }
 
 <h2>Pages</h2>
@@ -65,7 +65,7 @@ else // Show Page List Table
     @Html.Partial("_ConfiromDeleteModal")
 
 @section Scripts {
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.js"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.js"></script>
     <script type="text/javascript" src="~/Scripts/page.js"></script>
     <script type="text/javascript">
         "use strict";
@@ -77,14 +77,14 @@ else // Show Page List Table
                 name: ""
             }
         });
+        var SESSION_KEY = "selectedPage";
         $(function () {
             $("#pageListTable").DataTable({
                 "order": [[3, "desc"]]
             });
             sessionStorage.clear();
             $("body").on("click", "#confirmDelete", function () {
-                var sessionKey = $(this).attr("data-sessionkey");;
-                confirmDelete(sessionKey);
+                confirmDelete();
             });
             $("a.copy-page").click(function (e) {
                 e.preventDefault();
@@ -102,9 +102,7 @@ else // Show Page List Table
                     pageName: $(this).attr("data-pagename"),
                     pageSection: $(this).attr("data-pagesection")
                 };
-                var sessionKey = "page-" + pageItem.pageId;
-                $("#confirmDeletePage").attr("data-sessionkey", sessionKey);
-                sessionStorage.setItem(sessionKey, JSON.stringify(pageItem));
+                sessionStorage.setItem(SESSION_KEY, JSON.stringify(pageItem));
                 // set tokens in vue modal and show it
                 deleteModalVue.name = " /" + pageItem.pageSection + "/" + pageItem.pageName
                 deleteModalVue.$mount("#deleteModal");
@@ -114,25 +112,25 @@ else // Show Page List Table
             });
         }); // end document ready function
         // called on confirmation of delete modal
-        function confirmDelete(sessionKey) {
-            if (sessionKey != null) {
+        function confirmDelete() {
+            if (SESSION_KEY != null) {
                 var storedPage = null;
                 try {
-                    storedPage = JSON.parse(sessionStorage.getItem(sessionKey));
+                    storedPage = JSON.parse(sessionStorage.getItem(SESSION_KEY));
                 }
                 catch (ex) {
                     console.log(ex);
                 }
-                if (storedPage != null && storedPage.hasOwnProperty(pageId)) {
+                if (storedPage != null && storedPage.hasOwnProperty("pageId")) {
                     var deleteResult = page.delete(storedPage.pageId, storedPage.pageSection, storedPage.pageName, "#alertMsgs");
                     var deleteStatus = deleteResult != null ? deleteResult.responseJSON.Status : false;
                     if (deleteStatus) {
                         $("a[data-pageid=\"" + storedPage.pageId + "\"]").parent().parent().remove(); // remove deleted row
                     } // end if deleteStatus true
                 }
-                sessionStorage.removeItem(sessionKey);
+                sessionStorage.removeItem(SESSION_KEY);
             } // end if pageName != null
-            $("#deletePage").modal("hide");
+            $("#deleteModal").modal("hide");
         }
         // called by "a.copy-page" click event 
         function copyPage(id, section, name) {

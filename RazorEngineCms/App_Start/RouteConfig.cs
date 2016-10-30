@@ -8,7 +8,7 @@ namespace RazorEngineCms
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-
+            
             routes.MapRoute(
                 name: "LoginRedirect",
                 url: "CMS/Account/Login/{returnUrl}",
@@ -19,7 +19,7 @@ namespace RazorEngineCms
                     action = "Login",
                     returnUrl = UrlParameter.Optional
                 });
-
+          
             routes.MapRoute(
                 name: "Page",
                 url: "CMS/Page/{action}/{section}/{name}/{param}/{param2}",
@@ -35,28 +35,38 @@ namespace RazorEngineCms
                 });
 
             routes.MapRoute(
-                name: "Include",
-                url: "CMS/Include/{action}/{id}",
+                name: "CMS",
+                url: "CMS/{controller}/{action}/{id}",
                 defaults:
                 new
                 {
-                    controller = "Include",
+                    controller = UrlParameter.Optional,
                     action = UrlParameter.Optional,
                     id = UrlParameter.Optional
                 });
 
             routes.MapRoute(
-                name: "Default",
-                url: "{section}/{name}/{param}/{param2}",
-                defaults: new
+                name: "Dashbaord",
+                url: "CMS/Home/{action}",
+                defaults:
+                new
                 {
-                    controller = "Page",
-                    action = "View",
-                    name = UrlParameter.Optional,
-                    section = UrlParameter.Optional,
-                    param = UrlParameter.Optional,
-                    param2 = UrlParameter.Optional
+                    controller = "Home",
+                    action = UrlParameter.Optional
                 });
+
+            routes.MapRoute(
+               name: "Default",
+               url: "{section}/{name}/{param}/{param2}",
+               defaults: new
+               {
+                   controller = "Page",
+                   action = "View",
+                   name = UrlParameter.Optional,
+                   section = UrlParameter.Optional,
+                   param = UrlParameter.Optional,
+                   param2 = UrlParameter.Optional
+               });
         }
     }
 }

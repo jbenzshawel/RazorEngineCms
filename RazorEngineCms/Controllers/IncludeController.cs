@@ -83,12 +83,12 @@ namespace RazorEngineCms.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult> Delete(string param)
+        public async Task<ActionResult> Delete(string id)
         {
             bool status = false;
             int includeId;
             
-            if (int.TryParse(param, out includeId))
+            if (int.TryParse(id, out includeId))
             {
                 var includeModel = this._db.Include.FirstOrDefault(i => i.Id == includeId);
                 if (includeModel != null)
