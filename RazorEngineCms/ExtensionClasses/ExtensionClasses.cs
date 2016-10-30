@@ -21,6 +21,25 @@ namespace RazorEngineCms.ExtensionClasses
             return @this.Cast<string>().ToDictionary(k => k, v => @this[v]);
         }
 
+        public static Include ToInclude(this DataRow @this)
+        {
+            Include include = null;
+            if (@this.Table.Columns.Contains("Id") &&
+                 @this.Table.Columns.Contains("Name") &&
+                 @this.Table.Columns.Contains("Content"))
+            {
+                include = new Include
+                {
+                    Id = int.Parse(@this["Id"].ToString()),
+                    Name = @this["Name"].ToString(),
+                    Content = @this["Content"].ToString(),
+                    Updated = DateTime.Parse(@this["Updated"].ToString())
+                };
+            }
+
+            return include;
+        }
+
         /// <summary>
         /// http://stackoverflow.com/questions/3928822/comparing-2-dictionarystring-string-instances
         /// </summary>
