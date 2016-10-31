@@ -23,9 +23,9 @@ Page.prototype.init = function () {
     this.$template = $("#template");
     this.createTemplateFile = $("input[name=\"templateFile\"]:checked").val();
     this.hasParams = $("input[name=\"hasParams\"]:checked").val();
-    this.hasIncludes = $("input[name=\"hasInclude\"]:checked").val();
+    this.hasInclude = $("input[name=\"hasInclude\"]:checked").val();
     if (typeof (pageTemplateEditor) != "undefined") {
-        this.template = pageTemplateEditor.getValue().trim();
+        this.template = pageTemplateEditor.getValue().trim().replace("</script>", "<\/script>");
     }
     if (typeof (pageModelEditor) != "undefined") {
         this.model = pageModelEditor.getValue().trim();

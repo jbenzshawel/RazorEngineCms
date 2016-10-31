@@ -15,6 +15,8 @@ namespace RazorEngineCms.Models
 
         public bool HasParams { get; set; }
 
+        public bool HasInclude { get; set; }
+
         public bool CreateTemplateFile { get; set; }
 
         [Required]

@@ -51,6 +51,28 @@
                 </label>
             </div>
             <div class="form-group">
+                <p>
+                    <strong>Does this page use an include? </strong><br />
+                    Pages with includes have the model format <code>@@Model.PageModel</code> for model created below and <code>@@Model.Includes</code>
+                </p>
+                <label for="hasInclude-true" class="weight-normal">
+                    <input type="radio" name="hasInclude" id="hasInclude-true" value="true" class="formControl" 
+                           @if (Model.HasInclude == true)
+                           {
+                               @:checked="checked"
+                           }
+                           /> Yes
+                </label>
+                <label for="hasInclude-false" class="weight-normal">
+                    <input type="radio" name="hasInclude" id="hasInclude-false" value="false" class="formControl" 
+                           @if (Model.HasInclude != true)
+                           {
+                               @:checked="checked"
+                           }
+                            /> No
+                </label>
+            </div>
+            <div class="form-group">
                 <label for="model">Page Model</label> (<a href="#" data-toggle="modal" data-target="#modelEditorInfoModal">More Info</a>)
                 <p>Create an object variable named <code>Model</code> to pass .NET code to view.</p>
                 <textarea class="form-control" id="model" name="model"></textarea>
@@ -105,7 +127,7 @@
             mode: "htmlmixed",
             theme: "material"
         });
-        pageTemplateEditor.getDoc().setValue(`@Html.Raw(Model.Template)`);
+        pageTemplateEditor.getDoc().setValue(`@Html.Raw(Model.Template.Replace("</script>", "<\\/script>"))`);
         pageTemplateEditor.setSize("100%", "80%");
         $(function () {
             if (!(page instanceof Page)) {

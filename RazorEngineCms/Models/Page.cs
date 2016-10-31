@@ -46,6 +46,7 @@ namespace RazorEngineCms.Models
             this.Model = pageRequest.Model;
             this.Template = pageRequest.Template;
             this.HasParams = pageRequest.HasParams;
+            this.HasInclude = pageRequest.HasInclude;
         }
 
         internal static Page FindPage(string section, string name)
@@ -90,7 +91,7 @@ namespace RazorEngineCms.Models
                 {
                     var templateModel = new TemplateModel
                     {
-                        PageModel = JsonConvert.DeserializeObject(jsonModel),
+                        PageModel = jsonModel != null ? JsonConvert.DeserializeObject(jsonModel) : null,
                         Includes = new Include()
                     };
 
