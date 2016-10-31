@@ -6,8 +6,9 @@
     <title>@ViewBag.Title - My ASP.NET Application</title>
     @Styles.Render("~/Content/css")
     <link rel="stylesheet" href="/Content/simple-sidebar.css" type="text/css" />
-    @Scripts.Render("~/bundles/modernizr")
     @RenderSection("styles", required: false)
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/Scripts/vendor/jquery.js")
 
 </head>
 <body>
@@ -45,7 +46,6 @@
         <!--/End View Content-->
     </div>
     <!-- Scripts -->
-    @Scripts.Render("~/Scripts/vendor/jquery.js");
     @Scripts.Render("~/Scripts/vendor/bootstrap.min.js")
     @Scripts.Render("~/Scripts/default.js")
     @RenderSection("scripts", required: false)

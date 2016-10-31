@@ -12,7 +12,7 @@ namespace RazorEngineCms.Controllers
 {
     public class PageController : BaseController
     {
-        public IDictionary<string,string> QueryStringParams { get; set; }
+        public IDictionary<string, string> QueryStringParams { get; set; }
 
         public PageController()
         {
@@ -35,7 +35,7 @@ namespace RazorEngineCms.Controllers
         {
             Page page = null; // will store the page once we find it
             Func<Page, bool> templateNeedsCompiled = (iPage) => (string.IsNullOrEmpty(iPage.CompiledTemplate) &&
-                                !string.IsNullOrEmpty(iPage.CompiledModel) &&
+                                (!string.IsNullOrEmpty(iPage.CompiledModel) || iPage.HasInclude) &&
                                 !string.IsNullOrEmpty(iPage.Template));
             // templage model that will be passed to the View
             var template = new PageTemplate { Content = string.Empty };
@@ -60,7 +60,7 @@ namespace RazorEngineCms.Controllers
             var templateIsCompiled = page != null &&
                                      (!string.IsNullOrEmpty(page.CompiledTemplate) || !templateNeedsCompiled(page)) &&
                                      !page.HasParams;
-            if (templateIsCompiled)
+            if (templateIsCompiled) //
             {
                 template.Content = page.CompiledTemplate ?? page.Template;
             }
@@ -309,12 +309,13 @@ namespace RazorEngineCms.Controllers
         /// <returns></returns>
         private async Task<Page> _CompileTemplateAndSavePage(Page page, bool saveAsFile = false)
         {
-            if (!string.IsNullOrEmpty(page.Model) && !page.HasParams)
+            if ((!string.IsNullOrEmpty(page.Model) || page.HasInclude) &&
+                !page.HasParams) // don't want to save compiled template if want to use params in Model
             {
                 ConcurrentBag<string> errors = this.Errors;
                 page.CompileTemplate(ref errors);
             }
-            else if (string.IsNullOrEmpty(page.Model) && !page.HasParams) // no template model so do not need to compile
+            else if (string.IsNullOrEmpty(page.Model) && !page.HasParams && !page.HasInclude) // no template model or include so do not need to compile template
             {
                 page.CompiledTemplate = page.Template;
             }
