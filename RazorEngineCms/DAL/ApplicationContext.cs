@@ -4,7 +4,7 @@ using RazorEngineCms.Models;
 
 namespace RazorEngineCms.DAL
 {
-    public class ApplicationContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationContext : IdentityDbContext<ApplicationUser>, IApplicationContext
     {
         public ApplicationContext()
             : base("ApplicationContext")

@@ -5,11 +5,16 @@ using System.Web.Mvc;
 using RazorEngineCms.App_Classes;
 using RazorEngineCms.Models;
 using System.Threading.Tasks;
+using RazorEngineCms.DAL.Repository;
 
 namespace RazorEngineCms.Controllers
 {
     public class IncludeController : BaseController
     {
+        public IncludeController(IRepositoryService repository) : base(repository)
+        {
+        }
+
         // GET: Include/New
         [AuthRedirect]
         public ActionResult New()
@@ -20,7 +25,7 @@ namespace RazorEngineCms.Controllers
         [AuthRedirect]
         public ActionResult Edit(int id)
         {
-            var Include = this._db.Include.FirstOrDefault(i => i.Id == id);
+            var Include = this._repository.FindInclude(id);
             return View(Include);
         }
 

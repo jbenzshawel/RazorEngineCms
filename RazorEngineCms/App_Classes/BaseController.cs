@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Configuration;
 using System.Web.Mvc;
+using RazorEngineCms.DAL.Repository;
 
 namespace RazorEngineCms.App_Classes
 {
@@ -17,8 +18,11 @@ namespace RazorEngineCms.App_Classes
 
         internal ApplicationContext _db { get; set; }
 
-        public BaseController()
+        internal IRepositoryService  _repository { get; set; }
+
+        public BaseController(IRepositoryService repository)
         {
+            this._repository = repository;
             this._db = new ApplicationContext();
             this.Errors = new ConcurrentBag<string>();
             this.FileHelper = new FileHelper();
