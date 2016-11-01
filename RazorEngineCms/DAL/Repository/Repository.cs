@@ -216,11 +216,24 @@ namespace RazorEngineCms.DAL.Repository
                     this._db.Page.Attach(pageModel);
                     this._db.Page.Remove(pageModel);
                 }
+            } 
+            else if (obj.GetType() == typeof(Include))
+            {
+                var include = obj as Include;
+                Include includeModel = this.Find(include.Id) as Include;
+                if (includeModel == null)
+                {
+                    errors.Add("Include not found");
+                }
+                else
+                {
+                    this._db.Include.Attach(includeModel);
+                    this._db.Include.Remove(includeModel);
+                }
             }
             
             try
             {
-
                 if (await this._db.SaveChangesAsync() < 1)
                 {
                     errors.Add("Server error while saving. 0 rows updated");
@@ -230,7 +243,6 @@ namespace RazorEngineCms.DAL.Repository
             {
                 errors.Add(ex.Message);
             }
-
 
             return errors;
         }

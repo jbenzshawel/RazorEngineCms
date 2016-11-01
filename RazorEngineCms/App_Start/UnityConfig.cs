@@ -1,12 +1,12 @@
+using System.Data.Entity;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Practices.Unity;
 using Unity.Mvc5;
 using RazorEngineCms.DAL;
 using RazorEngineCms.DAL.Repository;
-using Microsoft.AspNet.Identity;
 using RazorEngineCms.Models;
-using Microsoft.AspNet.Identity.EntityFramework;
-using System.Data.Entity;
 using RazorEngineCms.Controllers;
 
 namespace RazorEngineCms
@@ -15,11 +15,8 @@ namespace RazorEngineCms
     {
         public static void RegisterComponents()
         {
-			var container = new UnityContainer();
-
-            // register all your components with the container here
-            // it is NOT necessary to register your controllers
-
+            var container = new UnityContainer();
+            
             // register Identity for Account Controller
             container.RegisterType<IUserStore<ApplicationUser>, UserStore<ApplicationUser>>();
             container.RegisterType<UserManager<ApplicationUser>>();

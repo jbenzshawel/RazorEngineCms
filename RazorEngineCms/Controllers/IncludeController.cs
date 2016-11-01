@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Web.Mvc;
 using RazorEngineCms.App_Classes;
 using RazorEngineCms.Models;
@@ -60,33 +58,17 @@ namespace RazorEngineCms.Controllers
         [Authorize]
         public async Task<ActionResult> Delete(string id)
         {
-            bool status = false;
-            int includeId;
-            
-            if (int.TryParse(id, out includeId))
+            int parsedId = 0;
+            if (int.TryParse(id, out parsedId))
             {
-                var includeModel = this._repository.db.Include.FirstOrDefault(i => i.Id == includeId);
-                if (includeModel != null)
-                {
-                    try
-                    {
-                        this._repository.db.Include.Attach(includeModel);
-                        this._repository.db.Include.Remove(includeModel);
-                        status = await this._repository.db.SaveChangesAsync() > 0;
+                this.Errors = await this._repository.DeleteInclude(new Include { Id = parsedId }, this.Errors);
+            }
+            else
+            {
+                this.Errors.Add("Invalid id.");
+            }
 
-                    }
-                    catch (Exception ex)
-                    {
-                        this.Errors.Add(ex.Message);
-                    }
-                }
-                else
-                {
-                    this.Errors.Add("Include not found");
-                }
-            } // end try parse includeId 
-
-            return Json(new { Status = status, this.Errors });
+            return Json(new { Status = this.Errors.Count == 0, this.Errors });
         }
     }
 }

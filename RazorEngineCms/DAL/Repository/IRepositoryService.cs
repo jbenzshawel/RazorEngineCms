@@ -27,5 +27,7 @@ namespace RazorEngineCms.DAL.Repository
         Task<Page> CopyPage(Page page, ConcurrentBag<string> errors);
 
         Task<ConcurrentBag<string>> DeletePage(Page page, ConcurrentBag<string> errors);
+
+        Task<ConcurrentBag<string>> DeleteInclude(Include page, ConcurrentBag<string> errors);
     }
 }

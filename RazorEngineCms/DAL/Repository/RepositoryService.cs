@@ -73,6 +73,11 @@ namespace RazorEngineCms.DAL.Repository
             return await this._PageRepository.Delete(page, errors);
         }
 
+        public async Task<ConcurrentBag<string>> DeleteInclude(Include include, ConcurrentBag<string> errors)
+        {
+            return await this._IncludeRepository.Delete(include, errors);
+        }
+
         private bool _NotUpToDate<T>(T obj)
         {
             bool status = false;

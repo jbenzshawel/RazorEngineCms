@@ -61,7 +61,7 @@ namespace RazorEngineCms.Controllers
             var templateIsCompiled = page != null &&
                                      (!string.IsNullOrEmpty(page.CompiledTemplate) || !templateNeedsCompiled(page)) &&
                                      !page.HasParams;
-            if (templateIsCompiled) //
+            if (templateIsCompiled) 
             {
                 template.Content = page.CompiledTemplate ?? page.Template;
             }
