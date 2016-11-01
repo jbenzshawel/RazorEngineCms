@@ -160,10 +160,10 @@ namespace RazorEngineCms.Controllers
                 }
             }
 
-            if (this._repository.db.Page.Any())
+            List<Page> pagesInDb = this._repository.AllPages();
+            if (pagesInDb.Count > 0)
             {
-                pageList = _repository.db.Page.ToList();
-
+                pageList.AddRange(pagesInDb);
             }
 
             return View(pageList);

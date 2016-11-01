@@ -1,6 +1,7 @@
 ﻿using RazorEngineCms.Models;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace RazorEngineCms.DAL.Repository
@@ -28,6 +29,17 @@ namespace RazorEngineCms.DAL.Repository
         public Include FindInclude(int Id)
         {
             return this._IncludeRepository.Find(Id);
+        }
+
+
+        public List<Page> AllPages()
+        {
+            return this._PageRepository.All();
+        }
+
+        public List<Include> AllIncludes()
+        {
+            return this._IncludeRepository.All();
         }
 
         public async Task<ConcurrentBag<string>> SavePage(Page page, ConcurrentBag<string> errors)

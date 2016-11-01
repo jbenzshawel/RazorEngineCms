@@ -2,6 +2,7 @@
 using RazorEngineCms.Models;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,6 +13,8 @@ namespace RazorEngineCms.DAL.Repository
         Page Find(string section, string name, DateTime? updated = null);
 
         T Find(int Id);
+
+        List<T> All();
 
         Task<ConcurrentBag<string>> Save(T obj, ConcurrentBag<string> errors);
 
@@ -42,6 +45,22 @@ namespace RazorEngineCms.DAL.Repository
             }
 
             return null;
+        }
+
+        public List<T> All()
+        {
+            List<T> listT = new List<T>();
+
+            if (typeof(T) == typeof(Page))
+            {
+                listT = this._db.Page.ToList() as List<T>;
+            }
+            else if (typeof(T) == typeof(Include))
+            {
+                listT = this._db.Include.ToList() as List<T>;
+            }
+            
+            return listT;
         }
 
         public Page Find(string section, string name, DateTime? updated = null)

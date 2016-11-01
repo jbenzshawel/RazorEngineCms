@@ -51,14 +51,8 @@ namespace RazorEngineCms.Controllers
         [AuthRedirect]
         public ActionResult List()
         {
-            var includes = new List<Include>(); 
-
-            if (this._repository.db.Include.Any())
-            {
-                includes = this._repository.db.Include.OrderByDescending(i => i.Updated).ToList(); 
-            }
-
-
+            List<Include> includes = this._repository.AllIncludes();
+            
             return View(includes);
         }
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RazorEngineCms.DAL.Repository
 {
-    internal interface IRepositoryService
+    public interface IRepositoryService
     {
         ApplicationContext db { get; set; }
 
@@ -19,6 +19,10 @@ namespace RazorEngineCms.DAL.Repository
         Page FindPage(string section, string name, DateTime? updated = null);
 
         Include FindInclude(int Id);
+
+        List<Page> AllPages();
+
+        List<Include> AllIncludes();
 
         Task<Page> CopyPage(Page page, ConcurrentBag<string> errors);
 
