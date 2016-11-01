@@ -129,14 +129,14 @@ Page.prototype.delete = function (id, section, name, msgSel) {
     this.Id = id,
     this.section = section;
     this.name = name;
-    return this.ajaxPost(id, name, section, msgSel, "Delete");
+    return this.ajaxPost(id, section, name, msgSel, "Delete");
 };
 
 Page.prototype.copy = function (id, section, name, msgSel) {
     this.Id = id,
     this.section = section;
     this.name = name;
-    return this.ajaxPost(id, name, section, msgSel, "Copy");
+    return this.ajaxPost(id, section, name, msgSel, "Copy");
 }
 
 Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {

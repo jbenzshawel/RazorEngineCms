@@ -16,11 +16,11 @@ namespace RazorEngineCms.DAL.Repository
 
         List<T> All();
 
-        Task<ConcurrentBag<string>> Save(T obj, ConcurrentBag<string> errors);
+        Task Save(T obj, ConcurrentBag<string> errors);
 
         Task<T> Copy(T page, ConcurrentBag<string> errors);
 
-        Task<ConcurrentBag<string>> Delete(T obj, ConcurrentBag<string> errors);
+        Task Delete(T obj, ConcurrentBag<string> errors);
 
     }
 
@@ -85,7 +85,13 @@ namespace RazorEngineCms.DAL.Repository
             return page;
         }
 
-        public async Task<ConcurrentBag<string>> Save(T obj, ConcurrentBag<string> errors)
+        /// <summary>
+        /// Save object of type T (Include or Page)
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="errors"></param>
+        /// <returns></returns>
+        public async Task Save(T obj, ConcurrentBag<string> errors)
         {
             if (obj.GetType() == typeof(Page))
             {
@@ -136,30 +142,15 @@ namespace RazorEngineCms.DAL.Repository
                 }
             }
 
-            try
-            {
-                await this._db.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                errors.Add(string.Format("Error Saving Model: {0}", ex.Message));
-                // if failed to save model get why
-                if (this._db.GetValidationErrors().Any())
-                {
-                    foreach (var error in this._db.GetValidationErrors())
-                    {
-                        foreach (var valErr in error.ValidationErrors)
-                        {
-                            errors.Add(string.Format("Model Error: {0}, Model Property: {1}",
-                                valErr.ErrorMessage, valErr.PropertyName));
-                        }
-                    } // end foreach this._db.GetValidationErrors()
-                } // end if have validation errors
-            } // end catch
+            await this.SaveAsync(errors);
+         }
 
-            return errors;
-        }
-
+        /// <summary>
+        /// Copies object of type T (Include or Page)
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="errors"></param>
+        /// <returns></returns>
         public async Task<T> Copy(T obj, ConcurrentBag<string> errors)
         {
             object returnObj = null;
@@ -188,19 +179,18 @@ namespace RazorEngineCms.DAL.Repository
 
             }
 
-            try
-            {
-                await this._db.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                errors.Add(ex.Message);
-            }
+            await this.SaveAsync(errors);
 
             return returnObj as T;
         }
 
-        public async Task<ConcurrentBag<string>> Delete(T obj, ConcurrentBag<string> errors)
+        /// <summary>
+        /// Deletes object of type T (Include or Page)
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="errors"></param>
+        /// <returns></returns>
+        public async Task Delete(T obj, ConcurrentBag<string> errors)
         {
             if (obj.GetType() == typeof(Page))
             {
@@ -231,20 +221,42 @@ namespace RazorEngineCms.DAL.Repository
                     this._db.Include.Remove(includeModel);
                 }
             }
-            
+
+            await this.SaveAsync(errors);
+        }  
+
+        /// <summary>
+        /// Saves changes in _db ApplicationContext and adds errors 
+        /// to errors concurrent bag.
+        /// </summary>
+        /// <param name="errors"></param>
+        /// <returns></returns>
+        private async Task SaveAsync(ConcurrentBag<string> errors)
+        {
             try
             {
                 if (await this._db.SaveChangesAsync() < 1)
                 {
-                    errors.Add("Server error while saving. 0 rows updated");
+                    errors.Add("0 rows updated");
+
                 }
             }
             catch (Exception ex)
             {
-                errors.Add(ex.Message);
+                errors.Add(string.Format("Error Saving Model: {0}", ex.Message));
+                // if failed to save model get why
+                if (this._db.GetValidationErrors().Any())
+                {
+                    foreach (var error in this._db.GetValidationErrors())
+                    {
+                        foreach (var valErr in error.ValidationErrors)
+                        {
+                            errors.Add(string.Format("Model Error: {0}, Model Property: {1}",
+                                valErr.ErrorMessage, valErr.PropertyName));
+                        }
+                    } // end foreach this._db.GetValidationErrors()
+                } // end if have validation errors
             }
-
-            return errors;
         }
     }
 }

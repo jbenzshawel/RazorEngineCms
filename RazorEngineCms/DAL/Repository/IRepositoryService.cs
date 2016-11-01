@@ -12,9 +12,9 @@ namespace RazorEngineCms.DAL.Repository
     {
         ApplicationContext db { get; set; }
 
-        Task<ConcurrentBag<string>> SavePage(Page page, ConcurrentBag<string> errors);
+        Task SavePage(Page page, ConcurrentBag<string> errors);
 
-        Task<ConcurrentBag<string>> SaveInclude(Include include, ConcurrentBag<string> errors);
+        Task SaveInclude(Include include, ConcurrentBag<string> errors);
 
         Page FindPage(string section, string name, DateTime? updated = null);
 
@@ -26,8 +26,8 @@ namespace RazorEngineCms.DAL.Repository
 
         Task<Page> CopyPage(Page page, ConcurrentBag<string> errors);
 
-        Task<ConcurrentBag<string>> DeletePage(Page page, ConcurrentBag<string> errors);
+        Task DeletePage(Page page, ConcurrentBag<string> errors);
 
-        Task<ConcurrentBag<string>> DeleteInclude(Include page, ConcurrentBag<string> errors);
+        Task DeleteInclude(Include page, ConcurrentBag<string> errors);
     }
 }

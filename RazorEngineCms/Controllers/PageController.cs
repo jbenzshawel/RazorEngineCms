@@ -251,7 +251,7 @@ namespace RazorEngineCms.Controllers
         [Authorize]
         public async Task<ActionResult> Delete(AjaxPageRequest pageRequest)
         {
-            this.Errors = await this._repository.DeletePage(new Page
+            await this._repository.DeletePage(new Page
             {
                 Id = pageRequest.Id,
                 Name = pageRequest.Name,
@@ -331,12 +331,8 @@ namespace RazorEngineCms.Controllers
                 } // end catch
             } // end if saveAsFile
 
-            var saveErrors = await this._repository.SavePage(page, this.Errors);
-            if (saveErrors.Count > 0)
-            {
-                this.Errors.AddRange(saveErrors);
-            }
-
+            await this._repository.SavePage(page, this.Errors);
+            
             return page;
         }
     }

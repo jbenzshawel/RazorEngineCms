@@ -42,25 +42,22 @@ namespace RazorEngineCms.DAL.Repository
             return this._IncludeRepository.All();
         }
 
-        public async Task<ConcurrentBag<string>> SavePage(Page page, ConcurrentBag<string> errors)
+        public async Task SavePage(Page page, ConcurrentBag<string> errors)
         {
             if (!this._NotUpToDate<Page>(page))
             {
-                return await this._PageRepository.Save(page, errors);
+                await this._PageRepository.Save(page, errors);
             }
             errors.Add("Someone else has updated this page before you");
-            return errors;
         }
 
-        public async Task<ConcurrentBag<string>> SaveInclude(Include include, ConcurrentBag<string> errors)
+        public async Task SaveInclude(Include include, ConcurrentBag<string> errors)
         {
             if(!this._NotUpToDate<Include>(include))
             {
-                return await this._IncludeRepository.Save(include, errors);
+                await this._IncludeRepository.Save(include, errors);
             }
             errors.Add("Someone else has updated this include before you");
-            return errors;
-
         }
 
         public async Task<Page> CopyPage(Page page, ConcurrentBag<string> errors)
@@ -68,14 +65,14 @@ namespace RazorEngineCms.DAL.Repository
             return await this._PageRepository.Copy(page, errors);
         }
 
-        public async Task<ConcurrentBag<string>> DeletePage(Page page, ConcurrentBag<string> errors)
+        public async Task DeletePage(Page page, ConcurrentBag<string> errors)
         {
-            return await this._PageRepository.Delete(page, errors);
+            await this._PageRepository.Delete(page, errors);
         }
 
-        public async Task<ConcurrentBag<string>> DeleteInclude(Include include, ConcurrentBag<string> errors)
+        public async Task DeleteInclude(Include include, ConcurrentBag<string> errors)
         {
-            return await this._IncludeRepository.Delete(include, errors);
+            await this._IncludeRepository.Delete(include, errors);
         }
 
         private bool _NotUpToDate<T>(T obj)

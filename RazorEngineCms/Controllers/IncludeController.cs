@@ -36,7 +36,7 @@ namespace RazorEngineCms.Controllers
             
             if (ModelState.IsValid)
             {
-                this.Errors = await this._repository.SaveInclude(includeModel, this.Errors);
+                await this._repository.SaveInclude(includeModel, this.Errors);
             }
             else
             {
@@ -61,7 +61,7 @@ namespace RazorEngineCms.Controllers
             int parsedId = 0;
             if (int.TryParse(id, out parsedId))
             {
-                this.Errors = await this._repository.DeleteInclude(new Include { Id = parsedId }, this.Errors);
+                await this._repository.DeleteInclude(new Include { Id = parsedId }, this.Errors);
             }
             else
             {
