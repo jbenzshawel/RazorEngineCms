@@ -21,6 +21,10 @@
         <p>Default route is <code>/section/name/param/param2</code> where <code>param</code> and <code>param2</code> are optional parameters.</p>
         <form id="newPage" action="">
             <div class="form-group">
+                <label for="pageUpdated">Updated:</label>
+                <span id="pageUpdated">@Model.Updated.ToString()</span>
+            </div>
+            <div class="form-group">
                 <label for="pageId">Page Id:</label>
                 <span id="pageId">@Model.Id</span>
             </div>

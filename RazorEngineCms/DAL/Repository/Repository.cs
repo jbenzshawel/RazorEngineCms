@@ -9,9 +9,9 @@ namespace RazorEngineCms.DAL.Repository
 {
     public interface IRepository<T>
     {
-        Page Find(string section, string name);
+        Page Find(string section, string name, DateTime? updated = null);
 
-        Include Find(int Id);
+        T Find(int Id);
 
         Task<ConcurrentBag<string>> Save(T obj, ConcurrentBag<string> errors);
 
@@ -30,12 +30,21 @@ namespace RazorEngineCms.DAL.Repository
             this._db = db;
         }
 
-        public Include Find(int Id)
+        public T Find(int Id)
         {
-            return this._db.Include.FirstOrDefault(i => i.Id == Id);
+            if (typeof (T) == typeof(Include))
+            {
+                return this._db.Include.FirstOrDefault(i => i.Id == Id) as T;
+            }
+            else if (typeof(T) == typeof(Page))
+            {
+                return this._db.Page.FirstOrDefault(p => p.Id == Id) as T;
+            }
+
+            return null;
         }
 
-        public Page Find(string section, string name)
+        public Page Find(string section, string name, DateTime? updated = null)
         {
             var page = new Page { Name = name, Section = section };
             var fileHelper = new FileHelper();
@@ -52,6 +61,8 @@ namespace RazorEngineCms.DAL.Repository
                                                         p.Section.Equals(section, StringComparison.CurrentCultureIgnoreCase));
             }
 
+            if (page != null && (page.Updated != null || updated != null))
+                page.Updated = updated != null ? (DateTime) updated : page.Updated;
             return page;
         }
 
@@ -84,6 +95,25 @@ namespace RazorEngineCms.DAL.Repository
                 else // insert a new page 
                 {
                     this._db.Page.Add(page);
+                }
+            }
+            else if (obj.GetType() == typeof(Include))
+            {
+                var include = obj as Include;
+                var includeInDb = this._db.Include.FirstOrDefault(i => i.Id == include.Id);
+                // set updated to now before upsert 
+                include.Updated = DateTime.Now;
+                if (includeInDb != null) // update the include if it exists
+                {
+                    includeInDb.Name = include.Name;
+                    includeInDb.Type = include.Type;
+                    includeInDb.Content = include.Content;
+                    includeInDb.Updated = include.Updated;
+
+                }
+                else // insert a new include 
+                {
+                    this._db.Include.Add(include);
                 }
             }
 

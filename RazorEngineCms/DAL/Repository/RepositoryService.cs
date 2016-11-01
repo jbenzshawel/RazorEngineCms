@@ -1,39 +1,28 @@
 ﻿using RazorEngineCms.Models;
+using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace RazorEngineCms.DAL.Repository
 {
-    public interface IRepositoryService
-    {
-        Task<ConcurrentBag<string>> SavePage(Page page, ConcurrentBag<string> errors);
-
-        Page FindPage(string section, string name);
-
-        Include FindInclude(int Id);
-
-        Task<Page> CopyPage(Page page, ConcurrentBag<string> errors);
-
-        Task<ConcurrentBag<string>> DeletePage(Page page, ConcurrentBag<string> errors);
-    }
-
     public class RepositoryService : IRepositoryService
     {
-        internal ApplicationContext _db { get; set; }
+        public ApplicationContext db { get; set; }
+
         internal IRepository<Page> _PageRepository { get; set; }
 
         internal IRepository<Include> _IncludeRepository {get; set; }
 
         public RepositoryService(ApplicationContext db)
         {
-            this._db = db;
+            this.db = db;
             this._PageRepository = new Repository<Page>(db);
             this._IncludeRepository = new Repository<Include>(db);
         }
 
-        public Page FindPage(string section, string name)
+        public Page FindPage(string section, string name, DateTime? updated = null)
         {
-            return this._PageRepository.Find(section, name);
+            return this._PageRepository.Find(section, name, updated);
         }
 
         public Include FindInclude(int Id)
@@ -49,6 +38,17 @@ namespace RazorEngineCms.DAL.Repository
             }
             errors.Add("Someone else has updated this page before you");
             return errors;
+        }
+
+        public async Task<ConcurrentBag<string>> SaveInclude(Include include, ConcurrentBag<string> errors)
+        {
+            if(!this._NotUpToDate<Include>(include))
+            {
+                return await this._IncludeRepository.Save(include, errors);
+            }
+            errors.Add("Someone else has updated this include before you");
+            return errors;
+
         }
 
         public async Task<Page> CopyPage(Page page, ConcurrentBag<string> errors)

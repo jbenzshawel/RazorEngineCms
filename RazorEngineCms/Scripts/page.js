@@ -15,6 +15,7 @@ var Page = function () {
 // initialize Page object properties 
 Page.prototype.init = function () {
     this.Id = $("#pageId").text().trim(),
+    this.Updated = $("#pageUpdated").text(),
     this.name = $("#pageName").val() != undefined ? $("#pageName").val().trim() : "";
     this.$name = $("#pageName");
     this.section = $("#pageVar").val() != undefined ? $("#pageVar").val().trim() : "";
@@ -74,7 +75,8 @@ Page.prototype.save = function () {
             Template: scopedObject.template,
             CreateTemplateFile: scopedObject.createTemplateFile,
             HasParams: scopedObject.hasParams,
-            HasInclude: scopedObject.hasInclude
+            HasInclude: scopedObject.hasInclude,
+            Updated: scopedObject.Updated
         };
         if (this.Id != "") {
             pageModel.Id = this.Id;

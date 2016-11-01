@@ -207,7 +207,9 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\PageController.cs" />
     <Compile Include="DAL\ApplicationContext.cs" />
-    <Compile Include="DAL\IApplicationContext.cs" />
+    <Compile Include="DAL\Repository\IRepositoryService.cs" />
+    <Compile Include="DAL\Repository\RepositoryService.cs" />
+    <Compile Include="DAL\Repository\Repository.cs" />
     <Compile Include="ExtensionClasses\ExtensionClasses.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

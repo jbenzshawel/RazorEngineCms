@@ -38,31 +38,7 @@ namespace RazorEngineCms.Controllers
             
             if (ModelState.IsValid)
             {
-                var includeInDb = this._db.Include.FirstOrDefault(i => i.Id == includeModel.Id);
-                // set updated to now before upsert 
-                includeModel.Updated = DateTime.Now;
-                if (includeInDb != null) // update the include if it exists
-                {
-                    includeInDb.Name = includeModel.Name;
-                    includeInDb.Type = includeModel.Type;
-                    includeInDb.Content = includeModel.Content;
-                    includeInDb.Updated = includeModel.Updated;
-
-                }
-                else // insert a new include 
-                {
-                    this._db.Include.Add(includeModel);
-                }
-
-                try
-                {
-                    isValid = await this._db.SaveChangesAsync() > 0;
-                }
-                catch (Exception ex)
-                {
-                    this.Errors.Add("Internal server error saving Include.");
-                    this.Errors.Add(ex.Message);
-                }
+                this.Errors = await this._repository.SaveInclude(includeModel, this.Errors);
             }
             else
             {
@@ -77,9 +53,9 @@ namespace RazorEngineCms.Controllers
         {
             var includes = new List<Include>(); 
 
-            if (this._db.Include.Any())
+            if (this._repository.db.Include.Any())
             {
-                includes = this._db.Include.OrderByDescending(i => i.Updated).ToList(); 
+                includes = this._repository.db.Include.OrderByDescending(i => i.Updated).ToList(); 
             }
 
 
@@ -95,14 +71,14 @@ namespace RazorEngineCms.Controllers
             
             if (int.TryParse(id, out includeId))
             {
-                var includeModel = this._db.Include.FirstOrDefault(i => i.Id == includeId);
+                var includeModel = this._repository.db.Include.FirstOrDefault(i => i.Id == includeId);
                 if (includeModel != null)
                 {
                     try
                     {
-                        this._db.Include.Attach(includeModel);
-                        this._db.Include.Remove(includeModel);
-                        status = await this._db.SaveChangesAsync() > 0;
+                        this._repository.db.Include.Attach(includeModel);
+                        this._repository.db.Include.Remove(includeModel);
+                        status = await this._repository.db.SaveChangesAsync() > 0;
 
                     }
                     catch (Exception ex)
