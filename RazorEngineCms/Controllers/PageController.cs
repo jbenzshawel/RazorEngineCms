@@ -238,7 +238,7 @@ namespace RazorEngineCms.Controllers
                 Errors.Add("Invalid parameters");
             }
 
-            return Json(new { Status = Errors.Count == 0, Errors });
+            return Json(new { Status = Errors.Count == 0, Errors, Updated = page.Updated.ToString() });
         }
 
         /// <summary>

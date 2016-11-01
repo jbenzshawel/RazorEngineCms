@@ -32,8 +32,6 @@ namespace RazorEngineCms.Controllers
         [Authorize]
         public async Task<ActionResult> Save(Include includeModel)
         {
-            bool isValid = false;
-            
             if (ModelState.IsValid)
             {
                 await this._repository.SaveInclude(includeModel, this.Errors);
@@ -43,7 +41,7 @@ namespace RazorEngineCms.Controllers
                 this.Errors.Add("Invalid model parameter.");
             }
 
-            return Json(new { Status = isValid, Errors, Data = new { IncludeId = includeModel.Id } });
+            return Json(new { Status = this.Errors.Count == 0, Errors, IncludeId = includeModel.Id, Updated = includeModel.Updated.ToString() });
         }
 
         [AuthRedirect]

@@ -44,20 +44,26 @@ namespace RazorEngineCms.DAL.Repository
 
         public async Task SavePage(Page page, ConcurrentBag<string> errors)
         {
-            if (!this._NotUpToDate<Page>(page))
+            if (!this._UpdateTimesDiffer<Page>(page))
             {
                 await this._PageRepository.Save(page, errors);
             }
-            errors.Add("Someone else has updated this page before you");
+            else
+            {
+                errors.Add("Someone else has updated this page before you");
+            }
         }
 
         public async Task SaveInclude(Include include, ConcurrentBag<string> errors)
         {
-            if(!this._NotUpToDate<Include>(include))
+            if(!this._UpdateTimesDiffer<Include>(include))
             {
                 await this._IncludeRepository.Save(include, errors);
             }
-            errors.Add("Someone else has updated this include before you");
+            else
+            {
+                errors.Add("Someone else has updated this include before you");
+            }
         }
 
         public async Task<Page> CopyPage(Page page, ConcurrentBag<string> errors)
@@ -75,22 +81,26 @@ namespace RazorEngineCms.DAL.Repository
             await this._IncludeRepository.Delete(include, errors);
         }
 
-        private bool _NotUpToDate<T>(T obj)
+        private bool _UpdateTimesDiffer<T>(T obj)
         {
-            bool status = false;
+            bool status = true;
             if (obj.GetType() == typeof(Page))
             {
                 var pageToSave = obj as Page;
                 var pageInDb = this.FindPage(pageToSave.Section, pageToSave.Name);
-                if (pageToSave.Updated == pageInDb.Updated)
+                if (pageToSave.Updated.ToString() == pageInDb.Updated.ToString())
                 {
-                    status = true;
+                    status = false;
                 }
             }
             else if (obj.GetType() == typeof(Include))
             {
                 var includeToSave = obj as Include;
-                ///var includeInDb = 
+                var includeInDb = this.FindInclude(includeToSave.Id);
+                if (includeInDb.Updated.ToString() == includeToSave.Updated.ToString())
+                {
+                    status = false;
+                }
             }
             return status;
         }

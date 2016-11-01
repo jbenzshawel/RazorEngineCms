@@ -15,7 +15,7 @@ var Page = function () {
 // initialize Page object properties 
 Page.prototype.init = function () {
     this.Id = $("#pageId").text().trim(),
-    this.Updated = $("#pageUpdated").text(),
+    this.updated = $("#pageUpdated").text(),
     this.name = $("#pageName").val() != undefined ? $("#pageName").val().trim() : "";
     this.$name = $("#pageName");
     this.section = $("#pageVar").val() != undefined ? $("#pageVar").val().trim() : "";
@@ -76,7 +76,7 @@ Page.prototype.save = function () {
             CreateTemplateFile: scopedObject.createTemplateFile,
             HasParams: scopedObject.hasParams,
             HasInclude: scopedObject.hasInclude,
-            Updated: scopedObject.Updated
+            Updated: scopedObject.updated
         };
         if (this.Id != "") {
             pageModel.Id = this.Id;
@@ -88,6 +88,9 @@ Page.prototype.save = function () {
             $("#newPage").prepend("<div id=\"new-page-alert\"></div>");
             if (data.Status == true) {
                 _default.alertMsg("success", "Page has been saved. <a href='/" + scopedObject.section + "/" + scopedObject.name + "' target='_blank'>View</a>", "#new-page-alert")
+                if (data.Updated != null) {
+                    $("#pageUpdated").text(data.Updated);
+                }
             } else {
                 _default.alertMsg("error", "Something went wrong. Try again?", "#new-page-alert")
                 if (data.Errors.length > 0) {
