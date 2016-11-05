@@ -25,6 +25,8 @@ Page.prototype.init = function () {
     this.createTemplateFile = $("input[name=\"templateFile\"]:checked").val();
     this.hasParams = $("input[name=\"hasParams\"]:checked").val();
     this.hasInclude = $("input[name=\"hasInclude\"]:checked").val();
+    var hasModel = document.getElementById("hasModel-true");
+    this.hasModel = hasModel != null ? hasModel.checked : false;
     if (typeof (pageTemplateEditor) != "undefined") {
         this.template = pageTemplateEditor.getValue().trim().replace("</script>", "<\/script>");
     }
@@ -59,6 +61,10 @@ Page.prototype.validate = function () {
         this.$model.addError("Sys SQL Object not accessible", "model");
         isValid = false;
     }
+    if (this.hasModel != undefined && !this.hasModel) {
+        this.model = null;
+    }
+    
     return isValid;
 }
 // calls page.validate() then saves page using /Page/New post request
@@ -219,3 +225,27 @@ Page.prototype.checkPageVariables = function () {
         });
     }
 };
+
+Page.prototype.checkModelStatus = function () {
+    this.init();
+    if (this.hasModel) {
+        $("#pageModelSection").slideDown();
+        // setup code mirror editor
+        window.pageModelEditor = CodeMirror.fromTextArea(document.getElementById("model"), {
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: "text/x-csharp",
+            theme: "material"
+        });
+        window.pageModelEditor.setSize("100%", "80%");
+    } else {
+        $("#pageModelSection").slideUp();
+        // remove code mirror editor 
+        var clearCodeMirror = function() {
+            if (typeof(window.pageModelEditor) === "object")
+                window.pageModelEditor.toTextArea();
+        };
+        // set timeout to prevent showing unstyled textbox before it is hidden
+        window.setTimeout(clearCodeMirror, 500); 
+    }
+}

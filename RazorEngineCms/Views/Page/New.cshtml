@@ -14,49 +14,6 @@
     <div class="row">
         <div class="col-xs-12">
             <form id="newPage" action="">
-                <p>Default route is <code>/section/name/param/param2</code> where <code>param</code> and <code>param2</code> are optional parameters.</p>
-                <div class="form-group">
-                    <label for="pageVar">Page Section</label>
-                    <input type="text" name="pageVar" id="pageVar" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <label for="pageName">Page Name</label>
-                    <input type="text" name="pageName" id="pageName" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <p>
-                        <strong>Does this page have url parameters? </strong>(<code>param</code> and/or <code>param2</code>)<br />
-                        Note: pages with url parameters cannot be pre compiled
-                    </p>
-                    <label for="hasParams-true" class="weight-normal">
-                        <input type="radio" name="hasParams" id="hasParams-true" value="true" class="formControl" /> Yes
-                    </label>
-                    <label for="hasParams-false" class="weight-normal">
-                        <input type="radio" name="hasParams" id="hasParams-false" value="false" class="formControl" checked /> No
-                    </label>
-                </div>
-                <div class="form-group">
-                    <p>
-                        <strong>Does this page use an include? </strong><br />
-                        Pages with includes have the model format <code>@@Model.PageModel</code> for model created below and <code>@@Model.Includes</code>
-                    </p>
-                    <label for="hasInclude-true" class="weight-normal">
-                        <input type="radio" name="hasInclude" id="hasInclude-true" value="true" class="formControl" /> Yes
-                    </label>
-                    <label for="hasInclude-false" class="weight-normal">
-                        <input type="radio" name="hasInclude" id="hasInclude-false" value="false" class="formControl" checked /> No
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label for="model">Page Model</label> (<a href="#" data-toggle="modal" data-target="#modelEditorInfoModal">More Info</a>)
-                    <p>Create an object variable named <code>Model</code> to pass .NET code to view.</p>
-                    <textarea class="form-control" id="model" name="model"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="template">Page Template </label>
-                    <p>Access Page Model with Razor Syntax (e.g. <code>@@Model.PropertyName</code>)</p>
-                    <textarea class="form-control" id="template" name="template"></textarea>
-                </div>
                 <div class="form-group" id="template-file-option">
                     <p><strong>Create Template File?</strong></p>
                     <label for="templateFileTrue" class="weight-normal">
@@ -68,6 +25,64 @@
                         No
                     </label>
                 </div>
+                <p>Default route is <code>/section/name/param/param2</code> where <code>param</code> and <code>param2</code> are optional parameters.</p>
+                <div class="form-group col-md-6 col-sm-12">
+                    <label for="pageVar">Page Section</label>
+                    <input type="text" name="pageVar" id="pageVar" class="form-control" />
+                </div>
+                <div class="form-group col-md-6 col-sm-12">
+                    <label for="pageName">Page Name</label>
+                    <input type="text" name="pageName" id="pageName" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <p>
+                        <strong>Include page model?</strong><br />
+                        Pages can optionally have a page model that uses Url Parameters, User Info, or DataBase Info. 
+                    </p>
+                    <label for="hasModel-true" class="weight-normal">
+                        <input type="radio" name="hasModel" id="hasModel-true" value="true" class="formControl" /> Yes
+                    </label>
+                    <label for="hasModel-false" class="weight-normal">
+                        <input type="radio" name="hasModel" id="hasModel-false" value="false" class="formControl" checked /> No
+                    </label>
+                </div>
+                <div class="well" id="pageModelSection" style="display:none">
+                    <div class="form-group">
+                        <p>
+                            <strong>Will the page model use url parameters? </strong>(<code>param</code> and/or <code>param2</code>)<br />
+                            Note: pages with url parameters cannot be pre compiled
+                        </p>
+                        <label for="hasParams-true" class="weight-normal">
+                            <input type="radio" name="hasParams" id="hasParams-true" value="true" class="formControl" /> Yes
+                        </label>
+                        <label for="hasParams-false" class="weight-normal">
+                            <input type="radio" name="hasParams" id="hasParams-false" value="false" class="formControl" checked /> No
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="model">Page Model</label> (<a href="#" data-toggle="modal" data-target="#modelEditorInfoModal">More Info</a>)
+                        <p>Create an object variable named <code>Model</code> and access it in view as <code>@@Model.PageMoel</code>.</p>
+                        <textarea class="form-control" id="model" name="model"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <p>
+                        <strong>Does this page use an include? </strong><br />
+                        Pages with includes have a model with the <code>@@Model.Includes</code> property containing the method GetInclude(string name, string type)
+                    </p>
+                    <label for="hasInclude-true" class="weight-normal">
+                        <input type="radio" name="hasInclude" id="hasInclude-true" value="true" class="formControl" /> Yes
+                    </label>
+                    <label for="hasInclude-false" class="weight-normal">
+                        <input type="radio" name="hasInclude" id="hasInclude-false" value="false" class="formControl" checked /> No
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="template">Page Template </label>
+                    <p>Access Page Model with Razor Syntax (e.g. <code>@@Model.PropertyName</code>)</p>
+                    <textarea class="form-control" id="template" name="template"></textarea>
+                </div>
+                
                 <div class="form-group">
                     <input type="submit" class="btn btn-default" id="submitNewPage" />
                 </div>
@@ -84,14 +99,6 @@
     "use strict";
     // page object for validating and submitting a new page request 
     var page = new Page();
-    // setup code mirror editors 
-    var pageModelEditor = CodeMirror.fromTextArea(document.getElementById("model"), {
-        lineNumbers: true,
-        matchBrackets: true,
-        mode: "text/x-csharp",
-        theme: "material"
-    });
-    pageModelEditor.setSize("100%", "80%");
     var pageTemplateEditor = CodeMirror.fromTextArea(document.getElementById("template"), {
         lineNumbers: true,
         matchBrackets: true,
@@ -104,8 +111,11 @@
             page = new Page(); 
         }
         page.checkPageVariables();
+        $("input[name='hasModel']").change(function () {
+            page.checkModelStatus();
+        });
         $("input[name='hasParams']").change(function () {
-            page.checkPageVariables(this);
+            page.checkPageVariables();
         });
         $("#submitNewPage").click(function (e) {
             e.preventDefault();
