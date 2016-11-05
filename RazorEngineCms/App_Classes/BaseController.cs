@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Configuration;
 using System.Web.Mvc;
+using RazorEngineCms.DAL.Repository;
 
 namespace RazorEngineCms.App_Classes
 {
@@ -15,11 +16,11 @@ namespace RazorEngineCms.App_Classes
 
         internal CacheManager CacheManager { get; set; }
 
-        internal ApplicationContext _db { get; set; }
+        internal IRepositoryService  _repository { get; set; }
 
-        public BaseController()
+        public BaseController(IRepositoryService repository)
         {
-            this._db = new ApplicationContext();
+            this._repository = repository;
             this.Errors = new ConcurrentBag<string>();
             this.FileHelper = new FileHelper();
             this.AllowCache = ConfigurationManager.AppSettings["AllowPageCaching"] == "true";

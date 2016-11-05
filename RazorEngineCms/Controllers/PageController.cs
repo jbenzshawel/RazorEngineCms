@@ -7,6 +7,7 @@ using RazorEngineCms.Models;
 using RazorEngineCms.App_Classes;
 using RazorEngineCms.ExtensionClasses;
 using System.Collections.Concurrent;
+using RazorEngineCms.DAL.Repository;
 
 namespace RazorEngineCms.Controllers
 {
@@ -14,7 +15,7 @@ namespace RazorEngineCms.Controllers
     {
         public IDictionary<string, string> QueryStringParams { get; set; }
 
-        public PageController()
+        public PageController(IRepositoryService repository) : base(repository)
         {
             this.QueryStringParams = System.Web.HttpContext.Current.Request.QueryString.ToDictionary();
         }
@@ -53,14 +54,14 @@ namespace RazorEngineCms.Controllers
             // if we couldn't get the page from cache get it from the db
             if (page == null || page.CompiledTemplate == null)
             {
-                page = Page.FindPage(section, name);
+                page = this._repository.FindPage(section, name);
             }
 
             // when page doesn't have parameters can use pre-compiled template 
             var templateIsCompiled = page != null &&
                                      (!string.IsNullOrEmpty(page.CompiledTemplate) || !templateNeedsCompiled(page)) &&
                                      !page.HasParams;
-            if (templateIsCompiled) //
+            if (templateIsCompiled) 
             {
                 template.Content = page.CompiledTemplate ?? page.Template;
             }
@@ -159,10 +160,10 @@ namespace RazorEngineCms.Controllers
                 }
             }
 
-            if (_db.Page.Any())
+            List<Page> pagesInDb = this._repository.AllPages();
+            if (pagesInDb.Count > 0)
             {
-                pageList = _db.Page.ToList();
-
+                pageList.AddRange(pagesInDb);
             }
 
             return View(pageList);
@@ -184,7 +185,7 @@ namespace RazorEngineCms.Controllers
         [AuthRedirect]
         public ActionResult Edit(string section, string name)
         {
-            var page = Page.FindPage(section, name);
+            var page = this._repository.FindPage(section, name);
 
             if (page != null)
             {
@@ -237,7 +238,7 @@ namespace RazorEngineCms.Controllers
                 Errors.Add("Invalid parameters");
             }
 
-            return Json(new { Status = Errors.Count == 0, Errors });
+            return Json(new { Status = Errors.Count == 0, Errors, Updated = page.Updated.ToString() });
         }
 
         /// <summary>
@@ -250,42 +251,27 @@ namespace RazorEngineCms.Controllers
         [Authorize]
         public async Task<ActionResult> Delete(AjaxPageRequest pageRequest)
         {
-            bool status = false;
-            Page pageModel = pageRequest.GetPage();
-
-            if (pageModel == null)          
+            await this._repository.DeletePage(new Page
             {
-                this.Errors.Add("Page not found");
-            }
-            else
-            {
-                try
-                {
-                    this._db.Page.Attach(pageModel);
-                    this._db.Page.Remove(pageModel);
-                    status = await this._db.SaveChangesAsync() > 0;
-                }
-                catch (Exception ex)
-                {
-                    this.Errors.Add(ex.Message);
-                }
-            }
+                Id = pageRequest.Id,
+                Name = pageRequest.Name,
+                Section = pageRequest.Section
+            }, this.Errors);
 
-            return Json(new { Status = status, this.Errors });
+            return Json(new { Status = this.Errors.Count == 0, this.Errors });
         }
 
         [HttpPost]
         [Authorize]
-        public ActionResult Copy(AjaxPageRequest pageRequest)
+        public async Task<ActionResult> Copy(AjaxPageRequest pageRequest)
         {
-            var status = false;
-            int? copiedPageId = null;
-            Page pageModel = pageRequest.GetPage();
-
-            if (pageModel != null)
+            bool status = false;
+            Page copiedPage = null;
+            Page origPage = this._repository.FindPage(pageRequest.Section, pageRequest.Name);
+            if (origPage != null)
             {
-                copiedPageId = Page.Copy(pageModel);
-                status = copiedPageId != null ? true : false;
+                copiedPage =  await this._repository.CopyPage(origPage, this.Errors);
+                status = copiedPage.Id > 0;
                 if (!status)
                 {
                     this.Errors.Add("Server error copying page.");
@@ -296,7 +282,7 @@ namespace RazorEngineCms.Controllers
                 this.Errors.Add("Could not find page.");
             }
 
-            return Json(new { Status = status, NewId = copiedPageId, Errors = this.Errors });
+            return Json(new { Status = status, NewId = copiedPage.Id, Errors = this.Errors });
         }
 
         /// <summary>
@@ -345,57 +331,8 @@ namespace RazorEngineCms.Controllers
                 } // end catch
             } // end if saveAsFile
 
-            // save copy in db regardless of saveAsFile param
-            var pageInDb = this._db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                    p.Section.Equals(page.Section, StringComparison.CurrentCultureIgnoreCase));
-
-            // if the page has url parameters do not want to save precompiled template and model
-            if (page.HasParams)
-            {
-                page.CompiledModel = null;
-                page.CompiledTemplate = null;
-            }
-            // set updated to now before upsert 
-            page.Updated = DateTime.Now;
-            if (pageInDb != null) // update the page if it exists
-            {
-                pageInDb.Model = page.Model;
-                pageInDb.Template = page.Template;
-                pageInDb.CompiledModel = page.CompiledModel;
-                pageInDb.CompiledTemplate = page.CompiledTemplate;
-                pageInDb.HasParams = page.HasParams;
-                pageInDb.Updated = page.Updated;
-            }
-            else // insert a new page 
-            {
-                this._db.Page.Add(page);
-            }
-
-            try
-            {
-                await this._db.SaveChangesAsync();
-            }
-            catch (Exception ex) // catch exception from saving to db
-            {
-                this.Errors.Add(string.Format("Error Saving Model: {0}", ex.Message));
-                // if failed to save model get why
-                if (this._db.GetValidationErrors().Any())
-                {
-                    foreach (var error in this._db.GetValidationErrors())
-                    {
-                        foreach (var valErr in error.ValidationErrors)
-                        {
-                            this.Errors.Add(string.Format("Model Error: {0}, Model Property: {1}",
-                                valErr.ErrorMessage, valErr.PropertyName));
-                        }
-                    } // end foreach this._db.GetValidationErrors()
-                } // end if have validation errors
-            } // end catch
-            finally
-            {
-                this._db.Dispose();
-            }
-
+            await this._repository.SavePage(page, this.Errors);
+            
             return page;
         }
     }

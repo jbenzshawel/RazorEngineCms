@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@{
+    string controller = ViewContext.RouteData.Values["controller"].ToString();
+    string action = ViewContext.RouteData.Values["action"].ToString();
+}
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -13,34 +18,116 @@
     <div id="wrapper">
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
-            <ul class="sidebar-nav">
+            <ul class="sidebar-nav main-nav">
                 <li class="sidebar-brand">
                     <a href="#">Razor Engine CMS</a>
                 </li>
                 <li><a href="/CMS/Home/Index">Dashboard</a></li>
                 @if (HttpContext.Current.User != null && HttpContext.Current.Request.IsAuthenticated)
                 {
-                    <li class="sidebar-header">
-                        <h4>Pages</h4>
-                    </li>
-                    <li><a href="/CMS/Page/New">New Page</a></li>
-                    <li><a href="/CMS/Page/List">List Pages</a></li>
-                    <li class="sidebar-header">
-                        <h4>Includes</h4>
-                    </li>
-                    <li><a href="/CMS/Include/New">New Include</a></li>
-                    <li><a href="/CMS/Include/List">List Includes</a></li>
-                    <li class="sidebar-header">
-                        <h4>Account</h4>
-                    </li>
-                    <li><a href="/CMS/Account/LogOff">Logout</a></li>
-                }
-                else
-                {
-                    <li><a href="/CMS/Account/Login">Login</a></li>
-                }
+                    <li>
+                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="pageHeading">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#pagesCollapse" aria-expanded="
+                                        @if(controller.Equals("page", StringComparison.InvariantCultureIgnoreCase))
+                                        {
+                                        @:true
+                                        }
+                                        else
+                                        {
+                                        @:false
+                                        }" aria-controls="pagesCollapse">
+                                            Pages
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="pagesCollapse" class="panel-collapse collapse 
+                                @if(controller.Equals("page", StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    @:in
+                                }
+                                else
+                                {
+                                    @:
+                                }" role="tabpanel" aria-labelledby="pageHeading">
+                                    <div class="panel-body">
+                                        <ul class="sidebar-nav nested-nav">
+                                            <li
+                                            @if(action.Equals("new", StringComparison.InvariantCultureIgnoreCase) && 
+                                                controller.Equals("page", StringComparison.InvariantCultureIgnoreCase))
+                                            {
+                                                @:class="active"
+                                            }
+                                            >
+                                                <a href="/CMS/Page/New">New Page</a></li>
+                                            <li
+                                            @if(action.Equals("list", StringComparison.InvariantCultureIgnoreCase) && 
+                                                controller.Equals("page", StringComparison.InvariantCultureIgnoreCase))
+                                            {
+                                                @:class="active"
+                                            }
+                                            >
+                                                <a href="/CMS/Page/List">List Pages</a></li>
+                                        </ul>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+
+                        <li>
+                            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" role="tab" id="includeHeading">
+                                        <h4 class="panel-title">
+                                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#includeCollapse" aria-expanded="
+                                               @if (controller.Equals("include", StringComparison.InvariantCultureIgnoreCase)) { @: true
+                                                                                       } else { @: false
+                                                                                       } " aria-controls="pagesCollapse">
+                                                Includes
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="includeCollapse" class="panel-collapse collapse
+                                @if(controller.Equals("include", StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    @:in
+                                }
+                                else
+                                {
+                                    @:
+                                }" role="tabpanel" aria-labelledby="includeHeading">
+                                        <div class="panel-body">
+                                            <ul class="sidebar-nav nested-nav">
+                                                <li @if (action.Equals("new", StringComparison.InvariantCultureIgnoreCase) && 
+                                                    controller.Equals("include", StringComparison.InvariantCultureIgnoreCase)) { @: class="active"
+                                                                                                }>
+                                                    <a href="/CMS/Include/New">New Include</a>
+                                                </li>
+                                                <li @if (action.Equals("list", StringComparison.InvariantCultureIgnoreCase) && 
+                                                    controller.Equals("include", StringComparison.InvariantCultureIgnoreCase)) { @: class="active"
+                                                                                                }>
+                                                    <a href="/CMS/Include/List">List Includes</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="sidebar-header">
+                            <h4>Account</h4>
+                        </li>
+                        <li><a href="/CMS/Account/LogOff">Logout</a></li>
+                        }
+                        else
+                        {
+                        <li><a href="/CMS/Account/Login">Login</a></li>
+                        }
             </ul>
-            @*Html.Partial("_LoginPartial")*@
         </div>
         <div id="page-content-wrapper">
             <div class="container-fluid">
@@ -57,6 +144,14 @@
     @Scripts.Render("~/Scripts/vendor/bootstrap.min.js")
     @Scripts.Render("~/Scripts/vendor/vue.js")
     @Scripts.Render("~/Scripts/default.js")
+    <script type="text/javascript">
+        $(function () {
+            $(".panel-title a").click(function () {
+                $(".panel-collapse.collapse.in").removeClass("in");
+                $(this).parent().parent().parent().find(".panel-collapse").collapse();
+            });
+        })
+    </script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

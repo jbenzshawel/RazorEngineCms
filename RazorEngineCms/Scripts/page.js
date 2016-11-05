@@ -15,6 +15,7 @@ var Page = function () {
 // initialize Page object properties 
 Page.prototype.init = function () {
     this.Id = $("#pageId").text().trim(),
+    this.updated = $("#pageUpdated").text(),
     this.name = $("#pageName").val() != undefined ? $("#pageName").val().trim() : "";
     this.$name = $("#pageName");
     this.section = $("#pageVar").val() != undefined ? $("#pageVar").val().trim() : "";
@@ -24,6 +25,8 @@ Page.prototype.init = function () {
     this.createTemplateFile = $("input[name=\"templateFile\"]:checked").val();
     this.hasParams = $("input[name=\"hasParams\"]:checked").val();
     this.hasInclude = $("input[name=\"hasInclude\"]:checked").val();
+    var hasModel = document.getElementById("hasModel-true");
+    this.hasModel = hasModel != null ? hasModel.checked : false;
     if (typeof (pageTemplateEditor) != "undefined") {
         this.template = pageTemplateEditor.getValue().trim().replace("</script>", "<\/script>");
     }
@@ -58,6 +61,10 @@ Page.prototype.validate = function () {
         this.$model.addError("Sys SQL Object not accessible", "model");
         isValid = false;
     }
+    if (this.hasModel != undefined && !this.hasModel) {
+        this.model = null;
+    }
+    
     return isValid;
 }
 // calls page.validate() then saves page using /Page/New post request
@@ -74,7 +81,8 @@ Page.prototype.save = function () {
             Template: scopedObject.template,
             CreateTemplateFile: scopedObject.createTemplateFile,
             HasParams: scopedObject.hasParams,
-            HasInclude: scopedObject.hasInclude
+            HasInclude: scopedObject.hasInclude,
+            Updated: scopedObject.updated
         };
         if (this.Id != "") {
             pageModel.Id = this.Id;
@@ -86,6 +94,9 @@ Page.prototype.save = function () {
             $("#newPage").prepend("<div id=\"new-page-alert\"></div>");
             if (data.Status == true) {
                 _default.alertMsg("success", "Page has been saved. <a href='/" + scopedObject.section + "/" + scopedObject.name + "' target='_blank'>View</a>", "#new-page-alert")
+                if (data.Updated != null) {
+                    $("#pageUpdated").text(data.Updated);
+                }
             } else {
                 _default.alertMsg("error", "Something went wrong. Try again?", "#new-page-alert")
                 if (data.Errors.length > 0) {
@@ -127,14 +138,14 @@ Page.prototype.delete = function (id, section, name, msgSel) {
     this.Id = id,
     this.section = section;
     this.name = name;
-    return this.ajaxPost(id, name, section, msgSel, "Delete");
+    return this.ajaxPost(id, section, name, msgSel, "Delete");
 };
 
 Page.prototype.copy = function (id, section, name, msgSel) {
     this.Id = id,
     this.section = section;
     this.name = name;
-    return this.ajaxPost(id, name, section, msgSel, "Copy");
+    return this.ajaxPost(id, section, name, msgSel, "Copy");
 }
 
 Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {
@@ -214,3 +225,27 @@ Page.prototype.checkPageVariables = function () {
         });
     }
 };
+
+Page.prototype.checkModelStatus = function () {
+    this.init();
+    if (this.hasModel) {
+        $("#pageModelSection").slideDown();
+        // setup code mirror editor
+        window.pageModelEditor = CodeMirror.fromTextArea(document.getElementById("model"), {
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: "text/x-csharp",
+            theme: "material"
+        });
+        window.pageModelEditor.setSize("100%", "80%");
+    } else {
+        $("#pageModelSection").slideUp();
+        // remove code mirror editor 
+        var clearCodeMirror = function() {
+            if (typeof(window.pageModelEditor) === "object")
+                window.pageModelEditor.toTextArea();
+        };
+        // set timeout to prevent showing unstyled textbox before it is hidden
+        window.setTimeout(clearCodeMirror, 500); 
+    }
+}

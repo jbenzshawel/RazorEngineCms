@@ -8,6 +8,7 @@ var Include = function () {
 Include.prototype.init = function () {
     this.Id = $("#includeId").text().trim() || "",
     this.name = $("#includeName").val() != undefined ? $("#includeName").val().trim() : "";
+    this.updated = $("#includeUpdated").text();
     this.$name = $("#includeName");
     this.type = $("#includeType").val() != undefined ? $("#includeType").val() : "";
     this.$type = $("#includeType");
@@ -47,7 +48,8 @@ Include.prototype.save = function (async) {
         var IncludeModel = {
             Name: scopedObject.name,
             Type: scopedObject.type,
-            content: scopedObject.content
+            content: scopedObject.content,
+            Updated: scopedObject.updated
         };
         if (this.Id != "") {
             IncludeModel.Id = this.Id;
@@ -59,9 +61,8 @@ Include.prototype.save = function (async) {
             $("#newInclude").prepend("<div id=\"new-include-alert\"></div>");
             if (result.Status == true) {
                 _default.alertMsg("success", "Include has been saved.", "#new-include-alert");
-                if (result.Data.IncludeId != null) {
-                    // set idReturn value declared at start of save function
-                    idReturn = result.Data.IncludeId; 
+                if (result.Updated != null) {
+                    $("#includeUpdated").text(result.Updated);
                 }
             } else {
                 _default.alertMsg("error", "Something went wrong. Try again?", "#new-include-alert")
