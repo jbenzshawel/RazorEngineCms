@@ -8,6 +8,9 @@ using Moq;
 
 namespace RazorEngineCms.Tests.Mocks
 {
+    /// <summary>
+    /// Contains a Mock ApplicationContext with 5 Page objects and 5 Include objects
+    /// </summary>
     public class MockDAL
     {
         public Mock<ApplicationContext> ApplicationContext { get; set; }

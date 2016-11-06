@@ -10,6 +10,10 @@ using System.Collections.Generic;
 
 namespace RazorEngineCms.Tests
 {
+    /// <summary>
+    /// Contains test for the methods in the RazorEngineCms.DAL.RepositoryService class
+    /// using mock data in MockDAL.ApplicationContext of type Mock&lt;ApplicationContext&gt;
+    /// </summary>
     [TestClass]
     public class RepositoryServiceTests
     {
@@ -130,6 +134,7 @@ namespace RazorEngineCms.Tests
 
             this._AssertErrors(errors);
         }
+        #endregion
 
         private void _AssertErrors(ConcurrentBag<string> errors)
         {
@@ -139,6 +144,5 @@ namespace RazorEngineCms.Tests
             Assert.IsTrue(errors.FirstOrDefault() != null && errors.FirstOrDefault() == "0 rows updated");
 
         }
-        #endregion
     }
 }

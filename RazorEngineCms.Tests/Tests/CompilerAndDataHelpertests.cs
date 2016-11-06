@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.CSharp;
 using Newtonsoft.Json;
 using RazorEngineCms.App_Classes;
+using RazorEngineCms.ExtensionClasses;
 
 namespace RazorEngineCMS.Tests
 {
@@ -63,6 +64,7 @@ namespace RazorEngineCMS.Tests
             var results = dataHelper.GetData("prGetPages");
 
             Assert.IsTrue(results.Rows.Count > 0);
+            Assert.IsTrue(!string.IsNullOrEmpty(results.ToJson()));
         }
     }
 }
