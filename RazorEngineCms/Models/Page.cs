@@ -47,7 +47,7 @@ namespace RazorEngineCms.Models
             this.Template = pageRequest.Template;
             this.HasParams = pageRequest.HasParams;
             this.HasInclude = pageRequest.HasInclude;
-            this.Updated = pageRequest.Updated;
+            this.Updated = (DateTime)pageRequest.Updated;
         }
 
        

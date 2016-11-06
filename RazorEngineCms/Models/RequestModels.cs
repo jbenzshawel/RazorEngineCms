@@ -20,7 +20,7 @@ namespace RazorEngineCms.Models
 
         public bool CreateTemplateFile { get; set; }
 
-        public DateTime Updated { get; set; }
+        public DateTime? Updated { get; set; }
 
         [Required]
         public string Template { get; set; }

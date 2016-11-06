@@ -12,7 +12,7 @@ namespace RazorEngineCms.DAL.Repository
 
         internal IRepository<Page> _PageRepository { get; set; }
 
-        internal IRepository<Include> _IncludeRepository {get; set; }
+        internal IRepository<Include> _IncludeRepository { get; set; }
 
         public RepositoryService(ApplicationContext db)
         {
@@ -44,7 +44,7 @@ namespace RazorEngineCms.DAL.Repository
 
         public async Task SavePage(Page page, ConcurrentBag<string> errors)
         {
-            if (!this._UpdateTimesDiffer<Page>(page))
+            if (page.Id == 0 || !this._UpdateTimesDiffer<Page>(page))
             {
                 await this._PageRepository.Save(page, errors);
             }
@@ -56,7 +56,7 @@ namespace RazorEngineCms.DAL.Repository
 
         public async Task SaveInclude(Include include, ConcurrentBag<string> errors)
         {
-            if(!this._UpdateTimesDiffer<Include>(include))
+            if (include.Id == 0 || !this._UpdateTimesDiffer<Include>(include))
             {
                 await this._IncludeRepository.Save(include, errors);
             }
