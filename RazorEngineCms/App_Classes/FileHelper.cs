@@ -48,8 +48,8 @@ namespace RazorEngineCms.App_Classes
 
         public File GetFile(string name, string variable)
         {
-            return this.Files.FirstOrDefault(f => string.Equals(f.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                                    (string.Equals(f.Variable, variable, StringComparison.CurrentCultureIgnoreCase) ||
+            return this.Files.FirstOrDefault(f => string.Equals(f.Name, name, StringComparison.InvariantCultureIgnoreCase) &&
+                                                                    (string.Equals(f.Variable, variable, StringComparison.InvariantCultureIgnoreCase) ||
                                                                         ((f.Variable == "_" || f.Variable == "") && variable == "")));
                                                                
         }
