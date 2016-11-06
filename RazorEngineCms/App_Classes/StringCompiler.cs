@@ -139,13 +139,18 @@ namespace RazorEngineCms.App_Classes
                 OutputAssembly = string.Format("temp-assemly-{0}", Guid.NewGuid().ToString())
 
             };
+            string currentPath = Path.GetDirectoryName(Path.GetDirectoryName(Directory.GetCurrentDirectory()));
+
+            if (currentPath.Contains(".Tests"))
+                currentPath = currentPath.Replace(".Tests", "");
             paramz.ReferencedAssemblies.AddRange(new string[] { "System.dll",
                                                         "System.Linq.dll",
                                                         "System.Data.dll",
                                                         "System.Xml.dll",
                                                         "System.Web.dll",
-                                                        @"C:\Git\RazorEngineCms\RazorEngineCms\bin\RazorEngineCms.PageModelClasses.dll",
-                                                        @"C:\Git\RazorEngineCms\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll" });
+                                                        
+                                                        currentPath + @"\RazorEngineCms.PageModelClasses.dll",
+                                                        @"Newtonsoft.Json.dll" });
 
             compilerModel.CopilerParams = paramz;
             return compilerModel;
