@@ -37,7 +37,6 @@ namespace RazorEngineCms.DAL.RepositoryService
             return this._IncludeRepository.Find(Id);
         }
 
-
         public List<Page> AllPages()
         {
             return this._PageRepository.All();

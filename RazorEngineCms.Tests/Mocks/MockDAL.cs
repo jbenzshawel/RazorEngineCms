@@ -3,7 +3,6 @@ using System.Data.Entity;
 using System.Collections.Generic;
 using System.Linq;
 using RazorEngineCms.DAL;
-using RazorEngineCms.DAL.RepositoryService;
 using RazorEngineCms.Models;
 using Moq;
 
@@ -102,5 +101,4 @@ namespace RazorEngineCms.Tests.Mocks
             return includes.AsQueryable();
         }
     }
-
 }

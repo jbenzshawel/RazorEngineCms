@@ -30,6 +30,6 @@ namespace RazorEngineCms.DAL.RepositoryService
 
         Task DeletePage(Page page, ConcurrentBag<string> errors, bool ignoreFiles = false);
 
-        Task DeleteInclude(Include page, ConcurrentBag<string> errors);
+        Task DeleteInclude(Include include, ConcurrentBag<string> errors);
     }
 }
