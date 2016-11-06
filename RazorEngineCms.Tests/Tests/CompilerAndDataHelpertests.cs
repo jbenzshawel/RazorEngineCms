@@ -8,7 +8,6 @@ using RazorEngineCms.DAL.RepositoryService;
 using RazorEngineCms.Tests.Mocks;
 using RazorEngineCms.Models;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace RazorEngineCMS.Tests
