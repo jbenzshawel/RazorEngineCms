@@ -46,8 +46,10 @@ namespace RazorEngineCms.Tests.Mocks
         }
 
         /// <summary>
-        /// Returns a list of mock Page objects
+        /// Returns a list of mock Page objects having the count of the 
+        /// integer passed in
         /// </summary>
+        /// <param name="numberOfPages"></param>
         /// <returns></returns>
         private IQueryable<Page> _GetPages(int numberOfPages)
         {
@@ -83,6 +85,12 @@ namespace RazorEngineCms.Tests.Mocks
             return mockPages.AsQueryable();
         }
 
+        /// <summary>
+        /// Returns a list of includes objects having the count of the
+        /// integer passed in
+        /// </summary>
+        /// <param name="numberOfIncludes"></param>
+        /// <returns></returns>
         private IQueryable<Include> _GetIncludes(int numberOfIncludes)
         {
             List<Include> includes = new List<Include>();
