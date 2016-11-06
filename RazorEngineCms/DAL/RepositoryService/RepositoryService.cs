@@ -3,8 +3,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using RazorEngineCms.DAL.Repository;
 
-namespace RazorEngineCms.DAL.Repository
+namespace RazorEngineCms.DAL.RepositoryService
 {
     public class RepositoryService : IRepositoryService
     {

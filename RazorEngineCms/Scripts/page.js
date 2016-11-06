@@ -229,7 +229,6 @@ Page.prototype.checkPageVariables = function () {
 Page.prototype.checkModelStatus = function () {
     this.init();
     if (this.hasModel) {
-        $("#pageModelSection").slideDown();
         // setup code mirror editor
         window.pageModelEditor = CodeMirror.fromTextArea(document.getElementById("model"), {
             lineNumbers: true,
@@ -238,6 +237,7 @@ Page.prototype.checkModelStatus = function () {
             theme: "material"
         });
         window.pageModelEditor.setSize("100%", "80%");
+        window.setTimeout(("#pageModelSection").slideDown(), 250);
     } else {
         $("#pageModelSection").slideUp();
         // remove code mirror editor 

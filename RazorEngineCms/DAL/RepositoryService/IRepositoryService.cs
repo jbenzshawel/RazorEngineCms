@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RazorEngineCms.DAL.Repository
+namespace RazorEngineCms.DAL.RepositoryService
 {
     public interface IRepositoryService
     {

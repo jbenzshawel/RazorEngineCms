@@ -7,7 +7,7 @@ using RazorEngineCms.Models;
 using RazorEngineCms.App_Classes;
 using RazorEngineCms.ExtensionClasses;
 using System.Collections.Concurrent;
-using RazorEngineCms.DAL.Repository;
+using RazorEngineCms.DAL.RepositoryService;
 
 namespace RazorEngineCms.Controllers
 {

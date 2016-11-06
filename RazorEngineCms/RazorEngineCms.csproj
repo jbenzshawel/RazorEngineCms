@@ -190,7 +190,7 @@
   <ItemGroup>
     <Compile Include="App_Classes\AppExceptions.cs" />
     <Compile Include="App_Classes\AuthRedirect.cs" />
-    <Compile Include="App_Classes\BaseController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="App_Classes\CacheManager.cs" />
     <Compile Include="App_Classes\DataHelper.cs" />
     <Compile Include="App_Classes\FileHelper.cs" />
@@ -207,8 +207,9 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\PageController.cs" />
     <Compile Include="DAL\ApplicationContext.cs" />
-    <Compile Include="DAL\Repository\IRepositoryService.cs" />
-    <Compile Include="DAL\Repository\RepositoryService.cs" />
+    <Compile Include="DAL\RepositoryService\IRepositoryService.cs" />
+    <Compile Include="DAL\RepositoryService\RepositoryService.cs" />
+    <Compile Include="DAL\Repository\IRepository.cs" />
     <Compile Include="DAL\Repository\Repository.cs" />
     <Compile Include="ExtensionClasses\ExtensionClasses.cs" />
     <Compile Include="Global.asax.cs">

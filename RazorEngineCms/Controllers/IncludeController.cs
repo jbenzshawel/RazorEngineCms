@@ -3,7 +3,7 @@ using System.Web.Mvc;
 using RazorEngineCms.App_Classes;
 using RazorEngineCms.Models;
 using System.Threading.Tasks;
-using RazorEngineCms.DAL.Repository;
+using RazorEngineCms.DAL.RepositoryService;
 
 namespace RazorEngineCms.Controllers
 {
