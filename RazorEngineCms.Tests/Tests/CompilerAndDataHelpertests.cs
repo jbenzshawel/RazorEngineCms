@@ -4,18 +4,11 @@ using Microsoft.CSharp;
 using Newtonsoft.Json;
 using RazorEngineCms.App_Classes;
 
-namespace RazorEngineCMSTests
+namespace RazorEngineCMS.Tests
 {
     [TestClass]
-    public class UnitTests
+    public class CompilerAndDataHelperTests
     {
-        //[TestMethod]
-        //public void TestApplicationUserToJson()
-        //{
-        //    ApplicationUserManager = new ApplicationUserManager();
-        //    var user = 
-        //}
-
         [TestMethod]
         public void TestCompile()
         {
@@ -71,14 +64,5 @@ namespace RazorEngineCMSTests
 
             Assert.IsTrue(results.Rows.Count > 0);
         }
-
-        //[TestMethod]
-        //public void TestGetDataJson()
-        //{
-        //    var dataHelper = new DataHelper();
-        //    var results = dataHelper.GetDataJson("prGetPages");
-
-        //    Assert.IsNotNull(results);
-        //}
     }
 }
