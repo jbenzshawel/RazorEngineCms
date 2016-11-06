@@ -1,9 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Configuration;
 using System.Web.Mvc;
+using RazorEngineCms.App_Classes;
 using RazorEngineCms.DAL.RepositoryService;
 
-namespace RazorEngineCms.App_Classes
+namespace RazorEngineCms.Controllers
 {
     public class BaseController : Controller
     {

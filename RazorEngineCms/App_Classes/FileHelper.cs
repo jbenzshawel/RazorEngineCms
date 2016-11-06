@@ -39,7 +39,10 @@ namespace RazorEngineCms.App_Classes
 
         public FileHelper()
         {
-            this.TemplatesPath = HttpContext.Current.Server.MapPath("~") + "/Views/CompiledTemplates";
+            if (HttpContext.Current != null)
+            {
+                this.TemplatesPath = HttpContext.Current.Server.MapPath("~") + "/Views/CompiledTemplates";
+            }
             this.Files = GetFiles();
         }
 
