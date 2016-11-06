@@ -1,8 +1,7 @@
-﻿using RazorEngineCms.DAL;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Configuration;
 using System.Web.Mvc;
-using RazorEngineCms.DAL.Repository;
+using RazorEngineCms.DAL.RepositoryService;
 
 namespace RazorEngineCms.App_Classes
 {

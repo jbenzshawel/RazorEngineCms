@@ -11,9 +11,9 @@ namespace RazorEngineCms.DAL
         {
         }
         
-        public DbSet<Page> Page { get; set; }
+        public virtual IDbSet<Page> Page { get; set; }
 
-        public DbSet<Include> Include { get; set; }
+        public virtual IDbSet<Include> Include { get; set; }
 
         public static ApplicationContext Create()
         {

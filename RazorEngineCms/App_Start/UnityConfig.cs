@@ -5,7 +5,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Practices.Unity;
 using Unity.Mvc5;
 using RazorEngineCms.DAL;
-using RazorEngineCms.DAL.Repository;
+using RazorEngineCms.DAL.RepositoryService;
 using RazorEngineCms.Models;
 using RazorEngineCms.Controllers;
 

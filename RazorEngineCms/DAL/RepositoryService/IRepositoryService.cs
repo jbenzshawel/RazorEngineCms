@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RazorEngineCms.DAL.Repository
+namespace RazorEngineCms.DAL.RepositoryService
 {
     public interface IRepositoryService
     {
@@ -16,7 +16,9 @@ namespace RazorEngineCms.DAL.Repository
 
         Task SaveInclude(Include include, ConcurrentBag<string> errors);
 
-        Page FindPage(string section, string name, DateTime? updated = null);
+        Page FindPage(string section, string name);
+
+        Page FindPageInDb(string section, string name);
 
         Include FindInclude(int Id);
 
@@ -26,8 +28,8 @@ namespace RazorEngineCms.DAL.Repository
 
         Task<Page> CopyPage(Page page, ConcurrentBag<string> errors);
 
-        Task DeletePage(Page page, ConcurrentBag<string> errors);
+        Task DeletePage(Page page, ConcurrentBag<string> errors, bool ignoreFiles = false);
 
-        Task DeleteInclude(Include page, ConcurrentBag<string> errors);
+        Task DeleteInclude(Include include, ConcurrentBag<string> errors);
     }
 }

@@ -8,22 +8,6 @@ using System.Threading.Tasks;
 
 namespace RazorEngineCms.DAL.Repository
 {
-    public interface IRepository<T>
-    {
-        Page Find(string section, string name, DateTime? updated = null);
-
-        T Find(int Id);
-
-        List<T> All();
-
-        Task Save(T obj, ConcurrentBag<string> errors);
-
-        Task<T> Copy(T page, ConcurrentBag<string> errors);
-
-        Task Delete(T obj, ConcurrentBag<string> errors);
-
-    }
-
     public class Repository<T> : IRepository<T> where T: class
     {
         internal ApplicationContext _db { get; set; }
@@ -33,6 +17,11 @@ namespace RazorEngineCms.DAL.Repository
             this._db = db;
         }
 
+        /// <summary>
+        /// Find Page or Include by Id in db
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
         public T Find(int Id)
         {
             if (typeof (T) == typeof(Include))
@@ -47,6 +36,10 @@ namespace RazorEngineCms.DAL.Repository
             return null;
         }
 
+        /// <summary>
+        /// List all pages or includes in a List of T
+        /// </summary>
+        /// <returns></returns>
         public List<T> All()
         {
             List<T> listT = new List<T>();
@@ -63,7 +56,14 @@ namespace RazorEngineCms.DAL.Repository
             return listT;
         }
 
-        public Page Find(string section, string name, DateTime? updated = null)
+        /// <summary>
+        /// Find a Page object by its section and name. 
+        /// </summary>
+        /// <param name="section"></param>
+        /// <param name="name"></param>
+        /// <param name="updated"></param>
+        /// <returns></returns>
+        public Page Find(string section, string name)
         {
             var page = new Page { Name = name, Section = section };
             var fileHelper = new FileHelper();
@@ -75,14 +75,17 @@ namespace RazorEngineCms.DAL.Repository
             }
             else // get page from database if there isn't a file
             {
-                page = this._db.Page
-                                .FirstOrDefault(p => p.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                        p.Section.Equals(section, StringComparison.CurrentCultureIgnoreCase));
+                page = this.FindInDb(section, name);
             }
 
-            if (page != null && (page.Updated != null || updated != null))
-                page.Updated = updated != null ? (DateTime) updated : page.Updated;
             return page;
+        }
+
+        public Page FindInDb(string section, string name)
+        {
+            return this._db.Page
+                                .FirstOrDefault(p => p.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase) &&
+                                                        p.Section.Equals(section, StringComparison.InvariantCultureIgnoreCase));
         }
 
         /// <summary>
@@ -97,9 +100,7 @@ namespace RazorEngineCms.DAL.Repository
             {
                 var page = obj as Page;
                 // save copy in db regardless of saveAsFile param
-                var pageInDb = this._db.Page.FirstOrDefault(p => p.Name.Equals(page.Name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                        p.Section.Equals(page.Section, StringComparison.CurrentCultureIgnoreCase));
-
+                var pageInDb = this.FindInDb(page.Section, page.Name);
                 // if the page has url parameters do not want to save precompiled template and model
                 if (page.HasParams)
                 {
@@ -190,12 +191,16 @@ namespace RazorEngineCms.DAL.Repository
         /// <param name="obj"></param>
         /// <param name="errors"></param>
         /// <returns></returns>
-        public async Task Delete(T obj, ConcurrentBag<string> errors)
+        public async Task Delete(T obj, ConcurrentBag<string> errors, bool ignoreFiles = false)
         {
             if (obj.GetType() == typeof(Page))
             {
                 var page = obj as Page;
-                Page pageModel = this.Find(page.Section, page.Name);
+                Page pageModel;
+                if (ignoreFiles)
+                    pageModel = this.FindInDb(page.Section, page.Name);
+                else
+                    pageModel = this.Find(page.Section, page.Name);
 
                 if (pageModel == null)
                 {

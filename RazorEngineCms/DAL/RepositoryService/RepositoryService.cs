@@ -3,8 +3,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using RazorEngineCms.DAL.Repository;
 
-namespace RazorEngineCms.DAL.Repository
+namespace RazorEngineCms.DAL.RepositoryService
 {
     public class RepositoryService : IRepositoryService
     {
@@ -21,16 +22,20 @@ namespace RazorEngineCms.DAL.Repository
             this._IncludeRepository = new Repository<Include>(db);
         }
 
-        public Page FindPage(string section, string name, DateTime? updated = null)
+        public Page FindPage(string section, string name)
         {
-            return this._PageRepository.Find(section, name, updated);
+            return this._PageRepository.Find(section, name);
+        }
+
+        public Page FindPageInDb(string section, string name)
+        {
+            return this._PageRepository.FindInDb(section, name);
         }
 
         public Include FindInclude(int Id)
         {
             return this._IncludeRepository.Find(Id);
         }
-
 
         public List<Page> AllPages()
         {
@@ -71,9 +76,9 @@ namespace RazorEngineCms.DAL.Repository
             return await this._PageRepository.Copy(page, errors);
         }
 
-        public async Task DeletePage(Page page, ConcurrentBag<string> errors)
+        public async Task DeletePage(Page page, ConcurrentBag<string> errors, bool ignoreFiles = false)
         {
-            await this._PageRepository.Delete(page, errors);
+            await this._PageRepository.Delete(page, errors, ignoreFiles);
         }
 
         public async Task DeleteInclude(Include include, ConcurrentBag<string> errors)
