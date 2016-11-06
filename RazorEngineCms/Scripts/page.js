@@ -14,8 +14,8 @@ var Page = function () {
 
 // initialize Page object properties 
 Page.prototype.init = function () {
-    this.Id = $("#pageId").text().trim(),
-    this.updated = $("#pageUpdated").text(),
+    this.Id = $("#pageId").text().trim();
+    this.updated = $("#pageUpdated").text() != "" ? $("#pageUpdated").text() : new Date().toISOString();
     this.name = $("#pageName").val() != undefined ? $("#pageName").val().trim() : "";
     this.$name = $("#pageName");
     this.section = $("#pageVar").val() != undefined ? $("#pageVar").val().trim() : "";

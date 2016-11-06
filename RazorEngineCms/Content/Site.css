@@ -71,4 +71,11 @@
     background: #C04B4B;
 }
 
+.page-route .form-group {
+    padding:0 10px 0 0;
+}
 
+#newPage code {
+    color: #BD7E0A;
+    background-color: #F6EFE1;
+}

@@ -246,6 +246,14 @@
     <Compile Include="Migrations\201610232021355_UpdatingIncludeModel.Designer.cs">
       <DependentUpon>201610232021355_UpdatingIncludeModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201611052350109_UpdatingPageModel.cs" />
+    <Compile Include="Migrations\201611052350109_UpdatingPageModel.Designer.cs">
+      <DependentUpon>201611052350109_UpdatingPageModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611052351508_UpdatingPageModel1.cs" />
+    <Compile Include="Migrations\201611052351508_UpdatingPageModel1.Designer.cs">
+      <DependentUpon>201611052351508_UpdatingPageModel1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -698,6 +706,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610232021355_UpdatingIncludeModel.resx">
       <DependentUpon>201610232021355_UpdatingIncludeModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611052350109_UpdatingPageModel.resx">
+      <DependentUpon>201611052350109_UpdatingPageModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611052351508_UpdatingPageModel1.resx">
+      <DependentUpon>201611052351508_UpdatingPageModel1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
