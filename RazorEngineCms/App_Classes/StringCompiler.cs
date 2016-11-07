@@ -3,9 +3,11 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Web;
 using RazorEnginePageModelClasses;
 using RazorEngineCms.ExtensionClasses;
+using RazorEngineCms.App_Classes;
 
 namespace RazorEngineCms.App_Classes
 {
@@ -139,13 +141,24 @@ namespace RazorEngineCms.App_Classes
                 OutputAssembly = string.Format("temp-assemly-{0}", Guid.NewGuid().ToString())
 
             };
+            Dictionary<string, Assembly> asseblies = FileHelper.GetAssemblyFiles();
+
+            
             paramz.ReferencedAssemblies.AddRange(new string[] { "System.dll",
                                                         "System.Linq.dll",
                                                         "System.Data.dll",
                                                         "System.Xml.dll",
-                                                        "System.Web.dll",
-                                                        @"C:\Git\RazorEngineCms\RazorEngineCms\bin\RazorEngineCms.PageModelClasses.dll",
-                                                        @"C:\Git\RazorEngineCms\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll" });
+                                                        "System.Web.dll"});
+            if (asseblies.ContainsKey("Json.dll"))
+            {
+                string newtonSoft = asseblies["Json.dll"].Location;
+                paramz.ReferencedAssemblies.Add(newtonSoft);
+            }
+            if (asseblies.ContainsKey("PageModelClasses.dll"))
+            {
+                string razorEngineCmsPageModel = asseblies["PageModelClasses.dll"].Location;
+                paramz.ReferencedAssemblies.Add(razorEngineCmsPageModel);
+            }
 
             compilerModel.CopilerParams = paramz;
             return compilerModel;

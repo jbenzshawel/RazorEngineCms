@@ -17,7 +17,10 @@ namespace RazorEngineCms.Controllers
 
         public PageController(IRepositoryService repository) : base(repository)
         {
-            this.QueryStringParams = System.Web.HttpContext.Current.Request.QueryString.ToDictionary();
+
+            this.QueryStringParams = System.Web.HttpContext.Current != null
+                                ? System.Web.HttpContext.Current.Request.QueryString.ToDictionary()
+                                : null;
         }
 
         #region Shared Actions

@@ -50,9 +50,7 @@ namespace RazorEngineCms.Models
             this.Updated = (DateTime)pageRequest.Updated;
         }
 
-       
-
-        internal void CompileTemplate(ref ConcurrentBag<string> errors, string template = null, string jsonModel = null)
+        public void CompileTemplate(ref ConcurrentBag<string> errors, string template = null, string jsonModel = null)
         {
             if (string.IsNullOrEmpty(template))
             {

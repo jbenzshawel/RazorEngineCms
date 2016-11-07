@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace RazorEngineCms.App_Classes
@@ -39,16 +41,62 @@ namespace RazorEngineCms.App_Classes
 
         public FileHelper()
         {
-            this.TemplatesPath = HttpContext.Current.Server.MapPath("~") + "/Views/CompiledTemplates";
+            if (HttpContext.Current != null)
+            {
+                this.TemplatesPath = HttpContext.Current.Server.MapPath("~") + "/Views/CompiledTemplates";
+            }
             this.Files = GetFiles();
         }
 
         public File GetFile(string name, string variable)
         {
-            return this.Files.FirstOrDefault(f => string.Equals(f.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-                                                                    (string.Equals(f.Variable, variable, StringComparison.CurrentCultureIgnoreCase) ||
+            return this.Files.FirstOrDefault(f => string.Equals(f.Name, name, StringComparison.InvariantCultureIgnoreCase) &&
+                                                                    (string.Equals(f.Variable, variable, StringComparison.InvariantCultureIgnoreCase) ||
                                                                         ((f.Variable == "_" || f.Variable == "") && variable == "")));
                                                                
+        }
+
+        public static Dictionary<string, Assembly> GetAssemblyFiles()
+        {
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            Dictionary<string, Assembly> assemblies = new Dictionary<string, Assembly>();
+
+            foreach (var assembly in loadedAssemblies)
+            {
+
+                string pat = @"([a-zA-Z0-9-_]*\.dll)";
+                string pat2 = @"(\\)+\w+(.dll,)";
+                Regex regex = new Regex(pat, RegexOptions.IgnoreCase);
+
+                try
+                {
+                    Match matches = regex.Match(assembly.Location);
+                    string assemblyName = assembly.Location;
+                    if (string.IsNullOrEmpty(matches.Value))
+                    {
+                        regex = new Regex(pat2, RegexOptions.IgnoreCase);
+                        matches = regex.Match(assembly.Location);
+                    }
+                    if (!string.IsNullOrEmpty(matches.Value))
+                    {
+                       assemblyName = matches.Value;
+
+                        if (assemblyName.IndexOf("\\", StringComparison.Ordinal) > -1)
+                        {
+                            assemblyName = assemblyName.Replace("\\", "");
+                        }
+                    }
+                    assemblies.Add(assemblyName, assembly);
+
+                }
+                catch (Exception ex)
+                {
+                    
+                }
+            }
+
+
+            return assemblies;
         }
 
         public IList<File> GetFiles()

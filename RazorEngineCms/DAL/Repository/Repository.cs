@@ -68,7 +68,7 @@ namespace RazorEngineCms.DAL.Repository
             var page = new Page { Name = name, Section = section };
             var fileHelper = new FileHelper();
             // first see if there is a file template 
-            if (fileHelper.Files.Any(f => string.Equals(f.Name, name, StringComparison.CurrentCultureIgnoreCase)))
+            if (fileHelper.Files.Any(f => string.Equals(f.Name, name, StringComparison.InvariantCultureIgnoreCase)))
             {
                 var file = fileHelper.GetFile(name, section);
                 page.CompiledTemplate = file.ToString();

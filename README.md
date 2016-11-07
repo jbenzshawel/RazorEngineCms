@@ -1,5 +1,7 @@
 # RazorEngineCms
 
+![BuildStatus](https://ci.appveyor.com/api/projects/status/7albf2jxsmqs508b?svg=true)
+
 Content Management System built on top of [Razor Engine](https://github.com/Antaris/RazorEngine). This project is not associated with Razor Engine but does use it to compile templates.
 
 Example of creating / editing a page in cms:

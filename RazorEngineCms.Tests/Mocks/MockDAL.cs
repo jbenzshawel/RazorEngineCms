@@ -8,6 +8,10 @@ using Moq;
 
 namespace RazorEngineCms.Tests.Mocks
 {
+    // ToDo: Make Config with Mock settings 
+    /// <summary>
+    /// Contains a Mock ApplicationContext with 5 Page objects and 5 Include objects
+    /// </summary>
     public class MockDAL
     {
         public Mock<ApplicationContext> ApplicationContext { get; set; }
@@ -15,16 +19,16 @@ namespace RazorEngineCms.Tests.Mocks
         public MockDAL()
         {
             this._SetupApplicationContext();
-            
         }
 
         /// <summary>
-        /// Sets up mock Application Context
+        /// Sets up mock Application Context with a mock Page List object containing 5 pages and 
+        /// a mock Include List object containg 5 includes
         /// </summary>
         private void _SetupApplicationContext()
         {
             // setup mock db.Page
-            IQueryable<Page> mockPagesQueryable = this._GetPages();
+            IQueryable<Page> mockPagesQueryable = this._GetPages(5);
             Mock<IDbSet<Page>> mockPageDbSet = new Mock<IDbSet<Page>>();
             mockPageDbSet.Setup(dbSet => dbSet.Provider).Returns(mockPagesQueryable.Provider);
             mockPageDbSet.Setup(dbSet => dbSet.Expression).Returns(mockPagesQueryable.Expression);
@@ -32,7 +36,7 @@ namespace RazorEngineCms.Tests.Mocks
             mockPageDbSet.Setup(dbSet => dbSet.GetEnumerator()).Returns(mockPagesQueryable.GetEnumerator());
 
             // setup mock db.Include
-            IQueryable<Include> mockIncludesQueryable = this._GetIncludes();
+            IQueryable<Include> mockIncludesQueryable = this._GetIncludes(5);
             Mock<IDbSet<Include>> mockIncludeDbSet = new Mock<IDbSet<Include>>();
             mockIncludeDbSet.Setup(dbSet => dbSet.Provider).Returns(mockIncludesQueryable.Provider);
             mockIncludeDbSet.Setup(dbSet => dbSet.Expression).Returns(mockIncludesQueryable.Expression);
@@ -46,13 +50,15 @@ namespace RazorEngineCms.Tests.Mocks
         }
 
         /// <summary>
-        /// Returns a list of mock Page objects
+        /// Returns a list of mock Page objects having the count of the 
+        /// integer passed in
         /// </summary>
+        /// <param name="numberOfPages"></param>
         /// <returns></returns>
-        private IQueryable<Page> _GetPages()
+        private IQueryable<Page> _GetPages(int numberOfPages)
         {
             List<Page> mockPages = new List<Page>();
-            for (var i = 1; i < 6; i++)
+            for (var i = 1; i < numberOfPages + 1; i++)
             {
                 mockPages.Add(new Page
                 {
@@ -83,10 +89,16 @@ namespace RazorEngineCms.Tests.Mocks
             return mockPages.AsQueryable();
         }
 
-        private IQueryable<Include> _GetIncludes()
+        /// <summary>
+        /// Returns a list of includes objects having the count of the
+        /// integer passed in
+        /// </summary>
+        /// <param name="numberOfIncludes"></param>
+        /// <returns></returns>
+        private IQueryable<Include> _GetIncludes(int numberOfIncludes)
         {
             List<Include> includes = new List<Include>();
-            for(var i = 1; i < 6; i++)
+            for(var i = 1; i < numberOfIncludes + 1; i++)
             {
                 includes.Add(new Include
                 {
