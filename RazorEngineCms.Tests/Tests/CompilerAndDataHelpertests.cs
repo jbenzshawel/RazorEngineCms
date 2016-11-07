@@ -108,7 +108,7 @@ namespace RazorEngineCMS.Tests
                 errors.Add("Error compiling Model");
             }
 
-            Assert.IsTrue(errors.Count() == 0);
+            Assert.IsTrue(!errors.Any());
             Assert.IsNotNull(page.CompiledTemplate);
         }
 
