@@ -132,7 +132,10 @@ namespace RazorEngineCms.Tests
                     model = viewResult.Model as T;
                 }
             }
-            catch(Exception ex) { }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.Message);
+            }
 
             return model;
         }

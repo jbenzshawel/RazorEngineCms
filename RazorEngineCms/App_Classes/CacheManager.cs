@@ -53,6 +53,12 @@ namespace RazorEngineCms.App_Classes
             }
         }
 
+        /// <summary>
+        /// Add item of type T to HttpContext.Current.Cache (if accessable)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="obj"></param>
         public void Add<T>(string key, T obj)
         {
             if (Cache != null)
@@ -61,6 +67,13 @@ namespace RazorEngineCms.App_Classes
             }
         }
 
+        /// <summary>
+        /// Gets an item of type T from HttpContext.Current.Cache
+        /// returns null if Cache empty or Cache[key] not found
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public T Get<T>(string key) where T: class
         {
             T obj = null;
