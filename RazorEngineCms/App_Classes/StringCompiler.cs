@@ -3,9 +3,11 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Web;
 using RazorEnginePageModelClasses;
 using RazorEngineCms.ExtensionClasses;
+using RazorEngineCms.App_Classes;
 
 namespace RazorEngineCms.App_Classes
 {
@@ -139,18 +141,24 @@ namespace RazorEngineCms.App_Classes
                 OutputAssembly = string.Format("temp-assemly-{0}", Guid.NewGuid().ToString())
 
             };
-            string currentPath = Path.GetDirectoryName(Path.GetDirectoryName(Directory.GetCurrentDirectory()));
+            Dictionary<string, Assembly> asseblies = FileHelper.GetAssemblyFiles();
 
-            if (currentPath.Contains(".Tests"))
-                currentPath = currentPath.Replace(".Tests", "");
+            
             paramz.ReferencedAssemblies.AddRange(new string[] { "System.dll",
                                                         "System.Linq.dll",
                                                         "System.Data.dll",
                                                         "System.Xml.dll",
-                                                        "System.Web.dll",
-                                                        
-                                                        currentPath + @"\RazorEngineCms.PageModelClasses.dll",
-                                                        @"Newtonsoft.Json.dll" });
+                                                        "System.Web.dll"});
+            if (asseblies.ContainsKey("Json.dll"))
+            {
+                string newtonSoft = asseblies["Json.dll"].Location;
+                paramz.ReferencedAssemblies.Add(newtonSoft);
+            }
+            if (asseblies.ContainsKey("PageModelClasses.dll"))
+            {
+                string razorEngineCmsPageModel = asseblies["PageModelClasses.dll"].Location;
+                paramz.ReferencedAssemblies.Add(razorEngineCmsPageModel);
+            }
 
             compilerModel.CopilerParams = paramz;
             return compilerModel;
