@@ -2,20 +2,40 @@
 using System.Data.Entity;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using RazorEngineCms.DAL;
 using RazorEngineCms.Models;
+using RazorEngineCMS.Tests;
 using Moq;
 
 namespace RazorEngineCms.Tests.Mocks
 {
-    // ToDo: Make Config with Mock settings 
     /// <summary>
     /// Contains a Mock ApplicationContext with 5 Page objects and 5 Include objects
     /// </summary>
     public class MockDAL
     {
+        /// <summary>
+        /// Number of Page objects to Mock
+        /// </summary>
+        public const int NUMBER_PAGES = 5;
+
+        /// <summary>
+        /// Number of Include objects to Mock
+        /// </summary>
+        public const int NUMBER_INCLUDES = 5;
+
+        /// <summary>
+        /// Type of Includes to be Mocked
+        /// </summary>
+        public const string INCLUDE_TYPE = "html";
+
+        /// <summary>
+        /// Mock ApplicationContext. Can access ApplicationContext 
+        /// with ApplicationContext.Object
+        /// </summary>
         public Mock<ApplicationContext> ApplicationContext { get; set; }
-        
+                
         public MockDAL()
         {
             this._SetupApplicationContext();
@@ -28,7 +48,7 @@ namespace RazorEngineCms.Tests.Mocks
         private void _SetupApplicationContext()
         {
             // setup mock db.Page
-            IQueryable<Page> mockPagesQueryable = this._GetPages(5);
+            IQueryable<Page> mockPagesQueryable = this._GetPages(NUMBER_PAGES);
             Mock<IDbSet<Page>> mockPageDbSet = new Mock<IDbSet<Page>>();
             mockPageDbSet.Setup(dbSet => dbSet.Provider).Returns(mockPagesQueryable.Provider);
             mockPageDbSet.Setup(dbSet => dbSet.Expression).Returns(mockPagesQueryable.Expression);
@@ -36,7 +56,7 @@ namespace RazorEngineCms.Tests.Mocks
             mockPageDbSet.Setup(dbSet => dbSet.GetEnumerator()).Returns(mockPagesQueryable.GetEnumerator());
 
             // setup mock db.Include
-            IQueryable<Include> mockIncludesQueryable = this._GetIncludes(5);
+            IQueryable<Include> mockIncludesQueryable = this._GetIncludes(NUMBER_INCLUDES);
             Mock<IDbSet<Include>> mockIncludeDbSet = new Mock<IDbSet<Include>>();
             mockIncludeDbSet.Setup(dbSet => dbSet.Provider).Returns(mockIncludesQueryable.Provider);
             mockIncludeDbSet.Setup(dbSet => dbSet.Expression).Returns(mockIncludesQueryable.Expression);
@@ -47,6 +67,8 @@ namespace RazorEngineCms.Tests.Mocks
             this.ApplicationContext = new Mock<ApplicationContext>();
             this.ApplicationContext.Setup(db => db.Page).Returns(mockPageDbSet.Object);
             this.ApplicationContext.Setup(db => db.Include).Returns(mockIncludeDbSet.Object);
+            this.ApplicationContext.Setup(db => db.SaveChanges()).Returns(1);
+            this.ApplicationContext.Setup(db => db.SaveChangesAsync()).ReturnsAsync(1);
         }
 
         /// <summary>
@@ -106,7 +128,7 @@ namespace RazorEngineCms.Tests.Mocks
                     Name = "Include" + i,
                     Content = "<h1>Heading " + i + "</h1>",
                     Updated = DateTime.Now.AddHours(i),
-                    Type = i % 2 == 0 ? "html" : "javascript"
+                    Type = INCLUDE_TYPE
                 });
             }
 

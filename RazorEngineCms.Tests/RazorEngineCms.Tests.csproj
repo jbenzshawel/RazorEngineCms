@@ -158,6 +158,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RazorEngineCms.PageModelClasses\RazorEngineCms.PageModelClasses.csproj">
+      <Project>{796f19cf-ceaa-4f81-a632-9b9e6493771f}</Project>
+      <Name>RazorEngineCms.PageModelClasses</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RazorEngineCms\RazorEngineCms.csproj">
       <Project>{a258a6e9-16b8-4e95-aa8a-b1a16adf414a}</Project>
       <Name>RazorEngineCms</Name>

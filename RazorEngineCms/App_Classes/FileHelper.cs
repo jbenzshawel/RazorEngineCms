@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Web;
+using Newtonsoft.Json;
 
 namespace RazorEngineCms.App_Classes
 {
@@ -90,12 +91,15 @@ namespace RazorEngineCms.App_Classes
 
                 }
                 catch (Exception ex)
-                {
-                    
+                {   
                 }
             }
 
-
+            if (!assemblies.ContainsKey("Newtonsoft.Json.dll"))
+            {
+                var json = typeof(Newtonsoft.Json.JsonConvert).Assembly;
+                assemblies.Add("Newtonsoft.Json.dll", json);
+            }
             return assemblies;
         }
 
