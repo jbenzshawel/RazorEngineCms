@@ -138,10 +138,8 @@ namespace RazorEngineCms.Tests
 
         private void _AssertErrors(ConcurrentBag<string> errors)
         {
-            // still haven't figured out why mock returns 0 rows updated 
-            // if save fails due to null or invalid model other errors with logged besides 0 rows updated
-            Assert.IsTrue(errors.Count == 1);
-            Assert.IsTrue(errors.FirstOrDefault() != null && errors.FirstOrDefault() == "0 rows updated");
+            Assert.IsTrue(errors.Count == 0);
+            //Assert.IsTrue(errors.FirstOrDefault() != null && errors.FirstOrDefault() == "0 rows updated");
 
         }
     }

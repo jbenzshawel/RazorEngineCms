@@ -38,9 +38,18 @@ namespace RazorEngineCms.Controllers
         public ActionResult View(string section, string name, string param = null, string param2 = null)
         {
             Page page = null; // will store the page once we find it
-            Func<Page, bool> templateNeedsCompiled = (iPage) => (string.IsNullOrEmpty(iPage.CompiledTemplate) &&
-                                (!string.IsNullOrEmpty(iPage.CompiledModel) || iPage.HasInclude) &&
-                                !string.IsNullOrEmpty(iPage.Template));
+            Func<Page, bool> templateNeedsCompiled = delegate(Page iPage)
+            {
+                var status = (string.IsNullOrEmpty(iPage.CompiledTemplate) &&
+                                (!string.IsNullOrEmpty(iPage.CompiledModel)) &&
+                                !string.IsNullOrEmpty(iPage.Template)) ||
+                                page.HasInclude;
+                
+                
+                return status;
+                    
+            };
+                                
             // templage model that will be passed to the View
             var template = new PageTemplate { Content = string.Empty };
 

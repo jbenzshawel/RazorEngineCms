@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Web;
+using Newtonsoft.Json;
 
 namespace RazorEngineCms.App_Classes
 {
@@ -58,6 +59,18 @@ namespace RazorEngineCms.App_Classes
 
         public static Dictionary<string, Assembly> GetAssemblyFiles()
         {
+            var cacheManager = new CacheManager();
+            const string assemblyListKey = "assemblyList";
+
+            Dictionary<string, Assembly> cachedAssemblies = null;
+            if (cacheManager.Cache != null)
+                cachedAssemblies = cacheManager.Get<Dictionary<string, Assembly>>(assemblyListKey);
+
+            if (cachedAssemblies != null)
+            {
+                return cachedAssemblies;
+            }
+
             var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
             Dictionary<string, Assembly> assemblies = new Dictionary<string, Assembly>();
 
@@ -90,11 +103,18 @@ namespace RazorEngineCms.App_Classes
 
                 }
                 catch (Exception ex)
-                {
-                    
+                {   
                 }
             }
 
+            if (!assemblies.ContainsKey("Newtonsoft.Json.dll"))
+            {
+                var json = typeof(Newtonsoft.Json.JsonConvert).Assembly;
+                assemblies.Add("Newtonsoft.Json.dll", json);
+            }
+
+            if (cacheManager.Cache != null)
+                cacheManager.Add(assemblyListKey, assemblies);
 
             return assemblies;
         }

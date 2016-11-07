@@ -108,20 +108,21 @@ namespace RazorEngineCMS.Tests
                 errors.Add("Error compiling Model");
             }
 
-            Assert.IsTrue(errors.Count() == 0);
+            Assert.IsTrue(!errors.Any());
             Assert.IsNotNull(page.CompiledTemplate);
         }
 
-        // commented out since integration test and is failing
-        // on CI build / test 
-        //[TestMethod]
-        //public void TestGetData()
-        //{
-        //    var dataHelper = new DataHelper();
-        //    var results = dataHelper.GetData("prGetPages");
+        // igorned since integration test and is failing
+        // on CI build 
+        [TestMethod]
+        [Ignore]
+        public void TestGetData()
+        {
+            var dataHelper = new DataHelper();
+            var results = dataHelper.GetData("prGetPages");
 
-        //    Assert.IsTrue(results.Rows.Count > 0);
-        //    Assert.IsTrue(!string.IsNullOrEmpty(results.ToJson()));
-        //}
+            Assert.IsTrue(results.Rows.Count > 0);
+            Assert.IsTrue(!string.IsNullOrEmpty(results.ToJson()));
+        }
     }
 }

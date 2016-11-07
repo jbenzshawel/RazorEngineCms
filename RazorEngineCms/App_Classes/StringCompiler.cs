@@ -149,9 +149,9 @@ namespace RazorEngineCms.App_Classes
                                                         "System.Data.dll",
                                                         "System.Xml.dll",
                                                         "System.Web.dll"});
-            if (asseblies.ContainsKey("Json.dll"))
+            if (asseblies.ContainsKey("Newtonsoft.Json.dll"))
             {
-                string newtonSoft = asseblies["Json.dll"].Location;
+                string newtonSoft = asseblies["Newtonsoft.Json.dll"].Location;
                 paramz.ReferencedAssemblies.Add(newtonSoft);
             }
             if (asseblies.ContainsKey("PageModelClasses.dll"))

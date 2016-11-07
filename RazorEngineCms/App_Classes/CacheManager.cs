@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Caching;
@@ -22,12 +23,14 @@ namespace RazorEngineCms.App_Classes
 
         private const string CACHE_KEY = "RazorEngineCms.App_Classes.CacheManager.CacheList";
 
-        private Cache Cache { get; set; }
+        public Cache Cache { get; set; }
 
         public CacheManager()
         {
-            this.Cache = HttpContext.Current.Cache;
-            this.UpdateCacheList();
+            this.Cache = HttpContext.Current != null ? HttpContext.Current.Cache : null;
+            
+            if (this.Cache != null)
+                this.UpdateCacheList();
         }
 
         /// <summary>
@@ -35,19 +38,37 @@ namespace RazorEngineCms.App_Classes
         /// </summary>
         public void UpdateCacheList()
         {
-            if (Cache[CACHE_KEY] != null)
+            if (ConfigurationManager.AppSettings["AllowPageCaching"] == "true")
             {
-                IList<PageCacheModel> cacheList = Cache[CACHE_KEY] as List<PageCacheModel>;
+                IList<PageCacheModel> cacheList = Cache?[CACHE_KEY] as List<PageCacheModel>;
                 if (cacheList != null)
                 {
                     this.CacheList = cacheList;
                 }
             }
-
+            
             if (this.CacheList == null)
             {
                 this.CacheList = new List<PageCacheModel>();
             }
+        }
+
+        public void Add<T>(string key, T obj)
+        {
+            if (Cache != null)
+            {
+                Cache[key] = obj;
+            }
+        }
+
+        public T Get<T>(string key) where T: class
+        {
+            T obj = null;
+            if (Cache != null && Cache[key] != null)
+            {
+                obj = Cache[key] as T;
+            }
+            return obj;
         }
 
         /// <summary>
@@ -58,11 +79,15 @@ namespace RazorEngineCms.App_Classes
         /// <param name="param2"></param>
         public void AddPage(Page page, string param = null, string param2 = null)
         {
-            var queryString = HttpContext.Current.Request.QueryString.ToDictionary();
-            var pageCache = new PageCacheModel(page, param, param2, queryString);
-            this.UpdateCacheList();
-            this.CacheList.Add(pageCache);
-            Cache[CACHE_KEY] = this.CacheList;
+            if (Cache != null)
+            {
+                var queryString = HttpContext.Current.Request.QueryString.ToDictionary();
+                var pageCache = new PageCacheModel(page, param, param2, queryString);
+                this.UpdateCacheList();
+                this.CacheList.Add(pageCache);
+                Cache[CACHE_KEY] = this.CacheList;
+            }
+
         }
 
         /// <summary>
@@ -74,10 +99,13 @@ namespace RazorEngineCms.App_Classes
         /// <param name="param2"></param>
         public void RemovePage(string name, string section, string param = null, string param2 = null)
         {
-            var pageToRemove = this.FindPage(name, section, param, param2);
-            this.UpdateCacheList();
-            this.CacheList.Remove(pageToRemove);
-            Cache[CACHE_KEY] = this.CacheList;
+            if (Cache != null)
+            {
+                var pageToRemove = this.FindPage(name, section, param, param2);
+                this.UpdateCacheList();
+                this.CacheList.Remove(pageToRemove);
+                Cache[CACHE_KEY] = this.CacheList;
+            }
         }
 
         public bool PageCacheExists(string name, string section, string param, string param2, IDictionary<string,string> queryString)
