@@ -43,6 +43,11 @@
     font-size:18px !important;
 }
 
+.main-nav .panel-group .panel {
+    border-radius: 0;
+    border-bottom: none;
+}
+
 .nested-nav {
     position:static !important;
     top:auto !important;

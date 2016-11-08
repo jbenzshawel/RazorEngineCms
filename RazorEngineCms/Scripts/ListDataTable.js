@@ -1,11 +1,11 @@
 ﻿/**
  * ListDataTable
- * Class for creating data tables that also loads datatables dependency 
- * Usage: 
+ * Class for creating data tables. DataTables dependency loaded  
+ * before creating class. Example: 
  * var listDataTable = new ListDataTable({
  *      selector: "#pageListTable",
  *      order: [[3, "desc"]]
- *   });                          
+ * });                          
  */
 
 // load datatables 
