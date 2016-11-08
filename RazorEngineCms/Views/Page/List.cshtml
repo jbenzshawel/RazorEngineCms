@@ -77,12 +77,12 @@ else // Show Page List Table
                 name: ""
             }
         });
+        var pageListTable = new ListDataTable({
+            selector: "#pageListTable",
+            order: [[3, "desc"]]
+        });
         var SESSION_KEY = "selectedPage";
         $(function () {
-            var pageListTable = new ListDataTable({
-                selector: "#pageListTable",
-                order: [[3, "desc"]]
-            });
             sessionStorage.clear();
             $("body").on("click", "#confirmDelete", function () {
                 confirmDelete();
@@ -95,7 +95,7 @@ else // Show Page List Table
                     pageSection: $(this).attr("data-pagesection")
                 };
                 copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
-            })
+            });
             $("a.delete-page").click(function (e) {
                 e.preventDefault();
                 var pageItem = {
@@ -126,12 +126,14 @@ else // Show Page List Table
                     var deleteResult = page.delete(storedPage.pageId, storedPage.pageSection, storedPage.pageName, "#alertMsgs");
                     var deleteStatus = deleteResult != null ? deleteResult.responseJSON.Status : false;
                     if (deleteStatus) {
-                        $("a[data-pageid=\"" + storedPage.pageId + "\"]").parent().parent().remove(); // remove deleted row
+                       // $("a[data-pageid=\"" + storedPage.pageId + "\"]").parent().parent().remove(); // remove deleted row
+                        pageListTable.deleteRowWithInt(storedPage.pageId);
                     } // end if deleteStatus true
                 }
                 sessionStorage.removeItem(SESSION_KEY);
             } // end if pageName != null
             $("#deleteModal").modal("hide");
+            
         }
         // called by "a.copy-page" click event 
         function copyPage(id, section, name) {
@@ -139,8 +141,7 @@ else // Show Page List Table
             if (id > 0 && section != null && section.length > 0) {
                 var newPageId = page.copy(id, section, name, "#alertMsgs");
                 if (newPageId > 0) {
-                    var dataTable = $("#pageListTable").DataTable();
-                    dataTable.row.add([
+                    pageListTable.dataTable.row.add([
                                         newPageId,
                                         section,
                                         name,
@@ -159,8 +160,8 @@ else // Show Page List Table
                                         "data-pagesection=\"" + section + "\"" +
                                         "class=\"delete-page\">" +
                                         "Delete</a>"
-                    ]).draw();
-                    dataTable.column(3).data().sort();
+                    ]);
+                    pageListTable.dataTable.column(3).data().sort().draw();
                 } // end if copiedPageId > 0 
             } // end if if and section are set 
 

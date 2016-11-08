@@ -1,4 +1,9 @@
-﻿.input-error {
+﻿code {
+    color: #BD7E0A !important;
+    background-color: #F6EFE1 !important;
+}
+
+.input-error {
         border: 1px solid #a94442;
 }
 
@@ -78,9 +83,4 @@
 
 .page-route .form-group {
     padding:0 10px 0 0;
-}
-
-#newPage code {
-    color: #BD7E0A;
-    background-color: #F6EFE1;
 }
