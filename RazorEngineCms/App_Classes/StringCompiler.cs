@@ -148,17 +148,15 @@ namespace RazorEngineCms.App_Classes
                                                         "System.Data.dll",
                                                         "System.Xml.dll",
                                                         "System.Web.dll"});
-            if (assemblies.ContainsKey("Newtonsoft.Json.dll"))
-            {
-                string newtonSoft = assemblies["Newtonsoft.Json.dll"].Location;
-                paramz.ReferencedAssemblies.Add(newtonSoft);
-            }
-            if (assemblies.ContainsKey("PageModelClasses.dll"))
-            {
-                string razorEngineCmsPageModel = assemblies["PageModelClasses.dll"].Location;
-                paramz.ReferencedAssemblies.Add(razorEngineCmsPageModel);
-            }
 
+            string newtonSoft = typeof(Newtonsoft.Json.JsonConvert).Assembly.Location;
+            if (!string.IsNullOrEmpty(newtonSoft))      
+                paramz.ReferencedAssemblies.Add(newtonSoft);
+
+            string razorEngineCmsPageModel = typeof(UrlParameters).Assembly.Location;
+            if (!string.IsNullOrEmpty(razorEngineCmsPageModel))
+                paramz.ReferencedAssemblies.Add(razorEngineCmsPageModel);
+            
             compilerModel.CopilerParams = paramz;
             return compilerModel;
         }

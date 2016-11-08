@@ -91,9 +91,9 @@ _default.get = function (settings, async) {
     if (async == undefined) async = true;
     if (typeof (settings) === 'object') {
         settings.type = 'GET';
+        settings.cache = false; // IE caches get requests by default
         settings.async = async;
-        $.ajax(settings);
-        return true;
+        return $.ajax(settings);
     }
     return false;
 }

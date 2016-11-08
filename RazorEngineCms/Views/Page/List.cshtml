@@ -65,8 +65,8 @@ else // Show Page List Table
     @Html.Partial("_ConfiromDeleteModal")
 
 @section Scripts {
-    <script type="text/javascript" src="//cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.js"></script>
     <script type="text/javascript" src="~/Scripts/page.js"></script>
+    <script type="text/javascript" src="~/Scripts/ListDataTable.js"></script>
     <script type="text/javascript">
         "use strict";
         var page = new Page();
@@ -79,8 +79,9 @@ else // Show Page List Table
         });
         var SESSION_KEY = "selectedPage";
         $(function () {
-            $("#pageListTable").DataTable({
-                "order": [[3, "desc"]]
+            var pageListTable = new ListDataTable({
+                selector: "#pageListTable",
+                order: [[3, "desc"]]
             });
             sessionStorage.clear();
             $("body").on("click", "#confirmDelete", function () {

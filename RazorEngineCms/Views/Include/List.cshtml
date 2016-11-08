@@ -64,7 +64,7 @@ else // Show Include List Table
 @Html.Partial("_ConfiromDeleteModal")
 
 @section Scripts {
-    <script type="text/javascript" src="//cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/ListDataTable.js"></script>
     <script type="text/javascript" src="~/Scripts/include.js"></script>
     <script type="text/javascript">
         "use strict";
@@ -78,8 +78,9 @@ else // Show Include List Table
         });
         var SESSION_KEY = "selectedInclude";
         $(function () {
-            $("#includeListTable").DataTable({
-                "order": [[3, "desc"]]
+            var includeListTable = new ListDataTable({
+                selector: "#includeListTable",
+                order: [[3, "desc"]]
             });
             sessionStorage.clear();
             $("body").on("click", "#confirmDelete", function () {
