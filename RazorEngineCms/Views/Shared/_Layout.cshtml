@@ -1,9 +1,4 @@
-﻿@{
-    string controller = ViewContext.RouteData.Values["controller"].ToString();
-    string action = ViewContext.RouteData.Values["action"].ToString();
-}
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -13,6 +8,10 @@
     <link rel="stylesheet" href="/Content/simple-sidebar.css" type="text/css" />
     @Scripts.Render("~/bundles/modernizr")
     @RenderSection("styles", required: false)
+    @{
+        string controller = ViewContext.RouteData.Values["controller"].ToString();
+        string action = ViewContext.RouteData.Values["action"].ToString();
+    }
 </head>
 <body>
     <div id="wrapper">
