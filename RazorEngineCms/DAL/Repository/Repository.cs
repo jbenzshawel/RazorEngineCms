@@ -193,23 +193,30 @@ namespace RazorEngineCms.DAL.Repository
         /// <returns></returns>
         public async Task Delete(T obj, ConcurrentBag<string> errors, bool ignoreFiles = false)
         {
+            T objModel = null; 
             if (obj.GetType() == typeof(Page))
             {
                 var page = obj as Page;
-                Page pageModel;
-                if (ignoreFiles)
-                    pageModel = this.FindInDb(page.Section, page.Name);
-                else
-                    pageModel = this.Find(page.Section, page.Name);
+                var fileHelper = new FileHelper();
+                File fileModel = null; 
+               
+                objModel = this.Find(page.Id);
 
-                if (pageModel == null)
+                fileModel = fileHelper.GetFile(page.Section, page.Name);
+                if (fileModel != null)
+                {
+                    System.IO.File.Delete(fileModel.Path);
+                }
+
+                if (objModel == null)
                 {
                     errors.Add("Page not found");
                 }
                 else
                 {
-                    this._db.Page.Attach(pageModel);
-                    this._db.Page.Remove(pageModel);
+                    page = objModel as Page; 
+                    this._db.Page.Attach(page);
+                    this._db.Page.Remove(page);
                 }
             } 
             else if (obj.GetType() == typeof(Include))

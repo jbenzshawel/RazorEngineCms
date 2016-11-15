@@ -135,25 +135,28 @@ else // Show Page List Table
     }
     // called by "a.copy-page" click event 
     function copyPage(id, section, name) {
-        var copiedPageId = null; 
         if (id > 0 && section != null && section.length > 0) {
-            copiedPageId = page.copy(id, section, name, "#alertMsgs");
+            var copyResult = page.copy(id, section, name, "#alertMsgs");
+            var copiedPageId = 0;
+            if (copyResult != null) {
+                copiedPageId = copyResult.responseJSON.NewId;
+            }
             if (copiedPageId > 0) {
                 pageListTable.DataTable().row.add([
-                                    newPageId,
+                                    copiedPageId,
                                     section,
                                     name,
                                     _default.dateTime(),
                                     "<a href=\"/" + section + "/" + name + "\">View</a>",
                                     "<a href=\"/CMS/Edit/" + section + "/" + name + "\">Edit</a>",
                                     "<a href=\"#\"" +
-                                    "data-pageid=\"" + newPageId + "\"" +
+                                    "data-pageid=\"" + copiedPageId + "\"" +
                                     "data-pagename=\"" + name + "\"" +
                                     "data-pagesection=\"" + section + "\"" +
                                     "class=\"copy-page\">" +
                                     "Copy</a>",
                                     "<a href=\"#\"" +
-                                    "data-pageid=\"" + newPageId + "\"" +
+                                    "data-pageid=\"" + copiedPageId + "\"" +
                                     "data-pagename=\"" + name + "\"" +
                                     "data-pagesection=\"" + section + "\"" +
                                     "class=\"delete-page\">" +
@@ -163,7 +166,6 @@ else // Show Page List Table
             } // end if copiedPageId > 0 
         } // end if if and section are set 
 
-        return copiedPageId;
     }
 </script>
 }

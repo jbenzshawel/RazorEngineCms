@@ -193,15 +193,7 @@ Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {
             }
         }
     };
-    if (settings.data != null) {
-        if (action.toLowerCase() === "copy") {
-            $.ajax(settings);
-        } else { // if delete don't need to return new id
-           return $.ajax(settings);
-        }
-    }
-
-    return returnId;
+    return $.ajax(settings);
 };
 
 //// callback function for ajax request. If message success alert message displayed 

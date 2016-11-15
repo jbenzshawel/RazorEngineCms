@@ -4,8 +4,8 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Caching;
-using RazorEngineCms.ExtensionClasses;
 using RazorEngineCms.Models;
+using RazorEngineCms.ExtensionClasses;
 
 namespace RazorEngineCms.App_Classes
 {
@@ -25,10 +25,12 @@ namespace RazorEngineCms.App_Classes
 
         public Cache Cache { get; set; }
 
+        public bool AllowCache { get; set; }
+
         public CacheManager()
         {
             this.Cache = HttpContext.Current != null ? HttpContext.Current.Cache : null;
-            
+            this.AllowCache = ConfigurationManager.AppSettings["AllowPageCaching"] == "true";
             if (this.Cache != null)
                 this.UpdateCacheList();
         }
@@ -38,7 +40,7 @@ namespace RazorEngineCms.App_Classes
         /// </summary>
         public void UpdateCacheList()
         {
-            if (ConfigurationManager.AppSettings["AllowPageCaching"] == "true")
+            if (this.AllowCache)
             {
                 IList<PageCacheModel> cacheList = Cache?[CACHE_KEY] as List<PageCacheModel>;
                 if (cacheList != null)
@@ -77,7 +79,7 @@ namespace RazorEngineCms.App_Classes
         public T Get<T>(string key) where T: class
         {
             T obj = null;
-            if (Cache != null && Cache[key] != null)
+            if (Cache?[key] != null)
             {
                 obj = Cache[key] as T;
             }
@@ -92,7 +94,7 @@ namespace RazorEngineCms.App_Classes
         /// <param name="param2"></param>
         public void AddPage(Page page, string param = null, string param2 = null)
         {
-            if (Cache != null)
+            if (Cache != null && this.AllowCache)
             {
                 var queryString = HttpContext.Current.Request.QueryString.ToDictionary();
                 var pageCache = new PageCacheModel(page, param, param2, queryString);
@@ -112,7 +114,7 @@ namespace RazorEngineCms.App_Classes
         /// <param name="param2"></param>
         public void RemovePage(string name, string section, string param = null, string param2 = null)
         {
-            if (Cache != null)
+            if (Cache != null && this.AllowCache)
             {
                 var pageToRemove = this.FindPage(name, section, param, param2);
                 this.UpdateCacheList();
