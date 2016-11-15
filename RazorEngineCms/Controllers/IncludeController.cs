@@ -54,6 +54,24 @@ namespace RazorEngineCms.Controllers
 
         [HttpPost]
         [Authorize]
+        public async Task<ActionResult> Copy(string id)
+        {
+            int parsedId = 0;
+            Include newInclude = null;
+            if (int.TryParse(id, out parsedId))
+            {
+                newInclude = await this._repository.CopyInclude(new Include { Id = parsedId }, this.Errors);
+            }
+            else
+            {
+                this.Errors.Add("Invalid id.");
+            }
+
+            return Json(new { Status = this.Errors.Count == 0, this.Errors, NewInclude = newInclude });
+        }
+
+        [HttpPost]
+        [Authorize]
         public async Task<ActionResult> Delete(string id)
         {
             int parsedId = 0;

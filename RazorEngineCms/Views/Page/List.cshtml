@@ -142,28 +142,45 @@ else // Show Page List Table
                 copiedPageId = copyResult.responseJSON.NewId;
             }
             if (copiedPageId > 0) {
-                pageListTable.DataTable().row.add([
-                                    copiedPageId,
-                                    section,
-                                    name,
-                                    _default.dateTime(),
-                                    "<a href=\"/" + section + "/" + name + "\">View</a>",
-                                    "<a href=\"/CMS/Edit/" + section + "/" + name + "\">Edit</a>",
-                                    "<a href=\"#\"" +
-                                    "data-pageid=\"" + copiedPageId + "\"" +
-                                    "data-pagename=\"" + name + "\"" +
-                                    "data-pagesection=\"" + section + "\"" +
-                                    "class=\"copy-page\">" +
-                                    "Copy</a>",
-                                    "<a href=\"#\"" +
-                                    "data-pageid=\"" + copiedPageId + "\"" +
-                                    "data-pagename=\"" + name + "\"" +
-                                    "data-pagesection=\"" + section + "\"" +
-                                    "class=\"delete-page\">" +
-                                    "Delete</a>"
-                ]);
+                pageListTable.DataTable()
+                    .row.add([
+                        copiedPageId,
+                        section,
+                        name,
+                        _default.dateTime(),
+                        "<a href=\"/" + section + "/" + name + "\">View</a>",
+                        "<a href=\"/CMS/Edit/" + section + "/" + name + "\">Edit</a>",
+                        "<a href=\"#\"" +
+                        "data-pageid=\"" +
+                        copiedPageId +
+                        "\"" +
+                        "data-pagename=\"" +
+                        name +
+                        "\"" +
+                        "data-pagesection=\"" +
+                        section +
+                        "\"" +
+                        "class=\"copy-page\">" +
+                        "Copy</a>",
+                        "<a href=\"#\"" +
+                        "data-pageid=\"" +
+                        copiedPageId +
+                        "\"" +
+                        "data-pagename=\"" +
+                        name +
+                        "\"" +
+                        "data-pagesection=\"" +
+                        section +
+                        "\"" +
+                        "class=\"delete-page\">" +
+                        "Delete</a>"
+                    ]);
                 pageListTable.DataTable().column(3).data().sort().draw();
-            } // end if copiedPageId > 0 
+            } else if (copyResult.responseJSON.Errors != null && copyResult.responseJSON.Errors.length > 0) { // end if copiedPageId > 0 
+                copyResult.responseJSON.Errors.forEach(function(error) {
+                    logger.logError(error);
+                });
+            }
         } // end if if and section are set 
 
     }

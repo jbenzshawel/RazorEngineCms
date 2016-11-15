@@ -28,6 +28,8 @@ namespace RazorEngineCms.DAL.RepositoryService
 
         Task<Page> CopyPage(Page page, ConcurrentBag<string> errors);
 
+        Task<Include> CopyInclude(Include include, ConcurrentBag<string> errors);
+
         Task DeletePage(Page page, ConcurrentBag<string> errors, bool ignoreFiles = false);
 
         Task DeleteInclude(Include include, ConcurrentBag<string> errors);

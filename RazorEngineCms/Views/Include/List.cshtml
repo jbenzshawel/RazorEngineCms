@@ -77,19 +77,18 @@ else // Show Include List Table
             }
         });
         var SESSION_KEY = "selectedInclude";
+        var includeListTable = new ListDataTable({
+            selector: "#includeListTable",
+            order: [[3, "desc"]]
+        });
         $(function () {
-            var includeListTable = new ListDataTable({
-                selector: "#includeListTable",
-                order: [[3, "desc"]]
-            });
             sessionStorage.clear();
             $("body").on("click", "#confirmDelete", function () {
                 confirmDelete();
             });
             $("a.copy-include").click(function (e) {
                 e.preventDefault();
-
-                //copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
+                copyInclude($(this).attr("data-includeid"));
             });
             $("a.delete-include").click(function (e) {
                 e.preventDefault();
@@ -125,6 +124,37 @@ else // Show Include List Table
                 }
             }
             $("#deleteModal").modal("hide");
+        }
+        // called by "a.copy-include" click event 
+        function copyInclude(id) {
+            if (id > 0 ) {
+                var copyResult = include.copy(id, "#alertMsgs");
+                var newInclude = null;
+                if (copyResult != null && copyResult.responseJSON.hasOwnProperty("NewInclude")) {
+                    newInclude = copyResult.responseJSON.NewInclude;
+                }
+                if (newInclude != null) {
+                    includeListTable.DataTable().row.add([
+                                        newInclude.Id,
+                                        newInclude.Name,
+                                        newInclude.Type,
+                                        _default.dateTime(),
+                                        "<a href=\"/CMS/Edit/" + newInclude.Id + "\">Edit</a>",
+                                        "<a href=\"#\"" +
+                                        "data-includeid=\"" + newInclude.Id + "\"" +
+                                        "class=\"copy-include\">" +
+                                        "Copy</a>",
+                                        "<a href=\"#\"" +
+                                        "data-includeid=\"" + newInclude.Id + "\"" +
+                                        "class=\"delete-include\">" +
+                                        "Delete</a>"]);
+                    includeListTable.DataTable().column(3).data().sort().draw();
+                } // end if copiedPageId > 0 
+            } else if (copyResult.responseJSON.Errors != null && copyResult.responseJSON.Errors.length > 0) { // end if copiedIncludeId > 0 
+                copyResult.responseJSON.Errors.forEach(function (error) {
+                    logger.logError(error);
+                });
+            }
         }
     </script>
 }

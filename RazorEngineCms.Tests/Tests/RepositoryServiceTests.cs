@@ -73,6 +73,25 @@ namespace RazorEngineCms.Tests
         }
 
         [TestMethod]
+        public async Task CopyIncludeTest()
+        {
+            var include = this._RepositoryService.FindInclude(1);
+            var errors = new ConcurrentBag<string>();
+            Include copiedInclude = null;
+            if (include != null)
+            {
+                copiedInclude = await this._RepositoryService.CopyInclude(include, errors);
+            }
+            else
+            {
+                errors.Add("Include not found");
+            }
+
+            this._AssertErrors(errors);
+            Assert.IsNotNull(copiedInclude, errors.FirstOrDefault());
+        }
+
+        [TestMethod]
         public async Task CopyPageTest()
         {
             var page = this._RepositoryService.FindPageInDb("Example", "Page1");
@@ -88,7 +107,7 @@ namespace RazorEngineCms.Tests
             }
 
             this._AssertErrors(errors);
-            Assert.IsNotNull(copiedPage);
+            Assert.IsNotNull(copiedPage, errors.FirstOrDefault());
         }
         #endregion
 
