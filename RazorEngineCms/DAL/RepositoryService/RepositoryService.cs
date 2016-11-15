@@ -76,6 +76,11 @@ namespace RazorEngineCms.DAL.RepositoryService
             return await this._PageRepository.Copy(page, errors);
         }
 
+        public async Task<Include> CopyInclude(Include include, ConcurrentBag<string> errors)
+        {
+            return await this._IncludeRepository.Copy(include, errors);
+        }
+
         public async Task DeletePage(Page page, ConcurrentBag<string> errors, bool ignoreFiles = false)
         {
             await this._PageRepository.Delete(page, errors, ignoreFiles);

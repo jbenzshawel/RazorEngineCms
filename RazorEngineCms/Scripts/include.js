@@ -104,7 +104,6 @@ Include.prototype.ajaxPost = function (id, msgSel, action) {
     if (id == undefined || id.length === 0) { // if empty get from Include object
         id = this.Id;
     }
-    var returnId = null;
     
     var scopedObj = this;
     var settings = {

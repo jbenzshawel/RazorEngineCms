@@ -65,11 +65,30 @@ namespace RazorEngineCms.Tests
         [TestMethod]
         public async Task DeletePageTest()
         {
-            var page = new Page { Section = "Example", Name = "Page3" };
+            var page = new Page { Id = 3, Section = "Example", Name = "Page3" };
             var errors = new ConcurrentBag<string>();
             await this._RepositoryService.DeletePage(page, errors, ignoreFiles: true);
 
             this._AssertErrors(errors);
+        }
+
+        [TestMethod]
+        public async Task CopyIncludeTest()
+        {
+            var include = this._RepositoryService.FindInclude(1);
+            var errors = new ConcurrentBag<string>();
+            Include copiedInclude = null;
+            if (include != null)
+            {
+                copiedInclude = await this._RepositoryService.CopyInclude(include, errors);
+            }
+            else
+            {
+                errors.Add("Include not found");
+            }
+
+            this._AssertErrors(errors);
+            Assert.IsNotNull(copiedInclude, errors.FirstOrDefault());
         }
 
         [TestMethod]
@@ -88,7 +107,7 @@ namespace RazorEngineCms.Tests
             }
 
             this._AssertErrors(errors);
-            Assert.IsNotNull(copiedPage);
+            Assert.IsNotNull(copiedPage, errors.FirstOrDefault());
         }
         #endregion
 

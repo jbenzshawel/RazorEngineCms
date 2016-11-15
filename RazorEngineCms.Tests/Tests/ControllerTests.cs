@@ -114,7 +114,7 @@ namespace RazorEngineCms.Tests
             Assert.IsNotNull(model);
             Assert.IsTrue(!string.IsNullOrEmpty(model.Content));
         }
-
+        
         #endregion
 
         private T _GetModel<T>(ActionResult actionResult) where T : class
@@ -132,7 +132,10 @@ namespace RazorEngineCms.Tests
                     model = viewResult.Model as T;
                 }
             }
-            catch(Exception ex) { }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.Message);
+            }
 
             return model;
         }

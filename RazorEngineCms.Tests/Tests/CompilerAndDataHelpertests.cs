@@ -112,10 +112,9 @@ namespace RazorEngineCMS.Tests
             Assert.IsNotNull(page.CompiledTemplate);
         }
 
-        // igorned since integration test and is failing
-        // on CI build 
+        
         [TestMethod]
-        [Ignore]
+        [Ignore] // igorned since integration test and is failing on CI build 
         public void TestGetData()
         {
             var dataHelper = new DataHelper();

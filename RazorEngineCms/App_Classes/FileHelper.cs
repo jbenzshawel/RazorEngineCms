@@ -57,55 +57,47 @@ namespace RazorEngineCms.App_Classes
                                                                
         }
 
+        /// <summary>
+        /// Returns a Dictionary of assemblies used in project with the Key corresponding
+        /// to the name of the assembly e. g. Newtonsoft.Json.dll and the Value equaling the
+        /// Assembly object for that Key.
+        /// If Cache available assemblied list stored in Cache as Cache["assemblyList"]
+        /// </summary>
+        /// <returns></returns>
         public static Dictionary<string, Assembly> GetAssemblyFiles()
         {
+            const string CACHE_KEY = "RazorEngineCms.App_Classes.FileHelper.AssemblyList";
             var cacheManager = new CacheManager();
-            const string assemblyListKey = "assemblyList";
 
-            Dictionary<string, Assembly> cachedAssemblies = null;
-            if (cacheManager.Cache != null)
-                cachedAssemblies = cacheManager.Get<Dictionary<string, Assembly>>(assemblyListKey);
-
-            if (cachedAssemblies != null)
-            {
-                return cachedAssemblies;
-            }
-
-            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-            Dictionary<string, Assembly> assemblies = new Dictionary<string, Assembly>();
-
+            Dictionary<string, Assembly> assemblies = cacheManager.Get<Dictionary<string, Assembly>>(CACHE_KEY); ;
+            if (assemblies != null)
+                return assemblies;
+            
+            assemblies = new Dictionary<string, Assembly>();
+            Assembly[] loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in loadedAssemblies)
             {
-
-                string pat = @"([a-zA-Z0-9-_]*\.dll)";
-                string pat2 = @"(\\)+\w+(.dll,)";
-                Regex regex = new Regex(pat, RegexOptions.IgnoreCase);
-
                 try
                 {
+                    Regex regex = new Regex(@"([a-zA-Z0-9-_]*\.dll)", RegexOptions.IgnoreCase);
                     Match matches = regex.Match(assembly.Location);
                     string assemblyName = assembly.Location;
-                    if (string.IsNullOrEmpty(matches.Value))
+                    if (matches.Success)
                     {
-                        regex = new Regex(pat2, RegexOptions.IgnoreCase);
-                        matches = regex.Match(assembly.Location);
-                    }
-                    if (!string.IsNullOrEmpty(matches.Value))
-                    {
-                       assemblyName = matches.Value;
-
-                        if (assemblyName.IndexOf("\\", StringComparison.Ordinal) > -1)
+                        if (!string.IsNullOrEmpty(matches.Value))
                         {
-                            assemblyName = assemblyName.Replace("\\", "");
-                        }
-                    }
-                    assemblies.Add(assemblyName, assembly);
+                            assemblyName = matches.Value;
 
-                }
-                catch (Exception ex)
-                {   
-                }
-            }
+                            if (assemblyName.IndexOf("\\", StringComparison.Ordinal) > -1)
+                                assemblyName = assemblyName.Replace("\\", "");
+                        } 
+                    } // end if matches.Success
+
+                    if (!string.IsNullOrEmpty(assemblyName) && !assemblies.ContainsKey(assemblyName))
+                        assemblies.Add(assemblyName, assembly);
+                } // end try
+                catch (Exception ex) {}
+            } // end foreach
 
             if (!assemblies.ContainsKey("Newtonsoft.Json.dll"))
             {
@@ -114,7 +106,7 @@ namespace RazorEngineCms.App_Classes
             }
 
             if (cacheManager.Cache != null)
-                cacheManager.Add(assemblyListKey, assemblies);
+                cacheManager.Add(CACHE_KEY, assemblies);
 
             return assemblies;
         }

@@ -172,43 +172,35 @@ Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {
         data: JSON.stringify(pageModel),
         async: false,
         success: function (data) {
-            return scopedObj.ajaxSuccessCallback(data, msgSel, action, returnId);
+            $(msgSel).empty(); // clear any previous messages
+            if (data.Status === true) {
+                var msgAction = "";
+                if (action != null && action.toLowerCase() == "copy") {
+                    msgAction = "copied";
+                    returnId = data.newId; // for copy return new id of copied page
+                } else if (action != null && action.toLowerCase() == "delete") {
+                    msgAction = "deleted";
+                }
+                var successMsg = "The page /" + scopedObj.section + "/" + scopedObj.name + " has been " + msgAction + ".";
+                if (msgSel != undefined && msgSel.length > 0) {
+                    _default.alertMsg("success", successMsg, msgSel);
+                }
+                logger.logSuccess(successMsg);
+            } else if (data.Errors.length > 0) {
+                data.Errors.forEach(function (error) {
+                    logger.logError(error);
+                });
+            }
         }
     };
-    if (settings != null && settings.data != null) {
-        if (action == "copy") {
-            $.ajax(settings);
-        } else { // if delete don't need to return new id
-            return $.ajax(settings);
-        }
-    }
-
-    return returnId;
+    return $.ajax(settings);
 };
 
-// callback function for ajax request. If message success alert message displayed 
-// else errors are logged 
-Page.prototype.ajaxSuccessCallback = function (data, msgSel, action, returnId) {
-    $(msgSel).empty(); // clear any previous messages
-    if (data.Status === true) {
-        var msgAction = "";
-        if (action != null && action.toLowerCase() == "copy") {
-            msgAction = "copied";
-            returnId = data.newId; // for copy return new id of copied page
-        } else if (action != null && action.toLowerCase() == "delete") {
-            msgAction = "deleted";
-        }
-        var successMsg = "The page /" + this.section + "/" + this.name + " has been " + msgAction + ".";
-        if (msgSel != undefined && msgSel.length > 0) {
-            _default.alertMsg("success", successMsg, msgSel);
-        }
-        logger.logSuccess(successMsg);
-    } else if (data.Errors.length > 0) {
-        data.Errors.forEach(function (error) {
-            logger.logError(error);
-        });
-    }
-};
+//// callback function for ajax request. If message success alert message displayed 
+//// else errors are logged 
+//Page.prototype.ajaxSuccessCallback = function (data, msgSel, action) {
+   
+//};
 
 // hides save template as file option if page uses url params
 Page.prototype.checkPageVariables = function () {

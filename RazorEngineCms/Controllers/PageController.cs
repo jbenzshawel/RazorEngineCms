@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
@@ -6,7 +7,6 @@ using System.Threading.Tasks;
 using RazorEngineCms.Models;
 using RazorEngineCms.App_Classes;
 using RazorEngineCms.ExtensionClasses;
-using System.Collections.Concurrent;
 using RazorEngineCms.DAL.RepositoryService;
 
 namespace RazorEngineCms.Controllers
@@ -38,18 +38,10 @@ namespace RazorEngineCms.Controllers
         public ActionResult View(string section, string name, string param = null, string param2 = null)
         {
             Page page = null; // will store the page once we find it
-            Func<Page, bool> templateNeedsCompiled = delegate(Page iPage)
-            {
-                var status = (string.IsNullOrEmpty(iPage.CompiledTemplate) &&
-                                (!string.IsNullOrEmpty(iPage.CompiledModel)) &&
-                                !string.IsNullOrEmpty(iPage.Template)) ||
-                                page.HasInclude;
-                
-                
-                return status;
-                    
-            };
-                                
+            Func<Page, bool> templateNeedsCompiled = iPage => (string.IsNullOrEmpty(iPage.CompiledTemplate) &&
+                                                               (!string.IsNullOrEmpty(iPage.CompiledModel)) &&
+                                                               !string.IsNullOrEmpty(iPage.Template)) ||
+                                                              iPage.HasInclude;
             // templage model that will be passed to the View
             var template = new PageTemplate { Content = string.Empty };
 
@@ -67,12 +59,12 @@ namespace RazorEngineCms.Controllers
             if (page == null || page.CompiledTemplate == null)
             {
                 page = this._repository.FindPage(section, name);
+                if (page.HasParams)
+                    page.CompiledTemplate = null;
             }
 
             // when page doesn't have parameters can use pre-compiled template 
-            var templateIsCompiled = page != null &&
-                                     (!string.IsNullOrEmpty(page.CompiledTemplate) || !templateNeedsCompiled(page)) &&
-                                     !page.HasParams;
+            var templateIsCompiled = page != null && !templateNeedsCompiled(page) && !page.HasParams;
             if (templateIsCompiled) 
             {
                 template.Content = page.CompiledTemplate ?? page.Template;
@@ -80,7 +72,7 @@ namespace RazorEngineCms.Controllers
             else if (page != null && (page.HasParams || templateNeedsCompiled(page)))
             {
                 // if page has url params pass them to model and compile it
-                if (page.HasParams && string.IsNullOrEmpty(page.CompiledModel))
+                if (page.HasParams || string.IsNullOrEmpty(page.CompiledModel))
                 {
                     using (var stringCompiler = new StringCompiler())
                     {

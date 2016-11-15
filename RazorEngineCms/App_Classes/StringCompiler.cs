@@ -141,25 +141,22 @@ namespace RazorEngineCms.App_Classes
                 OutputAssembly = string.Format("temp-assemly-{0}", Guid.NewGuid().ToString())
 
             };
-            Dictionary<string, Assembly> asseblies = FileHelper.GetAssemblyFiles();
-
+            Dictionary<string, Assembly> assemblies = FileHelper.GetAssemblyFiles();
             
             paramz.ReferencedAssemblies.AddRange(new string[] { "System.dll",
                                                         "System.Linq.dll",
                                                         "System.Data.dll",
                                                         "System.Xml.dll",
                                                         "System.Web.dll"});
-            if (asseblies.ContainsKey("Newtonsoft.Json.dll"))
-            {
-                string newtonSoft = asseblies["Newtonsoft.Json.dll"].Location;
-                paramz.ReferencedAssemblies.Add(newtonSoft);
-            }
-            if (asseblies.ContainsKey("PageModelClasses.dll"))
-            {
-                string razorEngineCmsPageModel = asseblies["PageModelClasses.dll"].Location;
-                paramz.ReferencedAssemblies.Add(razorEngineCmsPageModel);
-            }
 
+            string newtonSoft = typeof(Newtonsoft.Json.JsonConvert).Assembly.Location;
+            if (!string.IsNullOrEmpty(newtonSoft))      
+                paramz.ReferencedAssemblies.Add(newtonSoft);
+
+            string razorEngineCmsPageModel = typeof(UrlParameters).Assembly.Location;
+            if (!string.IsNullOrEmpty(razorEngineCmsPageModel))
+                paramz.ReferencedAssemblies.Add(razorEngineCmsPageModel);
+            
             compilerModel.CopilerParams = paramz;
             return compilerModel;
         }
