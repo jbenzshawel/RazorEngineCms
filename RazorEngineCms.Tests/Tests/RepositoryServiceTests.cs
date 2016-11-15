@@ -65,7 +65,7 @@ namespace RazorEngineCms.Tests
         [TestMethod]
         public async Task DeletePageTest()
         {
-            var page = new Page { Section = "Example", Name = "Page3" };
+            var page = new Page { Id = 3, Section = "Example", Name = "Page3" };
             var errors = new ConcurrentBag<string>();
             await this._RepositoryService.DeletePage(page, errors, ignoreFiles: true);
 
