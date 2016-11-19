@@ -7,6 +7,7 @@
 
 @section styles {
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css"/>
 }
 
 <h2>Pages</h2>
@@ -19,7 +20,7 @@
 else // Show Page List Table
 {
     <div id="alertMsgs"></div>
-    <table class="table" id="pageListTable">
+    <table class="table" id="pageListTable" style="display:none">
         <thead>
             <tr>
                 <th>Page ID</th>
@@ -64,125 +65,6 @@ else // Show Page List Table
 
 @Html.Partial("_ConfiromDeleteModal")
 @section Scripts {
-<script type="text/javascript" src="~/Scripts/page.js"></script>
-<script type="text/javascript" src="~/Scripts/ListDataTable.js"></script>
-<script type="text/javascript">
-    "use strict";
-    var page = new Page();
-    var deleteModalVue = new Vue({
-        data: {
-            type: "page",
-            modalHeader: "Delete Page?",
-            name: ""
-        }
-    });
-    var pageListTable = new ListDataTable({
-        selector: "#pageListTable",
-        order: [[3, "desc"]]
-    });
-    var SESSION_KEY = "selectedPage";
-    $(function () {
-        sessionStorage.clear();
-        $("body").on("click", "#confirmDelete", function () {
-            confirmDelete();
-        });
-        $("a.copy-page").click(function (e) {
-            e.preventDefault();
-            var pageItem = {
-                pageId: $(this).attr("data-pageid"),
-                pageName: $(this).attr("data-pagename"),
-                pageSection: $(this).attr("data-pagesection")
-            };
-            copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
-        });
-        $("a.delete-page").click(function (e) {
-            e.preventDefault();
-            var pageItem = {
-                pageId: $(this).attr("data-pageid"),
-                pageName: $(this).attr("data-pagename"),
-                pageSection: $(this).attr("data-pagesection")
-            };
-            sessionStorage.setItem(SESSION_KEY, JSON.stringify(pageItem));
-            // set tokens in vue modal and show it
-            deleteModalVue.name = " /" + pageItem.pageSection + "/" + pageItem.pageName;
-            deleteModalVue.$mount("#deleteModal");
-            Vue.nextTick(function () {
-                $("#deleteModal").modal("show");
-            });
-        });
-    }); // end document ready function
-    // called on confirmation of delete modal
-    function confirmDelete() {
-        if (SESSION_KEY != null) {
-            var storedPage = null;
-            try {
-                storedPage = JSON.parse(sessionStorage.getItem(SESSION_KEY));
-            }
-            catch (ex) {
-                console.log(ex);
-            }
-            if (storedPage != null && storedPage.hasOwnProperty("pageId")) {
-                var deleteResult = page.delete(storedPage.pageId, storedPage.pageSection, storedPage.pageName, "#alertMsgs");
-                var deleteStatus = deleteResult != null ? deleteResult.responseJSON.Status : false;
-                if (deleteStatus) {
-                    pageListTable.deleteRowWithInt(storedPage.pageId);
-                } // end if deleteStatus true
-            }
-            sessionStorage.removeItem(SESSION_KEY);
-        } // end if pageName != null
-        $("#deleteModal").modal("hide");
-            
-    }
-    // called by "a.copy-page" click event 
-    function copyPage(id, section, name) {
-        if (id > 0 && section != null && section.length > 0) {
-            var copyResult = page.copy(id, section, name, "#alertMsgs");
-            var copiedPageId = 0;
-            if (copyResult != null) {
-                copiedPageId = copyResult.responseJSON.NewId;
-            }
-            if (copiedPageId > 0) {
-                pageListTable.DataTable()
-                    .row.add([
-                        copiedPageId,
-                        section,
-                        name,
-                        _default.dateTime(),
-                        "<a href=\"/" + section + "/" + name + "\">View</a>",
-                        "<a href=\"/CMS/Edit/" + section + "/" + name + "\">Edit</a>",
-                        "<a href=\"#\"" +
-                        "data-pageid=\"" +
-                        copiedPageId +
-                        "\"" +
-                        "data-pagename=\"" +
-                        name +
-                        "\"" +
-                        "data-pagesection=\"" +
-                        section +
-                        "\"" +
-                        "class=\"copy-page\">" +
-                        "Copy</a>",
-                        "<a href=\"#\"" +
-                        "data-pageid=\"" +
-                        copiedPageId +
-                        "\"" +
-                        "data-pagename=\"" +
-                        name +
-                        "\"" +
-                        "data-pagesection=\"" +
-                        section +
-                        "\"" +
-                        "class=\"delete-page\">" +
-                        "Delete</a>"
-                    ]);
-                pageListTable.DataTable().column(3).data().sort().draw();
-            } else if (copyResult.responseJSON.Errors != null && copyResult.responseJSON.Errors.length > 0) { // end if copiedPageId > 0 
-                copyResult.responseJSON.Errors.forEach(function(error) {
-                    logger.logError(error);
-                });
-            }
-        } // end if if and section are set 
 
-    }
-</script>
+<script type="text/javascript" src="~/Scripts/views/ListPages.js"></script>
 }

@@ -8,7 +8,7 @@
 
 "use strict";
 
-var Page = function () {
+function Page() {
     this.init();
 }
 

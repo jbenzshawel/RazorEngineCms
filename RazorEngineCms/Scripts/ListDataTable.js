@@ -1,6 +1,6 @@
 ﻿/**
  * ListDataTable
- * Class for creating data tables. DataTables dependency loaded  
+ * Class for creating data tables
  * before creating class. Example: 
  * var listDataTable = new ListDataTable({
  *      selector: "#pageListTable",
@@ -8,52 +8,68 @@
  * });                          
  */
 
-// load datatables 
-$.ajax({
-    url: "//cdn.datatables.net/v/bs-3.3.6/dt-1.10.12/datatables.min.js",
-    type: "GET",
-    async: false
-});
-
 // constructor paramsObj is an object with params selector (selector of element) 
 // and order (col number order e.g [[1, "desc" ]]
 var ListDataTable = function (paramsObj) {
-    if (typeof (paramsObj) != "object" || paramsObj == null) {
-        logger.logError("Error: paramsObj cannot be null in ListDataTable.");
-        return;
-    }
-    this.selector = null, this.order = null, this.dataTable = null;
-    if (paramsObj.hasOwnProperty("selector")) {
-        this.selector = paramsObj.selector;
-    }
+    this.init(paramsObj);
+}
 
-    if (paramsObj.hasOwnProperty("order")) {
-        this.order = paramsObj.order;
-    }
+ListDataTable.prototype.init = function (paramsObj) {
+    this.selector = null, this.order = null, this.dataTable = null, this.addBootstrap = true;
+    // of object passed 
+    if (paramsObj != undefined) {
+        if (typeof (paramsObj) != "object") {
+            logger.logError("Error: paramsObj cannot be null in ListDataTable.");
+            return;
+        }
 
-    if (this.selector != undefined) {
-        this.setupDataTable();
+        if (paramsObj.hasOwnProperty("order")) {
+            this.order = paramsObj.order;
+        }
+
+        if (paramsObj.hasOwnProperty("addBootstrap")) {
+            window.listDataTable = paramsObj.addBootstrap;
+        }
+
+        if (paramsObj.hasOwnProperty("selector")) {
+            this.selector = paramsObj.selector;
+            this.setupDataTable();
+        }
     }
 }
 
+
 ListDataTable.prototype.setupDataTable = function () {
+    var scopedObj = this;
+    var dataTableCallback = function() {
+        var api = this.api();
+        // try to get display length from api context but fall back to 10 
+        var rowsPerPage = api.context[0]._iDisplayLength || 10;
+        if (api.data() != null && api.data().length < rowsPerPage + 1) {
+            $(".dataTables_paginate").hide();
+        }
+        if (scopedObj.addBootstrap) {
+            $("[name='pageListTable_length']").addClass("form-control");
+            $("[type='search']").addClass("form-control");
+        }
+        $("#pageListTable").show();
+    };
     var dataTableConfig = {
         // callback funciton that hides pagination if only one page of results 
-        "drawCallback": function() {
-            var api = this.api();
-            // try to get display length from api context but fall back to 10 
-            var rowsPerPage = api.context[0]._iDisplayLength || 10;
-            if (api.data() != null && api.data().length < rowsPerPage + 1) {
-                $(".pagination").hide();
-            }
-        }
+        "drawCallback": dataTableCallback
     };
     // add default sort order if set 
     if (typeof (this.order) === "object") {
         dataTableConfig.order = this.order;
     }
+    $(this.selector).DataTable(dataTableConfig)
+   // $.when()
+     //   .done(function() {
+       //     
+        //});
 
-    return $(this.selector).DataTable(dataTableConfig);
+
+    return $(this.selector).DataTable();
 }
 
 // @param selector (optional) string element selector 
@@ -87,7 +103,7 @@ ListDataTable.prototype.deleteRowWithInt = function (value) {
     }
 }
 
-ListDataTable.prototype.copyRowWithInt = function(value) {
+ListDataTable.prototype.copyRowWithInt = function (value) {
     var className = "copy-this-row";
     this.addClassToRowWithInt(value, className);
     var rowData = [];
@@ -103,7 +119,7 @@ ListDataTable.prototype.addClassToRowWithInt = function (value, className) {
     var $cols = $(this.selector + " td");
     if ($cols.length > 0) {
         // loop over columns until find match with value (always delete just first row found)
-        var callbackMatches = function(key) {
+        var callbackMatches = function (key) {
             var column = $cols[key];
             var matchVal = parseInt($(column).text(), 10);
             if (!isNaN(matchVal) && matchVal === parseInt(value, 10)) {
