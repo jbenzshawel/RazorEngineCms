@@ -10,60 +10,45 @@
         selector: "#pageListTable",
         order: [[3, "desc"]]
     });
-    var SESSION_KEY = "selectedPage";
     var pageObj = new Page();
     $(function () {
-        sessionStorage.clear();
         $("body").on("click", "#confirmDelete", function () {
-                    confirmDelete();
-                });
-        $("a.copy-page").click(function (e) {
-                e.preventDefault();
-                var pageItem = {
-                    pageId: $(this).attr("data-pageid"),
-                    pageName: $(this).attr("data-pagename"),
-                    pageSection: $(this).attr("data-pagesection")
-                };
-                copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
+            confirmDelete();
+        });
+        $("body").on("click", "a.copy-page", function (e) {
+            e.preventDefault();
+            var pageItem = pageObj.listItem(this);
+            copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
+        });
+        $("body").on("click", "a.delete-page", function (e) {
+            e.preventDefault();
+            var pageItem = pageObj.listItem(this);
+            pageObj.pageItem = pageItem;
+            // set tokens in vue modal and show it
+            deleteModalVue.name = " /" + pageItem.pageSection + "/" + pageItem.pageName;
+            deleteModalVue.$mount("#deleteModal");
+            Vue.nextTick(function () {
+                $("#deleteModal").modal("show");
             });
-        $("a.delete-page").click(function (e) {
-                e.preventDefault();
-                var pageItem = {
-                    pageId: $(this).attr("data-pageid"),
-                    pageName: $(this).attr("data-pagename"),
-                    pageSection: $(this).attr("data-pagesection")
-                };
-                sessionStorage.setItem(SESSION_KEY, JSON.stringify(pageItem));
-                // set tokens in vue modal and show it
-                deleteModalVue.name = " /" + pageItem.pageSection + "/" + pageItem.pageName;
-                deleteModalVue.$mount("#deleteModal");
-                Vue.nextTick(function () {
-                    $("#deleteModal").modal("show");
-                });
-            });
+       });
     }); // end document ready function
 
     // called on confirmation of delete modal
     function confirmDelete() {
-        if (SESSION_KEY != null) {
-            var storedPage = null;
-            try {
-                storedPage = JSON.parse(sessionStorage.getItem(SESSION_KEY));
-            } catch (ex) {
-                console.log(ex);
-            }
-            if (storedPage != null && storedPage.hasOwnProperty("pageId")) {
-                var deleteResult = pageObj.delete(storedPage.pageId,
-                    storedPage.pageSection,
-                    storedPage.pageName,
-                    "#alertMsgs");
-                var deleteStatus = deleteResult != null ? deleteResult.responseJSON.Status : false;
-                if (deleteStatus) {
-                    pageListTable.deleteRowWithInt(storedPage.pageId);
-                } // end if deleteStatus true
-            }
-            sessionStorage.removeItem(SESSION_KEY);
-        } // end if pageName != null
+        var storedPage = null;
+        if (pageObj.hasOwnProperty("pageItem")) {
+            storedPage = pageObj.pageItem;
+        }
+        if (storedPage != null && storedPage.hasOwnProperty("pageId")) {
+            var deleteResult = pageObj.delete(storedPage.pageId,
+                storedPage.pageSection,
+                storedPage.pageName,
+                "#alertMsgs");
+            var deleteStatus = deleteResult != null ? deleteResult.responseJSON.Status : false;
+            if (deleteStatus) {
+                pageListTable.deleteRowWithInt(storedPage.pageId);
+            } // end if deleteStatus true
+        }
         $("#deleteModal").modal("hide");
     }
 
