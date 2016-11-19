@@ -328,8 +328,10 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Scripts\app.js" />
     <Content Include="Scripts\include.js" />
     <Content Include="Scripts\ListDataTable.js" />
+    <Content Include="Scripts\main.js" />
     <Content Include="Scripts\page.js" />
     <Content Include="Scripts\vendor\bootstrap.js" />
     <Content Include="Scripts\vendor\bootstrap.min.js" />
@@ -613,6 +615,8 @@
     <Content Include="Scripts\vendor\codemirror-mode\z80\z80.js" />
     <Content Include="Scripts\vendor\codemirror.js" />
     <Content Include="Scripts\default.js" />
+    <Content Include="Scripts\vendor\dataTables.bootstrap.min.js" />
+    <Content Include="Scripts\vendor\dataTables.min.js" />
     <Content Include="Scripts\vendor\jquery-1.10.2.js" />
     <Content Include="Scripts\vendor\jquery-1.10.2.min.js" />
     <None Include="Scripts\vendor\jquery.validate-vsdoc.js" />
@@ -622,10 +626,13 @@
     <Content Include="Scripts\vendor\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\vendor\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\vendor\modernizr-2.6.2.js" />
+    <Content Include="Scripts\vendor\require.js" />
     <Content Include="Scripts\vendor\respond.js" />
     <Content Include="Scripts\vendor\respond.min.js" />
     <Content Include="Scripts\vendor\vue.js" />
     <Content Include="Scripts\vendor\_references.js" />
+    <Content Include="Scripts\views\ListIncludes.js" />
+    <Content Include="Scripts\views\ListPages.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
