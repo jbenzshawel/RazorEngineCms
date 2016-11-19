@@ -12,14 +12,6 @@ function Page() {
     this.init();
 }
 
-Page.prototype.listItem = function($sel) {
-    return {
-        pageId: $($sel).attr("data-pageid"),
-        pageName: $($sel).attr("data-pagename"),
-        pageSection: $($sel).attr("data-pagesection")
-    };
-}
-
 // initialize Page object properties 
 Page.prototype.init = function () {
     this.Id = $("#pageId").text().trim();
@@ -41,6 +33,14 @@ Page.prototype.init = function () {
     if (typeof (pageModelEditor) != "undefined") {
         this.model = pageModelEditor.getValue().trim();
     }
+}
+
+Page.prototype.listItem = function ($sel) {
+    return {
+        pageId: $($sel).attr("data-pageid"),
+        pageName: $($sel).attr("data-pagename"),
+        pageSection: $($sel).attr("data-pagesection")
+    };
 }
 
 // validates new page form inputs and returns true if valid 

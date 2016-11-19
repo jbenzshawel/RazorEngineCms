@@ -5,8 +5,8 @@
         "datatables": "/Scripts/vendor/dataTables.min",
         "Vue": "/Scripts/vendor/vue",
         "Default": "/Scripts/default",
-        "page": "/Scripts/page",
-        "include": "/Scripts/include",
+        "page": "/Scripts/models/page",
+        "include": "/Scripts/models/include",
         "listDataTable": "/Scripts/ListDataTable"
     },
     shim: {
