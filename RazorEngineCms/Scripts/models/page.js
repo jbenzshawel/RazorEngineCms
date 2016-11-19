@@ -35,6 +35,14 @@ Page.prototype.init = function () {
     }
 }
 
+Page.prototype.listItem = function ($sel) {
+    return {
+        pageId: $($sel).attr("data-pageid"),
+        pageName: $($sel).attr("data-pagename"),
+        pageSection: $($sel).attr("data-pagesection")
+    };
+}
+
 // validates new page form inputs and returns true if valid 
 Page.prototype.validate = function () {
     var isValid = true;

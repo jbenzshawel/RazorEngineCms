@@ -329,10 +329,9 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\app.js" />
-    <Content Include="Scripts\include.js" />
+    <Content Include="Scripts\models\include.js" />
     <Content Include="Scripts\ListDataTable.js" />
-    <Content Include="Scripts\main.js" />
-    <Content Include="Scripts\page.js" />
+    <Content Include="Scripts\models\page.js" />
     <Content Include="Scripts\vendor\bootstrap.js" />
     <Content Include="Scripts\vendor\bootstrap.min.js" />
     <None Include="Scripts\vendor\jquery-1.10.2.intellisense.js" />

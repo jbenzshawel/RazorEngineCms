@@ -8,24 +8,21 @@
             name: ""
         }
     });
-    var SESSION_KEY = "selectedInclude";
     var includeListTable = new ListDataTable({
         selector: "#includeListTable",
         order: [[3, "desc"]]
     });
     $(function () {
-        sessionStorage.clear();
         $("body").on("click", "#confirmDelete", function () {
             confirmDelete();
         });
-        $("a.copy-include").click(function (e) {
+        $("body").on("click", "a.copy-include", function (e) {
             e.preventDefault();
             copyInclude($(this).attr("data-includeid"));
         });
-        $("a.delete-include").click(function (e) {
+        $("body").on("click", "a.delete-include", function (e) {
             e.preventDefault();
-            var selInclude = { id: $(this).attr("data-includeid") };
-            sessionStorage.setItem(SESSION_KEY, JSON.stringify(selInclude));
+            includeObj.selInclude = { id: $(this).attr("data-includeid") };
             // set tokens in vue modal and show it
             deleteModalVue.name = $(this).attr("data-includename");
             deleteModalVue.$mount("#deleteModal");
@@ -37,24 +34,20 @@
 
     // called on confirmation of delete modal
     function confirmDelete() {
-        if (SESSION_KEY != null) {
-            var storedInclude = null;
-            try {
-                storedInclude = JSON.parse(sessionStorage.getItem(SESSION_KEY))
-            }
-            catch (ex) {
-                console.log(ex);
-            }
-            if (storedInclude != null) {
-                var response = includeObj.delete(storedInclude.id, "#alertMsgs").responseJSON;
-                if (response != null && response.Status != true && typeof (response.Errors) === "object") {
-                    response.Errors.forEach(function (err) { console.log(err); });
-                } else {
-                    $("[data-includeid=\"" + storedInclude.id + "\"]").parent().parent().remove();
-                }
-                sessionStorage.removeItem(SESSION_KEY);
+        var storedInclude = null;
+        if (includeObj.hasOwnProperty("selInclude")) {
+            storedInclude = includeObj.selInclude;
+        }
+
+        if (storedInclude != null) {
+            var response = includeObj.delete(storedInclude.id, "#alertMsgs").responseJSON;
+            if (response != null && response.Status != true && typeof (response.Errors) === "object") {
+                response.Errors.forEach(function (err) { console.log(err); });
+            } else {
+                $("[data-includeid=\"" + storedInclude.id + "\"]").parent().parent().remove();
             }
         }
+        
         $("#deleteModal").modal("hide");
     }
     // called by "a.copy-include" click event 
