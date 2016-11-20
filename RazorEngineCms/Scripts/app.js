@@ -7,7 +7,9 @@
         "Default": "/Scripts/default",
         "page": "/Scripts/models/page",
         "include": "/Scripts/models/include",
-        "listDataTable": "/Scripts/ListDataTable"
+        "listDataTable": "/Scripts/ListDataTable",
+        "codemirror": "/Scripts/vendor/codemirror",
+        "codemirror.htmlMixed": "/Scripts/vendor/codemirror-mode/htmlmixed/htmlmixed"
     },
     shim: {
         "bootstrap": { deps: ["jquery"] },

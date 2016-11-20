@@ -40,10 +40,10 @@
 </div>
 
 @section Scripts {
-<script type="text/javascript" src="~/Scripts/include.js"></script>
+<script type="text/javascript" src="~/Scripts/models/include.js"></script>
 <script type="text/javascript">
     "use strict";
-    var include = new Include();
+    var includeModel = new Include();
     // setup code mirror editors
     var includeModelEditor = CodeMirror.fromTextArea(document.getElementById("includeContent"), {
         lineNumbers: true,
@@ -52,25 +52,24 @@
         theme: "material"
     });
     $(function () {
-        if (!(include instanceof Include)) {
-            include = new Include();
+        if (!(includeModel instanceof Include)) {
+            includeModel = new Include();
         }
         $("#submitNewInclude").click(function (e) {
             e.preventDefault();
-            var newId = include.save(false); // async: false 
-            if (parseInt(newId, 10) > 0) {
-                // redirect to edit page after create
-                var redirectToEdit = function () {
-                    location.href = "/CMS/Include/Edit/" + newId;
-                };
-                setTimeout(redirectToEdit, 500);
-            } // end if newId > 0 
+            var saveCallback = function (data) {
+                var newId = data.IncludeId;
+                if (parseInt(newId, 10) > 0) {
+                    // redirect to edit page after create
+                    var redirectToEdit = function() {
+                        location.href = "/CMS/Include/Edit/" + newId;
+                    };
+                    setTimeout(redirectToEdit, 500);
+                } // end if newId > 0 
+            };
+            includeModel.save(saveCallback); 
         });
-        // clears errors after an input field has been updated 
-        var fields = ["#includeName", "#includeType", "#content"]
-        for (var i = 0, inputField; inputField = fields[i++];) {
-            _default.updateInputField(inputField);
-        }
+        
     });
 </script>
 }

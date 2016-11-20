@@ -129,34 +129,33 @@ Page.prototype.save = function () {
             $("html, body").animate({ scrollTop: 0 }, "slow");
         };
         // set params for ajax request 
-        var settings = {
+        // submit post request 
+        $.ajax({
             type: "POST",
             contentType: "application/json",
             url: "/CMS/Page/Save",
             data: JSON.stringify(pageModel),
             success: successCallback
-        };
-        // submit post request 
-        $.ajax(settings);
+        });
     } // end if valid request 
     return;
 };
 
-Page.prototype.delete = function (id, section, name, msgSel) {
+Page.prototype.delete = function (id, section, name, msgSel, callback) {
     this.Id = id,
     this.section = section;
     this.name = name;
-    return this.ajaxPost(id, section, name, msgSel, "Delete");
+    return this.ajaxPost(id, section, name, msgSel, "Delete", callback);
 };
 
-Page.prototype.copy = function (id, section, name, msgSel) {
+Page.prototype.copy = function (id, section, name, msgSel, callback) {
     this.Id = id,
     this.section = section;
     this.name = name;
-    return this.ajaxPost(id, section, name, msgSel, "Copy");
+    return this.ajaxPost(id, section, name, msgSel, "Copy", callback);
 }
 
-Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {
+Page.prototype.ajaxPost = function (id, section, name,  msgSel, action, callback) {
     if (id == undefined || id.length === 0) { // if empty get from Page object
         id = this.Id;
     }
@@ -171,37 +170,42 @@ Page.prototype.ajaxPost = function (id, section, name,  msgSel, action) {
         Section: section,
         Name: name
     };
-    var returnId = null;
+
+    // callback function shows alert message for copy or delete and calls the callback function if it is defined 
     var scopedObj = this;
-    var settings = {
+    var ajaxCallback = function(data) {
+        $(msgSel).empty(); // clear any previous messages
+        if (data.Status === true) {
+            var msgAction = "";
+            if (action != null && action.toLowerCase() == "copy") {
+                msgAction = "copied";
+            } else if (action != null && action.toLowerCase() == "delete") {
+                msgAction = "deleted";
+            }
+            var successMsg = "The page /" + scopedObj.section + "/" + scopedObj.name + " has been " + msgAction + ".";
+            if (msgSel != undefined && msgSel.length > 0) {
+                _default.alertMsg("success", successMsg, msgSel);
+            }
+            logger.logSuccess(successMsg);
+        } else if (data.Errors.length > 0) {
+            data.Errors.forEach(function(error) {
+                logger.logError(error);
+            });
+        }
+        if (typeof(callback) === "function") {
+            callback(data);
+        }
+    };
+
+    // send the ajax request 
+    return $.ajax({
         type: "POST",
         contentType: "application/json",
         url: "/CMS/Page/" + action,
         data: JSON.stringify(pageModel),
-        async: false,
-        success: function (data) {
-            $(msgSel).empty(); // clear any previous messages
-            if (data.Status === true) {
-                var msgAction = "";
-                if (action != null && action.toLowerCase() == "copy") {
-                    msgAction = "copied";
-                    returnId = data.newId; // for copy return new id of copied page
-                } else if (action != null && action.toLowerCase() == "delete") {
-                    msgAction = "deleted";
-                }
-                var successMsg = "The page /" + scopedObj.section + "/" + scopedObj.name + " has been " + msgAction + ".";
-                if (msgSel != undefined && msgSel.length > 0) {
-                    _default.alertMsg("success", successMsg, msgSel);
-                }
-                logger.logSuccess(successMsg);
-            } else if (data.Errors.length > 0) {
-                data.Errors.forEach(function (error) {
-                    logger.logError(error);
-                });
-            }
-        }
-    };
-    return $.ajax(settings);
+        async: true,
+        success: ajaxCallback
+    });
 };
 
 //// callback function for ajax request. If message success alert message displayed 
@@ -237,7 +241,9 @@ Page.prototype.checkModelStatus = function () {
             theme: "material"
         });
         window.pageModelEditor.setSize("100%", "80%");
-        window.setTimeout(("#pageModelSection").slideDown(), 250);
+        window.setTimeout(function () {
+            $("#pageModelSection").slideDown();
+        }, 250);
     } else {
         $("#pageModelSection").slideUp();
         // remove code mirror editor 
@@ -249,3 +255,11 @@ Page.prototype.checkModelStatus = function () {
         window.setTimeout(clearCodeMirror, 500); 
     }
 }
+
+Page.prototype.setFieldListeners = function() {
+    // clears errors after an input field has been updated 
+    var fields = ["#pageName", "#pageVar", "#model", "#template"]
+    fields.forEach(function(inputField) {
+        _default.updateInputField(inputField);
+    });
+};

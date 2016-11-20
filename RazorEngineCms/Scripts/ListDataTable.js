@@ -49,10 +49,10 @@ ListDataTable.prototype.setupDataTable = function () {
             $(".dataTables_paginate").hide();
         }
         if (scopedObj.addBootstrap) {
-            $("[name='pageListTable_length']").addClass("form-control");
+            $(".dataTables_length select").addClass("form-control");
             $("[type='search']").addClass("form-control");
         }
-        $("#pageListTable").show();
+        $(scopedObj.selector).show();
     };
     var dataTableConfig = {
         // callback funciton that hides pagination if only one page of results 

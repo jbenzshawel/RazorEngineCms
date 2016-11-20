@@ -84,3 +84,9 @@
 .page-route .form-group {
     padding:0 10px 0 0;
 }
+
+.dataTables_length {
+    width: 50%;
+    margin: 0;
+    float: left;
+}
