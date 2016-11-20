@@ -41,44 +41,48 @@
             storedPage = pageModel.pageItem;
         }
         if (storedPage != null && storedPage.hasOwnProperty("pageId")) {
-            var deleteResult = pageModel.delete(storedPage.pageId,
-                storedPage.pageSection,
-                storedPage.pageName,
-                "#alertMsgs");
-            var deleteStatus = deleteResult != null ? deleteResult.responseJSON.Status : false;
-            if (deleteStatus) {
-                pageListTable.deleteRowWithInt(storedPage.pageId);
-            } // end if deleteStatus true
-        }
-        $("#deleteModal").modal("hide");
+            var deleteCallback = function(data) {
+                var deleteStatus = data != null ? data.Status : false;
+                if (deleteStatus) {
+                    pageListTable.deleteRowWithInt(storedPage.pageId);
+                }
+                $("#deleteModal").modal("hide");
+            };
+            pageModel.delete(storedPage.pageId, storedPage.pageSection,
+                storedPage.pageName, "#alertMsgs", deleteCallback);
+       } 
     }
 
     // called by "a.copy-page" click event 
     function copyPage(id, section, name) {
         if (id > 0 && section != null && section.length > 0) {
-            var copyResult = pageModel.copy(id, section, name, "#alertMsgs");
-            var copiedPageId = 0;
-            if (copyResult != null) {
-                copiedPageId = copyResult.responseJSON.NewId;
-            }
-            var newRow = {};
-            newRow.view = '<a href="{{ section }}/{{ name }}">View</a>',
-            newRow.edit = '<a href="/CMS/Edit/{{ section }}/{{ name }}">Edit</a>';
-            newRow.copy = '<a href="#" data-pageid="{{ copiedPageId }}" data-pagename="{{ name }}" data-pagesection="{{ section }}" class="copy-page">Copy</a>';
-            newRow.delete = '<a href="#" data-pageid="{{ copiedPageId }}" data-pagename="{{ name }}" data-pagesection="{{ section }}" class="delete-page">Delete</a>';
-            $.each(newRow, function(key, value) {
-                newRow[key] = value.replace("{{ section }}", section).replace("{{ name }}", name)
-                                            .replace("{{ copiedPageId }}", copiedPageId);
-            });
-            if (copiedPageId > 0) {
-                pageListTable.DataTable()
-                    .row.add([copiedPageId, section, name, _default.dateTime(), newRow.view, newRow.edit, newRow.copy, newRow.delete]);
-                pageListTable.DataTable().column(3).data().sort().draw();
-            } else if (copyResult.responseJSON.Errors != null && copyResult.responseJSON.Errors.length > 0) { // end if copiedPageId > 0 
-                copyResult.responseJSON.Errors.forEach(function (error) {
-                    logger.logError(error);
+            var copyCallback = function(data) {
+                var copiedPageId = 0;
+                if (data != null) {
+                    copiedPageId = data.NewId;
+                }
+                var newRow = {};
+                newRow.view = '<a href="{{ section }}/{{ name }}">View</a>',
+                newRow.edit = '<a href="/CMS/Edit/{{ section }}/{{ name }}">Edit</a>';
+                newRow.copy = '<a href="#" data-pageid="{{ copiedPageId }}" data-pagename="{{ name }}" data-pagesection="{{ section }}" class="copy-page">Copy</a>';
+                newRow.delete = '<a href="#" data-pageid="{{ copiedPageId }}" data-pagename="{{ name }}" data-pagesection="{{ section }}" class="delete-page">Delete</a>';
+                $.each(newRow, function (key, value) {
+                    newRow[key] = value.replace("{{ section }}", section).replace("{{ name }}", name)
+                                                .replace("{{ copiedPageId }}", copiedPageId);
                 });
-            }
+                if (copiedPageId > 0) {
+                    pageListTable.DataTable()
+                        .row.add([copiedPageId, section, name, _default.dateTime(),
+                            newRow.view, newRow.edit, newRow.copy, newRow.delete]);
+                    pageListTable.DataTable().column(3).data().sort().draw();
+                } else if (data != null && data.Errors != null && data.Errors.length > 0) {
+                    data.Errors.forEach(function (error) {
+                        logger.logError(error);
+                    });
+                }
+            };
+            pageModel.copy(id, section, name, "#alertMsgs", copyCallback);
+            
         } // end if if and section are set 
     }
 });

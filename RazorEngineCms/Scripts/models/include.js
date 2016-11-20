@@ -90,36 +90,34 @@ Include.prototype.save = function (async) {
     return idReturn;
 };
 
-Include.prototype.delete = function (id, msgSel) {
+Include.prototype.delete = function (id, msgSel, callback) {
     this.Id = id;
-    return this.ajaxPost(id, msgSel, "Delete");
+    return this.ajaxPost(id, msgSel, "Delete", callback);
 };
 
-Include.prototype.copy = function (id, msgSel) {
+Include.prototype.copy = function (id, msgSel, callback) {
     this.Id = id;
-    return this.ajaxPost(id, msgSel, "Copy");
+    return this.ajaxPost(id, msgSel, "Copy", callback);
 }
 
-Include.prototype.ajaxPost = function (id, msgSel, action) {
+Include.prototype.ajaxPost = function (id, msgSel, action, callback) {
     if (id == undefined || id.length === 0) { // if empty get from Include object
         id = this.Id;
     }
     
     var scopedObj = this;
-    var settings = {
+    return $.ajax({
         type: "POST",
         contentType: "application/json",
         url: "/CMS/Include/" + action + "/" + id,
-        async: false,
+        async: true,
         success: function (data) {
+            if (typeof(callback) === "function") {
+                callback(data);
+            }
             return scopedObj.ajaxSuccessCallback(data, msgSel, action);
         }
-    };
-    if (settings != null) {
-        return $.ajax(settings);
-    }
-
-    return false;
+    });
 };
 
 // callback function for ajax request. If message success alert message displayed 
