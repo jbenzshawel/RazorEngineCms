@@ -23,7 +23,7 @@ namespace RazorEngineCms.Models
         [Required]
         public string Type { get; set; }
 
-        public DateTime Updated { get; set; }
+        public DateTime? Updated { get; set; }
 
         public static Include GetInclude(string name, string type)
         {

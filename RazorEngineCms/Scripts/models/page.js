@@ -129,15 +129,14 @@ Page.prototype.save = function () {
             $("html, body").animate({ scrollTop: 0 }, "slow");
         };
         // set params for ajax request 
-        var settings = {
+        // submit post request 
+        $.ajax({
             type: "POST",
             contentType: "application/json",
             url: "/CMS/Page/Save",
             data: JSON.stringify(pageModel),
             success: successCallback
-        };
-        // submit post request 
-        $.ajax(settings);
+        });
     } // end if valid request 
     return;
 };

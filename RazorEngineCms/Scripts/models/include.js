@@ -35,23 +35,21 @@ Include.prototype.validate = function () {
     return isValid;
 }
 // calls Include.validate() then saves Include using /Include/New post request
-Include.prototype.save = function (async) {
+Include.prototype.save = function (callback) {
     this.init();
     _default.clearErrors();
-    if (typeof (async) == "undefined") {
-        async = true;
-    }
-    var idReturn = null; // int return value of id of page saved (new id if created) 
     if (this.validate()) {
         var scopedObject = this;
         // create Include object model for post request 
         var IncludeModel = {
             Name: scopedObject.name,
             Type: scopedObject.type,
-            content: scopedObject.content,
-            Updated: scopedObject.updated
+            Content: scopedObject.content
         };
-        if (this.Id != "") {
+        if (this.updated.length > 0) {
+            IncludeModel.Updated = this.updated;
+        }
+        if (this.Id !== "") {
             IncludeModel.Id = this.Id;
         }
         // callback for successful post request
@@ -76,18 +74,20 @@ Include.prototype.save = function (async) {
                 } // end if data.Errors.length > 0 
             } // end else 
             $("html, body").animate({ scrollTop: 0 }, "slow");
+            if (typeof (callback) === "function") {
+                callback(result);
+            }
         };
-        // successCallback sets idReturn
-        $.ajax({
+        return $.ajax({
             type: "POST",
             contentType: "application/json",
             url: "/CMS/Include/Save",
             data: JSON.stringify(IncludeModel),
             success: successCallback,
-            async: async
+            async: true
         });
     } // end if valid request 
-    return idReturn;
+   
 };
 
 Include.prototype.delete = function (id, msgSel, callback) {
