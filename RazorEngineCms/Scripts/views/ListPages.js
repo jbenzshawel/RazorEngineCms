@@ -1,4 +1,5 @@
 ﻿requirejs(["jquery", "Vue", "Default", "page", "listDataTable", "datatables"], function ($, Vue, Default, page, listDataTable, datatables) {
+    "use strict";
     var deleteModalVue = new Vue({
         data: {
             type: "page",
@@ -10,20 +11,20 @@
         selector: "#pageListTable",
         order: [[3, "desc"]]
     });
-    var pageObj = new Page();
+    var pageModel = new Page();
     $(function () {
         $("body").on("click", "#confirmDelete", function () {
             confirmDelete();
         });
         $("body").on("click", "a.copy-page", function (e) {
             e.preventDefault();
-            var pageItem = pageObj.listItem(this);
+            var pageItem = pageModel.listItem(this);
             copyPage(pageItem.pageId, pageItem.pageSection, pageItem.pageName);
         });
         $("body").on("click", "a.delete-page", function (e) {
             e.preventDefault();
-            var pageItem = pageObj.listItem(this);
-            pageObj.pageItem = pageItem;
+            var pageItem = pageModel.listItem(this);
+            pageModel.pageItem = pageItem;
             // set tokens in vue modal and show it
             deleteModalVue.name = " /" + pageItem.pageSection + "/" + pageItem.pageName;
             deleteModalVue.$mount("#deleteModal");
@@ -36,11 +37,11 @@
     // called on confirmation of delete modal
     function confirmDelete() {
         var storedPage = null;
-        if (pageObj.hasOwnProperty("pageItem")) {
-            storedPage = pageObj.pageItem;
+        if (pageModel.hasOwnProperty("pageItem")) {
+            storedPage = pageModel.pageItem;
         }
         if (storedPage != null && storedPage.hasOwnProperty("pageId")) {
-            var deleteResult = pageObj.delete(storedPage.pageId,
+            var deleteResult = pageModel.delete(storedPage.pageId,
                 storedPage.pageSection,
                 storedPage.pageName,
                 "#alertMsgs");
@@ -55,7 +56,7 @@
     // called by "a.copy-page" click event 
     function copyPage(id, section, name) {
         if (id > 0 && section != null && section.length > 0) {
-            var copyResult = pageObj.copy(id, section, name, "#alertMsgs");
+            var copyResult = pageModel.copy(id, section, name, "#alertMsgs");
             var copiedPageId = 0;
             if (copyResult != null) {
                 copiedPageId = copyResult.responseJSON.NewId;

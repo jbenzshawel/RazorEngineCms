@@ -7,8 +7,6 @@
     @Styles.Render("~/Content/css")
     <link rel="stylesheet" href="/Content/simple-sidebar.css" type="text/css" />
     @Scripts.Render("~/bundles/modernizr")
-    <script type="text/javascript" src="~/Scripts/vendor/require.js"></script>
-    <script type="text/javascript" src="~/Scripts/app.js"></script>
     @RenderSection("styles", required: false)
     @{
         string controller = ViewContext.RouteData.Values["controller"].ToString();
@@ -143,7 +141,7 @@
 <!-- Scripts -->
 @Scripts.Render("~/Scripts/vendor/jquery.js")
 @Scripts.Render("~/Scripts/vendor/bootstrap.min.js")
-    @*Scripts.Render("//cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js")*@
+@Scripts.Render("~/Scripts/default.js")
 <script type="text/javascript">
     $(function() {
         $(".panel-title a")

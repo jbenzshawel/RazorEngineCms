@@ -237,7 +237,9 @@ Page.prototype.checkModelStatus = function () {
             theme: "material"
         });
         window.pageModelEditor.setSize("100%", "80%");
-        window.setTimeout(("#pageModelSection").slideDown(), 250);
+        window.setTimeout(function () {
+            $("#pageModelSection").slideDown();
+        }, 250);
     } else {
         $("#pageModelSection").slideUp();
         // remove code mirror editor 
@@ -249,3 +251,11 @@ Page.prototype.checkModelStatus = function () {
         window.setTimeout(clearCodeMirror, 500); 
     }
 }
+
+Page.prototype.setFieldListeners = function() {
+    // clears errors after an input field has been updated 
+    var fields = ["#pageName", "#pageVar", "#model", "#template"]
+    fields.forEach(function(inputField) {
+        _default.updateInputField(inputField);
+    });
+};

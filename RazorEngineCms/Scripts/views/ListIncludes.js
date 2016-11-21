@@ -1,6 +1,6 @@
 ﻿requirejs(["jquery", "Vue", "Default", "include", "listDataTable", "datatables"], function ($, Vue, Default, include, listDataTable, datatables) {
     "use strict";
-    var includeObj = new Include();
+    var includeModel = new Include();
     var deleteModalVue = new Vue({
         data: {
             type: "include",
@@ -22,7 +22,7 @@
         });
         $("body").on("click", "a.delete-include", function (e) {
             e.preventDefault();
-            includeObj.selInclude = { id: $(this).attr("data-includeid") };
+            includeModel.selInclude = { id: $(this).attr("data-includeid") };
             // set tokens in vue modal and show it
             deleteModalVue.name = $(this).attr("data-includename");
             deleteModalVue.$mount("#deleteModal");
@@ -35,12 +35,12 @@
     // called on confirmation of delete modal
     function confirmDelete() {
         var storedInclude = null;
-        if (includeObj.hasOwnProperty("selInclude")) {
-            storedInclude = includeObj.selInclude;
+        if (includeModel.hasOwnProperty("selInclude")) {
+            storedInclude = includeModel.selInclude;
         }
 
         if (storedInclude != null) {
-            var response = includeObj.delete(storedInclude.id, "#alertMsgs").responseJSON;
+            var response = includeModel.delete(storedInclude.id, "#alertMsgs").responseJSON;
             if (response != null && response.Status != true && typeof (response.Errors) === "object") {
                 response.Errors.forEach(function (err) { console.log(err); });
             } else {
@@ -52,7 +52,7 @@
     }
     // called by "a.copy-include" click event 
     function copyInclude(id) {
-        var copyResult = includeObj.copy(id, "#alertMsgs");
+        var copyResult = includeModel.copy(id, "#alertMsgs");
         if (id > 0) {
             var newInclude = null;
             if (copyResult != null && copyResult.responseJSON.hasOwnProperty("NewInclude")) {
